@@ -36,20 +36,20 @@ function AppCard({ app }: { app: App }) {
       href={app.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 border border-gray-100"
+      className="group flex flex-col items-center p-4 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100"
     >
-      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-lg mb-3 group-hover:scale-105 transition-transform">
+      <div className="w-14 h-14 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-lg mb-3 group-hover:scale-105 transition-transform">
         {app.logoUrl ? (
           <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain" />
         ) : (
           getInitials(app.name)
         )}
       </div>
-      <span className="text-sm font-medium text-gray-900 text-center line-clamp-2">
+      <span className="text-sm font-medium text-string-dark text-center line-clamp-2">
         {app.name}
       </span>
       {app.tagline && (
-        <span className="text-xs text-gray-500 text-center mt-1 line-clamp-1">
+        <span className="text-xs text-string-gray text-center mt-1 line-clamp-1">
           {app.tagline}
         </span>
       )}

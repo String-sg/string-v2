@@ -1,7 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+
+/* Brand Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Brand Colors */
+@theme {
+  --color-string-mint: #75f8cc;
+  --color-string-mint-light: #a8fae0;
+  --color-string-mint-dark: #5ce6b8;
+  --color-string-dark: #33373b;
+  --color-string-darker: #1a1d1f;
+  --color-string-gray: #6b7280;
+  --font-family-heading: 'Space Grotesk', sans-serif;
+  --font-family-body: 'Montserrat', sans-serif;
+}
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  font-family: var(--font-family-body);
+  @apply bg-white text-string-dark antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
 }
