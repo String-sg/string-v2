@@ -125,14 +125,15 @@ function Header({
 }) {
   return (
     <header className="bg-string-dark sticky top-0 z-20">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <img
           src="/logo-green.svg"
           alt="String"
           className="h-7"
         />
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop search bar */}
+          <div className="relative hidden sm:block">
             <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -148,6 +149,16 @@ function Header({
               Cmd+K
             </kbd>
           </div>
+          {/* Mobile search icon */}
+          <button
+            onClick={() => searchInputRef.current?.focus()}
+            className="sm:hidden p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
+            title="Search"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
           <button
             onClick={onToggleTheme}
             className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
@@ -163,6 +174,22 @@ function Header({
               </svg>
             )}
           </button>
+        </div>
+      </div>
+      {/* Mobile search bar - expandable below header */}
+      <div className="sm:hidden px-4 pb-3">
+        <div className="relative">
+          <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search apps..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 pl-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-string-mint bg-string-darker text-white placeholder-gray-400"
+          />
         </div>
       </div>
     </header>
@@ -200,14 +227,14 @@ function PinnedAppsRow({
         <span className={`text-sm font-semibold ${t('text-string-dark', 'text-white')}`}>Your Pinned Apps</span>
         <span className="bg-string-mint text-string-dark text-xs font-semibold px-2 py-0.5 rounded-full">{apps.length}</span>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-2">
+      <div className="flex flex-col sm:flex-row gap-3 sm:overflow-x-auto pb-2">
         {apps.map((app) => (
           <a
             key={app.id}
             href={app.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl min-w-[200px] transition-colors ${t(
+            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
               'bg-white border border-gray-200 hover:border-string-mint',
               'bg-string-surface border border-string-border hover:border-string-mint'
             )}`}
@@ -249,7 +276,7 @@ function CategorySidebar({
   t: (l: string, d: string) => string;
 }) {
   return (
-    <aside className="w-56 shrink-0">
+    <aside className="hidden md:block w-56 shrink-0">
       <div className={`text-xs font-semibold uppercase tracking-wider mb-3 ${t('text-gray-500', 'text-gray-400')}`}>Categories</div>
       <nav className="flex flex-col gap-0.5">
         <button
@@ -289,6 +316,41 @@ function CategorySidebar({
         ))}
       </nav>
     </aside>
+  );
+}
+
+function CategoryDropdown({
+  categories,
+  selectedCategory,
+  onSelect,
+  totalCount,
+  t,
+}: {
+  categories: { name: string; count: number }[];
+  selectedCategory: string | null;
+  onSelect: (cat: string | null) => void;
+  totalCount: number;
+  t: (l: string, d: string) => string;
+}) {
+  return (
+    <div className="md:hidden mb-4">
+      <select
+        value={selectedCategory || ''}
+        onChange={(e) => onSelect(e.target.value || null)}
+        className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium appearance-none cursor-pointer ${t(
+          'bg-white border border-gray-200 text-string-dark',
+          'bg-[#2a2d30] border border-[#3a3f44] text-white'
+        )}`}
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+      >
+        <option value="">All ({totalCount})</option>
+        {categories.map((cat) => (
+          <option key={cat.name} value={cat.name}>
+            {cat.name} ({cat.count})
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
@@ -442,7 +504,7 @@ function AppDetailSidebar({
     <>
       {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
@@ -648,11 +710,21 @@ export default function App() {
         onToggleTheme={toggleTheme}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-6 py-6">
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
         <GreetingSection t={t} />
         <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} t={t} />
 
+        {/* Mobile category dropdown */}
+        <CategoryDropdown
+          categories={categories.map((c) => ({ name: c, count: categoryCountMap[c] }))}
+          selectedCategory={selectedCategory}
+          onSelect={setSelectedCategory}
+          totalCount={apps.length}
+          t={t}
+        />
+
         <div className="flex gap-6">
+          {/* Desktop category sidebar */}
           <CategorySidebar
             categories={categories.map((c) => ({ name: c, count: categoryCountMap[c] }))}
             selectedCategory={selectedCategory}
