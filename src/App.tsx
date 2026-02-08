@@ -183,12 +183,10 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
 function PinnedAppsRow({
   apps,
   onUnpin,
-  onSelectApp,
   t,
 }: {
   apps: App[];
   onUnpin: (id: string) => void;
-  onSelectApp: (app: App) => void;
   t: (l: string, d: string) => string;
 }) {
   if (apps.length === 0) return null;
@@ -204,9 +202,11 @@ function PinnedAppsRow({
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2">
         {apps.map((app) => (
-          <button
+          <a
             key={app.id}
-            onClick={() => onSelectApp(app)}
+            href={app.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl min-w-[200px] transition-colors ${t(
               'bg-white border border-gray-200 hover:border-string-mint',
               'bg-string-surface border border-string-border hover:border-string-mint'
@@ -220,7 +220,7 @@ function PinnedAppsRow({
               <div className="text-xs text-string-text-secondary">{app.category}</div>
             </div>
             <div
-              onClick={(e) => { e.stopPropagation(); onUnpin(app.id); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
               className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 text-string-text-secondary cursor-pointer"
               title="Unpin"
             >
@@ -228,7 +228,7 @@ function PinnedAppsRow({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-          </button>
+          </a>
         ))}
       </div>
     </div>
@@ -650,7 +650,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto w-full px-6 py-6">
         <GreetingSection t={t} />
-        <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} onSelectApp={setSelectedApp} t={t} />
+        <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} t={t} />
 
         <div className="flex gap-6">
           <CategorySidebar
