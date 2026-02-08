@@ -1,0 +1,507 @@
+{
+  "meta": {
+    "generated_at": "2026-01-31",
+    "sources": [
+      "https://www.nls.edu.sg/quick-links/links-for-staff/",
+      "https://www.fengshanpri.moe.edu.sg/explore/for-staff/",
+      "https://www.crescent.edu.sg/quicklinks/for-teachers/",
+      "https://www.evergreensec.moe.edu.sg/our-staff/Useful-links-for-staff/",
+      "https://www.xinminsec.moe.edu.sg/resources/staff/quick-links/",
+      "https://www.dazhongpri.moe.edu.sg/about-dazhong/quick-link-staffs/",
+      "https://www.punggolsec.moe.edu.sg/staff-and-adminstration/",
+      "https://www.regentsec.moe.edu.sg/useful-links/quick-links-staff/",
+      "https://sites.google.com/moe.edu.sg/hgv-links/staff-links",
+      "https://www.eastspringpri.moe.edu.sg/for-staff/"
+    ],
+    "total_schools_analyzed": 10
+  },
+  "apps": [
+    {
+      "name": "SC Mobile",
+      "slug": "sc-mobile",
+      "url": "https://scmobile.moe.edu.sg/",
+      "description": "Mobile-first app for teachers to access essential school functions on-the-go",
+      "tagline": "School Cockpit on mobile",
+      "category": "Administration",
+      "tags": ["mobile", "attendance", "daily-ops"],
+      "is_official": true,
+      "frequency": 10,
+      "bump_rules": [
+        { "type": "time_window", "start": "06:00", "end": "07:30", "priority": 10 }
+      ]
+    },
+    {
+      "name": "Parents Gateway",
+      "slug": "parents-gateway",
+      "url": "https://pg.moe.edu.sg/",
+      "description": "Official communication channel between schools and parents",
+      "tagline": "Connect with parents",
+      "category": "Communication",
+      "tags": ["parents", "consent", "announcements"],
+      "is_official": true,
+      "frequency": 10
+    },
+    {
+      "name": "HRP",
+      "slug": "hrp",
+      "url": "https://www.hrp.gov.sg/hrp/#/",
+      "description": "Human Resource and Payroll portal for leave, claims, and HR matters",
+      "tagline": "HR & Payroll",
+      "category": "HR",
+      "tags": ["leave", "claims", "payroll"],
+      "is_official": true,
+      "frequency": 10
+    },
+    {
+      "name": "OPAL 2.0",
+      "slug": "opal",
+      "url": "https://idm.opal2.moe.edu.sg/",
+      "description": "Digital learning space for professional development",
+      "tagline": "One Portal All Learners",
+      "category": "Professional Development",
+      "tags": ["pd", "courses", "learning"],
+      "is_official": true,
+      "frequency": 10
+    },
+    {
+      "name": "School Cockpit",
+      "slug": "school-cockpit",
+      "url": "https://schoolcockpit.moe.gov.sg/",
+      "description": "Administrative portal for student data, results, and reports",
+      "tagline": "School admin portal",
+      "category": "Administration",
+      "tags": ["admin", "results", "reports"],
+      "is_official": true,
+      "frequency": 10
+    },
+    {
+      "name": "iCON",
+      "slug": "icon",
+      "url": "https://icon.moe.edu.sg/",
+      "description": "MOE email and Google Workspace apps for staff",
+      "tagline": "Email & Google Apps",
+      "category": "Communication",
+      "tags": ["email", "google", "workspace"],
+      "is_official": true,
+      "frequency": 9
+    },
+    {
+      "name": "iEXAMS",
+      "slug": "iexams",
+      "url": "https://iexams.seab.gov.sg/",
+      "description": "SEAB examination portal for exam registration and results",
+      "tagline": "Exam management",
+      "category": "Assessment",
+      "tags": ["exams", "seab", "results"],
+      "is_official": true,
+      "frequency": 8,
+      "bump_rules": [
+        { "type": "date_range", "description": "Exam periods", "priority": 8 }
+      ]
+    },
+    {
+      "name": "MOE Intranet",
+      "slug": "moe-intranet",
+      "url": "https://intranet.moe.gov.sg/",
+      "description": "Internal portal for MOE policies, circulars, and resources",
+      "tagline": "MOE internal portal",
+      "category": "Administration",
+      "tags": ["policies", "circulars", "resources"],
+      "is_official": true,
+      "frequency": 8
+    },
+    {
+      "name": "Student Learning Space (SLS)",
+      "slug": "sls",
+      "url": "https://vle.learning.moe.edu.sg/login",
+      "description": "National online learning platform with curriculum-aligned resources for all subjects",
+      "tagline": "Digital learning for students",
+      "category": "Teaching",
+      "tags": ["learning", "curriculum", "assignments"],
+      "is_official": true,
+      "frequency": 8
+    },
+    {
+      "name": "Resource Booking System",
+      "slug": "rbs",
+      "url": "https://rbs.avero-tech.com/",
+      "description": "Book school facilities and resources",
+      "tagline": "Book facilities",
+      "category": "Administration",
+      "tags": ["booking", "facilities", "resources"],
+      "is_official": false,
+      "frequency": 7
+    },
+    {
+      "name": "HR Online",
+      "slug": "hr-online",
+      "url": "https://intranet.moe.gov.sg/hronline/pages/home.aspx",
+      "description": "HR policies, procedures, and staff development information",
+      "tagline": "HR information hub",
+      "category": "HR",
+      "tags": ["hr", "policies", "staff"],
+      "is_official": true,
+      "frequency": 7
+    },
+    {
+      "name": "MIMS Portal",
+      "slug": "mims",
+      "url": "https://portal.mims.moe.gov.sg/",
+      "description": "MOE Identity Management System for account management and password reset",
+      "tagline": "Account management",
+      "category": "Administration",
+      "tags": ["identity", "password", "account"],
+      "is_official": true,
+      "frequency": 6
+    },
+    {
+      "name": "SSOE2 Service Portal",
+      "slug": "ssoe2",
+      "url": "https://ssoe2.moe.edu.sg/",
+      "description": "IT service portal for device and software support",
+      "tagline": "ICT support portal",
+      "category": "IT Support",
+      "tags": ["ict", "support", "devices"],
+      "is_official": true,
+      "frequency": 6
+    },
+    {
+      "name": "Academy of Singapore Teachers",
+      "slug": "ast",
+      "url": "https://academyofsingaporeteachers.moe.edu.sg/",
+      "description": "Professional learning community for educators",
+      "tagline": "Teacher academy",
+      "category": "Professional Development",
+      "tags": ["pd", "community", "learning"],
+      "is_official": true,
+      "frequency": 6
+    },
+    {
+      "name": "FormSG",
+      "slug": "formsg",
+      "url": "https://form.gov.sg/",
+      "description": "Government form builder for surveys and data collection",
+      "tagline": "Create forms easily",
+      "category": "Productivity",
+      "tags": ["forms", "surveys", "data"],
+      "is_official": true,
+      "frequency": 5
+    },
+    {
+      "name": "All Ears Forms",
+      "slug": "all-ears",
+      "url": "https://forms.moe.edu.sg/",
+      "description": "MOE form builder for education sector",
+      "tagline": "MOE forms",
+      "category": "Productivity",
+      "tags": ["forms", "moe"],
+      "is_official": true,
+      "frequency": 5
+    },
+    {
+      "name": "For.edu.sg",
+      "slug": "for-edu",
+      "url": "https://for.edu.sg/",
+      "description": "Education sector URL shortener",
+      "tagline": "Education short links",
+      "category": "Productivity",
+      "tags": ["links", "shortener", "education"],
+      "is_official": true,
+      "frequency": 4
+    },
+    {
+      "name": "Go.gov.sg",
+      "slug": "go-gov",
+      "url": "https://go.gov.sg/",
+      "description": "Official government URL shortener",
+      "tagline": "Short links",
+      "category": "Productivity",
+      "tags": ["links", "shortener"],
+      "is_official": true,
+      "frequency": 4
+    },
+    {
+      "name": "MOE Sports and Recreation Club",
+      "slug": "mesrc",
+      "url": "https://www.mesrc.net/",
+      "description": "Staff recreation and social activities club",
+      "tagline": "Staff recreation",
+      "category": "HR",
+      "tags": ["recreation", "social", "wellness"],
+      "is_official": true,
+      "frequency": 3
+    },
+    {
+      "name": "SEAB",
+      "slug": "seab",
+      "url": "https://www.seab.gov.sg/",
+      "description": "Singapore Examinations and Assessment Board main portal",
+      "tagline": "Exam authority",
+      "category": "Assessment",
+      "tags": ["exams", "assessment", "national"],
+      "is_official": true,
+      "frequency": 2
+    },
+    {
+      "name": "Google Classroom",
+      "slug": "google-classroom",
+      "url": "https://classroom.google.com/",
+      "description": "Google's learning management system for assignments and collaboration",
+      "tagline": "Classroom collaboration",
+      "category": "Teaching",
+      "tags": ["google", "assignments", "lms"],
+      "is_official": false,
+      "frequency": 2
+    },
+    {
+      "name": "MySkillsFuture",
+      "slug": "myskillsfuture",
+      "url": "https://www.myskillsfuture.gov.sg/content/student/en/secondary.html",
+      "description": "Career guidance and skills development portal for students",
+      "tagline": "Career planning",
+      "category": "Teaching",
+      "tags": ["careers", "guidance", "skills"],
+      "is_official": true,
+      "frequency": 2
+    },
+    {
+      "name": "Cyber Wellness Portal",
+      "slug": "cyber-wellness",
+      "url": "https://www.opal2.moe.edu.sg/csl/s/cce-2021-main-sdcd/wiki/page/view?title=Resources%20-%20Cyber%20Wellness",
+      "description": "Resources for teaching cyber wellness and digital citizenship",
+      "tagline": "Cyber wellness resources",
+      "category": "Teaching",
+      "tags": ["cyberwellness", "safety", "digital"],
+      "is_official": true,
+      "frequency": 2
+    },
+    {
+      "name": "Singapore Teaching Practice",
+      "slug": "stp",
+      "url": "https://go.gov.sg/stpwiki",
+      "description": "Wiki for Singapore Teaching Practice framework and resources",
+      "tagline": "Teaching practice guide",
+      "category": "Professional Development",
+      "tags": ["stp", "pedagogy", "framework"],
+      "is_official": true,
+      "frequency": 2
+    },
+    {
+      "name": "Haze Situation",
+      "slug": "haze",
+      "url": "https://www.haze.gov.sg/",
+      "description": "Real-time haze and air quality updates",
+      "tagline": "Air quality updates",
+      "category": "Administration",
+      "tags": ["haze", "health", "environment"],
+      "is_official": true,
+      "frequency": 2
+    },
+    {
+      "name": "Edupage",
+      "slug": "edupage",
+      "url": "https://www.edupage.org/",
+      "description": "School management system for timetabling, attendance, and communications",
+      "tagline": "School management",
+      "category": "Administration",
+      "tags": ["timetable", "management", "attendance"],
+      "is_official": false,
+      "frequency": 1
+    },
+    {
+      "name": "Civil Service College",
+      "slug": "csc",
+      "url": "https://www.cscollege.gov.sg/",
+      "description": "Training and development for public service officers",
+      "tagline": "Public service training",
+      "category": "Professional Development",
+      "tags": ["training", "courses", "public-service"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Public Service 21",
+      "slug": "ps21",
+      "url": "https://www.ps21.gov.sg/",
+      "description": "Public Service innovation and transformation initiatives",
+      "tagline": "PS innovation",
+      "category": "Professional Development",
+      "tags": ["innovation", "public-service"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Singapore Teachers' Union",
+      "slug": "stu",
+      "url": "https://www.stu.org.sg/",
+      "description": "Professional union for teachers in Singapore",
+      "tagline": "Teachers' union",
+      "category": "HR",
+      "tags": ["union", "membership", "advocacy"],
+      "is_official": false,
+      "frequency": 1
+    },
+    {
+      "name": "iMTL Portal",
+      "slug": "imtl",
+      "url": "https://imtl.moe.edu.sg/",
+      "description": "Interactive Mother Tongue Languages learning portal",
+      "tagline": "Mother Tongue resources",
+      "category": "Teaching",
+      "tags": ["mtl", "chinese", "malay", "tamil"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "ICT Connection",
+      "slug": "ict-connection",
+      "url": "https://ictconnection.moe.edu.sg/",
+      "description": "ICT resources and guides for educators",
+      "tagline": "ICT resources",
+      "category": "Teaching",
+      "tags": ["ict", "technology", "resources"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Koobits",
+      "slug": "koobits",
+      "url": "https://problemsums.koobits.com/",
+      "description": "Math problem-solving platform for students",
+      "tagline": "Math problem sums",
+      "category": "Teaching",
+      "tags": ["math", "practice", "problems"],
+      "is_official": false,
+      "frequency": 1
+    },
+    {
+      "name": "PaC@Gov",
+      "slug": "pacgov",
+      "url": "https://pacgov.agd.gov.sg/",
+      "description": "Government payment and claims portal",
+      "tagline": "Payment claims",
+      "category": "Administration",
+      "tags": ["payment", "claims", "finance"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "TRAISI",
+      "slug": "traisi",
+      "url": "https://traisi.moe.gov.sg/",
+      "description": "Training Administration System for tracking professional development",
+      "tagline": "Training records",
+      "category": "Professional Development",
+      "tags": ["training", "records", "pd"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "EPP (Exam Personal Portal)",
+      "slug": "epp",
+      "url": "https://myexamduty.seab.gov.sg/",
+      "description": "SEAB portal for exam invigilation duties",
+      "tagline": "Exam duties",
+      "category": "Assessment",
+      "tags": ["exams", "invigilation", "seab"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Singteach",
+      "slug": "singteach",
+      "url": "https://singteach.nie.edu.sg/",
+      "description": "NIE publication for education research and practice",
+      "tagline": "Education research",
+      "category": "Professional Development",
+      "tags": ["research", "nie", "articles"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Relief Roster System",
+      "slug": "relief-roster",
+      "url": "https://roster.diveanalytics.com/",
+      "description": "System for managing teacher relief and substitution",
+      "tagline": "Relief management",
+      "category": "Administration",
+      "tags": ["relief", "scheduling", "substitution"],
+      "is_official": false,
+      "frequency": 1
+    },
+    {
+      "name": "Commzgate SMS",
+      "slug": "commzgate",
+      "url": "https://portal.commzgate.com/",
+      "description": "SMS gateway for school communications",
+      "tagline": "SMS platform",
+      "category": "Communication",
+      "tags": ["sms", "messaging", "alerts"],
+      "is_official": false,
+      "frequency": 1
+    },
+    {
+      "name": "ask.gov.sg",
+      "slug": "askgov",
+      "url": "https://ask.gov.sg/",
+      "description": "Government FAQ and Q&A platform",
+      "tagline": "Government FAQ",
+      "category": "Administration",
+      "tags": ["faq", "support", "questions"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Pair",
+      "slug": "pair",
+      "url": "https://pair.gov.sg/",
+      "description": "AI-powered suite for public officers - writing, research, transcription, and data analysis",
+      "tagline": "AI for public officers",
+      "category": "Productivity",
+      "tags": ["ai", "writing", "research", "transcription"],
+      "is_official": true,
+      "frequency": 0,
+      "featured": true
+    },
+    {
+      "name": "SmartCompose",
+      "slug": "smartcompose",
+      "url": "https://smartcompose.gov.sg/",
+      "description": "AI-assisted tool for writing student remarks and reports",
+      "tagline": "Write student remarks faster",
+      "category": "Teaching",
+      "tags": ["ai", "writing", "remarks", "reports"],
+      "is_official": true,
+      "frequency": 0,
+      "featured": true,
+      "bump_rules": [
+        { "type": "date_range", "description": "Mid-quarter and end-quarter", "priority": 10 }
+      ]
+    },
+    {
+      "name": "String Bingo",
+      "slug": "bingo",
+      "url": "https://bingo.string.sg/",
+      "description": "Quick icebreaker bingo generator for classroom activities",
+      "tagline": "Classroom icebreakers",
+      "category": "Teaching",
+      "tags": ["icebreaker", "games", "classroom"],
+      "is_official": false,
+      "frequency": 0,
+      "featured": true,
+      "bump_rules": [
+        { "type": "time_window", "start": "07:30", "end": "08:30", "priority": 5 }
+      ]
+    }
+  ],
+  "categories": [
+    { "id": "administration", "name": "Administration", "icon": "settings" },
+    { "id": "teaching", "name": "Teaching", "icon": "book-open" },
+    { "id": "communication", "name": "Communication", "icon": "message-circle" },
+    { "id": "hr", "name": "HR", "icon": "users" },
+    { "id": "assessment", "name": "Assessment", "icon": "clipboard-check" },
+    { "id": "professional-development", "name": "Professional Development", "icon": "graduation-cap" },
+    { "id": "productivity", "name": "Productivity", "icon": "zap" },
+    { "id": "it-support", "name": "IT Support", "icon": "help-circle" }
+  ]
+}

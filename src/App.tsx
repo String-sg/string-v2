@@ -99,7 +99,7 @@ function CategoryFilter({
         onClick={() => onSelect(null)}
         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
           selected === null
-            ? 'bg-string-dark text-string-mint'
+            ? 'bg-string-mint text-string-dark'
             : 'bg-gray-100 text-string-gray hover:bg-gray-200'
         }`}
       >
@@ -111,7 +111,7 @@ function CategoryFilter({
           onClick={() => onSelect(cat)}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${
             selected === cat
-              ? 'bg-string-dark text-string-mint'
+              ? 'bg-string-mint text-string-dark'
               : 'bg-gray-100 text-string-gray hover:bg-gray-200'
           }`}
         >
@@ -133,11 +133,35 @@ export default function App() {
     async function fetchApps() {
       try {
         const res = await fetch('/api/apps');
+        if (!res.ok) throw new Error('API unavailable');
+        const contentType = res.headers.get('content-type');
+        if (!contentType?.includes('application/json')) throw new Error('Not JSON');
         const data = await res.json();
         setApps(data.apps || []);
         setFeatured(data.featured || null);
-      } catch (err) {
-        console.error('Failed to fetch apps:', err);
+      } catch {
+        // Fallback: load from seed data
+        try {
+          const res = await fetch('/apps-seed.json');
+          const data = await res.json();
+          const seedApps = (data.apps || []).map((a: Record<string, unknown>, i: number) => ({
+            id: String(i),
+            name: a.name,
+            slug: a.slug,
+            url: a.url,
+            logoUrl: a.logo_url || null,
+            description: a.description || null,
+            tagline: a.tagline || null,
+            category: a.category as string,
+            tags: (a.tags as string[]) || [],
+            isOfficial: a.is_official ?? true,
+            frequency: (a.frequency as number) || 0,
+            featured: (a.featured as boolean) || false,
+          }));
+          setApps(seedApps);
+        } catch (err) {
+          console.error('Failed to load apps:', err);
+        }
       } finally {
         setLoading(false);
       }
