@@ -181,7 +181,7 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
   return (
     <div className="mb-6">
       <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>{getGreeting()}</h1>
-      <p className="text-string-text-secondary text-sm mt-1">
+      <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
         Access your tools and resources. Press <kbd className={`text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-600', 'bg-string-dark text-gray-400')}`}>Cmd+K</kbd> to quick-search.
       </p>
     </div>
@@ -258,22 +258,22 @@ function CategorySidebar({
 }) {
   return (
     <aside className="w-56 shrink-0">
-      <div className="text-xs font-semibold uppercase tracking-wider text-string-text-secondary mb-3">Categories</div>
+      <div className="text-xs font-semibold uppercase tracking-wider mb-3 text-gray-500">Categories</div>
       <nav className="flex flex-col gap-0.5">
         <button
           onClick={() => onSelect(null)}
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
             selectedCategory === null
-              ? `${t('bg-string-mint/10 text-string-mint-dark', 'bg-string-surface text-string-mint')} font-medium`
-              : `${t('text-string-text-secondary hover:bg-gray-100', 'text-string-text-secondary hover:bg-string-surface-hover')} hover:text-string-text-primary`
+              ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+              : 'text-gray-700 hover:bg-gray-100/10 hover:text-string-text-primary'
           }`}
         >
           {DEFAULT_ICON}
           <span className="flex-1">All</span>
           <span className={`text-xs px-2 py-0.5 rounded-full ${
             selectedCategory === null
-              ? 'bg-string-mint/20 text-string-mint'
-              : t('bg-gray-100 text-gray-500', 'bg-string-darker text-gray-400')
+              ? 'bg-string-mint/20 text-string-mint-dark'
+              : 'bg-gray-500/10 text-gray-600'
           }`}>{totalCount}</span>
         </button>
         {categories.map((cat) => (
@@ -282,16 +282,16 @@ function CategorySidebar({
             onClick={() => onSelect(cat.name)}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
               selectedCategory === cat.name
-                ? `${t('bg-string-mint/10 text-string-mint-dark', 'bg-string-surface text-string-mint')} font-medium`
-                : `${t('text-string-text-secondary hover:bg-gray-100', 'text-string-text-secondary hover:bg-string-surface-hover')} hover:text-string-text-primary`
+                ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+                : 'text-gray-700 hover:bg-gray-100/10 hover:text-string-text-primary'
             }`}
           >
             {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
             <span className="flex-1">{cat.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full ${
               selectedCategory === cat.name
-                ? 'bg-string-mint/20 text-string-mint'
-                : t('bg-gray-100 text-gray-500', 'bg-string-darker text-gray-400')
+                ? 'bg-string-mint/20 text-string-mint-dark'
+                : 'bg-gray-500/10 text-gray-600'
             }`}>{cat.count}</span>
           </button>
         ))}
@@ -667,7 +667,6 @@ export default function App() {
             selectedCategory={selectedCategory}
             onSelect={setSelectedCategory}
             totalCount={apps.length}
-            t={t}
           />
 
           <div className="flex-1 min-w-0">
