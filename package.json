@@ -4,8 +4,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "dev:vite": "vite",
+    "dev": "vite",
+    "dev:api": "vercel dev",
     "build": "vite build",
     "preview": "vite preview",
     "db:generate": "drizzle-kit generate",
@@ -31,6 +31,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/cheerio": "^0.22.35",
     "@types/node": "^25.1.0",
     "@types/node-fetch": "^2.6.13",

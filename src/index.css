@@ -1,7 +1,37 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+
+/* Brand Colors */
+@theme {
+  --color-string-mint: #75f8cc;
+  --color-string-mint-light: #a8fae0;
+  --color-string-mint-dark: #2bb389;
+  --color-string-dark: #33373b;
+  --color-string-darker: #1a1d1f;
+  --color-string-gray: #6b7280;
+  --color-string-surface: #ffffff;
+  --color-string-surface-hover: #f3f4f6;
+  --color-string-border: #e5e7eb;
+  --color-string-text-primary: #1f2937;
+  --color-string-text-secondary: #4b5563;
+  --color-string-bg: #f9fafb;
+  --font-family-heading: 'Space Grotesk', sans-serif;
+  --font-family-body: 'Montserrat', sans-serif;
+}
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  font-family: var(--font-family-body);
+  @apply bg-string-bg text-string-text-primary antialiased;
+}
+
+/* Dark mode overrides */
+.dark body,
+body.dark {
+  @apply bg-string-darker text-[#f0f0f0];
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
 }
