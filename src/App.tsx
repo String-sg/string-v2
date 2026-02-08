@@ -61,22 +61,21 @@ function FeaturedSection({ featured }: { featured: FeaturedApp | null }) {
   if (!featured) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white mb-8">
-      <div className="flex items-center gap-2 text-blue-200 text-sm mb-2">
-        <span>⭐</span>
+    <div className="bg-string-dark rounded-2xl p-6 text-white mb-8">
+      <div className="flex items-center gap-2 text-string-mint text-sm mb-2">
         <span>Featured Today</span>
       </div>
       <h2 className="text-2xl font-bold mb-2">
         {featured.headline || featured.app.name}
       </h2>
-      <p className="text-blue-100 mb-4">
+      <p className="text-gray-300 mb-4">
         {featured.description || featured.app.description}
       </p>
       <a
         href={featured.app.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+        className="inline-flex items-center gap-2 bg-string-mint text-string-dark px-4 py-2 rounded-lg font-medium hover:bg-string-mint-light transition-colors"
       >
         Open {featured.app.name}
         <span>→</span>
@@ -100,8 +99,8 @@ function CategoryFilter({
         onClick={() => onSelect(null)}
         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
           selected === null
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            ? 'bg-string-dark text-string-mint'
+            : 'bg-gray-100 text-string-gray hover:bg-gray-200'
         }`}
       >
         All
@@ -112,8 +111,8 @@ function CategoryFilter({
           onClick={() => onSelect(cat)}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${
             selected === cat
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'bg-string-dark text-string-mint'
+              : 'bg-gray-100 text-string-gray hover:bg-gray-200'
           }`}
         >
           {cat.replace(/-/g, ' ')}
@@ -167,26 +166,24 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-string-mint"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-string-dark sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">
-            String<span className="text-blue-600">.sg</span>
-          </h1>
+          <img src="/logo-green.svg" alt="String" className="h-7" />
           <div className="relative">
             <input
               type="text"
               placeholder="Search apps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64 px-4 py-2 pl-10 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-64 px-4 py-2 pl-10 bg-string-darker rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-string-mint"
             />
             <svg
               className="absolute left-3 top-2.5 h-4 w-4 text-gray-400"
@@ -206,7 +203,7 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 flex-1">
         <FeaturedSection featured={featured} />
 
         <CategoryFilter
@@ -229,7 +226,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 mt-12 py-6 text-center text-sm text-gray-500">
+      <footer className="bg-string-dark py-6 text-center text-sm text-gray-400">
         <p>Built for educators in Singapore</p>
       </footer>
     </div>

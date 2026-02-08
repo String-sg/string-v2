@@ -19,7 +19,7 @@
 
 body {
   font-family: var(--font-family-body);
-  @apply bg-white text-string-dark antialiased;
+  @apply bg-gray-100 text-string-dark antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
