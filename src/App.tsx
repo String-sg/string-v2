@@ -116,29 +116,24 @@ function Header({
   searchInputRef,
   isDark,
   onToggleTheme,
-  t,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
   isDark: boolean;
   onToggleTheme: () => void;
-  t: (light: string, dark: string) => string;
 }) {
   return (
-    <header className={`${t('bg-white border-b border-gray-200', 'bg-string-dark')} sticky top-0 z-20`}>
+    <header className="bg-string-dark sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-string-mint flex items-center justify-center">
-            <span className="text-string-dark font-bold text-sm">S</span>
-          </div>
-          <span className={`font-semibold text-lg ${t('text-string-dark', 'text-white')}`} style={{ fontFamily: 'var(--font-family-heading)' }}>
-            String
-          </span>
-        </div>
+        <img
+          src="/logo-green.svg"
+          alt="String"
+          className="h-7"
+        />
         <div className="flex items-center gap-3">
           <div className="relative">
-            <svg className="absolute left-3 top-2.5 h-4 w-4 text-string-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -147,18 +142,15 @@ function Header({
               placeholder="Search apps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-72 px-4 py-2 pl-10 pr-16 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-string-mint ${t(
-                'bg-gray-100 text-string-text-primary placeholder-string-text-secondary',
-                'bg-string-darker text-white placeholder-gray-400'
-              )}`}
+              className="w-72 px-4 py-2 pl-10 pr-16 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-string-mint bg-string-darker text-white placeholder-gray-400"
             />
-            <kbd className={`absolute right-3 top-2 text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-500', 'bg-string-dark text-gray-400')}`}>
+            <kbd className="absolute right-3 top-2 text-xs px-1.5 py-0.5 rounded bg-string-darker text-gray-400">
               Cmd+K
             </kbd>
           </div>
           <button
             onClick={onToggleTheme}
-            className={`p-2 rounded-lg transition-colors ${t('hover:bg-gray-100 text-string-text-secondary', 'hover:bg-string-darker text-gray-400')}`}
+            className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? (
@@ -258,14 +250,14 @@ function CategorySidebar({
 }) {
   return (
     <aside className="w-56 shrink-0">
-      <div className="text-xs font-semibold uppercase tracking-wider mb-3 text-gray-500">Categories</div>
+      <div className={`text-xs font-semibold uppercase tracking-wider mb-3 ${t('text-gray-500', 'text-gray-400')}`}>Categories</div>
       <nav className="flex flex-col gap-0.5">
         <button
           onClick={() => onSelect(null)}
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
             selectedCategory === null
               ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-              : 'text-gray-700 hover:bg-gray-100/10 hover:text-string-text-primary'
+              : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 hover:text-string-text-primary`
           }`}
         >
           {DEFAULT_ICON}
@@ -273,7 +265,7 @@ function CategorySidebar({
           <span className={`text-xs px-2 py-0.5 rounded-full ${
             selectedCategory === null
               ? 'bg-string-mint/20 text-string-mint-dark'
-              : 'bg-gray-500/10 text-gray-600'
+              : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
           }`}>{totalCount}</span>
         </button>
         {categories.map((cat) => (
@@ -283,7 +275,7 @@ function CategorySidebar({
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
               selectedCategory === cat.name
                 ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-                : 'text-gray-700 hover:bg-gray-100/10 hover:text-string-text-primary'
+                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 hover:text-string-text-primary`
             }`}
           >
             {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
@@ -291,7 +283,7 @@ function CategorySidebar({
             <span className={`text-xs px-2 py-0.5 rounded-full ${
               selectedCategory === cat.name
                 ? 'bg-string-mint/20 text-string-mint-dark'
-                : 'bg-gray-500/10 text-gray-600'
+                : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
             }`}>{cat.count}</span>
           </button>
         ))}
@@ -320,7 +312,7 @@ function AppGridCard({
       onClick={() => onSelect(app)}
       className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors ${t(
         'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
-        'bg-string-surface border border-string-border hover:border-string-mint'
+        'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
       )}`}
     >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
@@ -332,7 +324,7 @@ function AppGridCard({
       </div>
       <div className="min-w-0 flex-1">
         <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
-        <div className="text-xs text-string-text-secondary line-clamp-1">{app.tagline || app.description}</div>
+        <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
       </div>
       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
@@ -412,7 +404,7 @@ function FeaturedSection({
               onClick={() => onSelectApp(app)}
               className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors flex-1 ${t(
                 'bg-white border border-gray-100 hover:border-string-mint',
-                'bg-string-surface border border-string-border hover:border-string-mint'
+                'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
               )}`}
             >
               <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
@@ -420,7 +412,7 @@ function FeaturedSection({
               </div>
               <div className="min-w-0">
                 <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
-                <div className="text-xs text-string-text-secondary line-clamp-1">{app.tagline || app.description}</div>
+                <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
                 <div className="text-xs text-string-mint mt-0.5">{app.category}</div>
               </div>
             </div>
@@ -452,7 +444,7 @@ function AppDetailSidebar({
       <aside
         className={`fixed top-0 right-0 h-full w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
-        } ${t('bg-white border-gray-200', 'bg-string-surface border-string-border')}`}
+        } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
         {app && (
           <div className="p-6">
@@ -470,7 +462,7 @@ function AppDetailSidebar({
                 {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain" /> : getInitials(app.name)}
               </div>
               <h2 className={`text-xl font-bold ${t('text-string-dark', 'text-white')}`}>{app.name}</h2>
-              <p className="text-sm text-string-text-secondary mt-2">{app.description}</p>
+              <p className={`text-sm mt-2 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.description}</p>
             </div>
 
             <div className="flex gap-2 mb-6">
@@ -513,21 +505,21 @@ function AppDetailSidebar({
             </div>
 
             <div className={`rounded-xl p-4 ${t('bg-gray-50', 'bg-string-darker')}`}>
-              <div className="text-xs font-semibold uppercase tracking-wider text-string-text-secondary mb-3">App Details</div>
+              <div className={`text-xs font-semibold uppercase tracking-wider mb-3 ${t('text-string-text-secondary', 'text-gray-400')}`}>App Details</div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-string-text-secondary">Category</span>
+                  <span className={t('text-string-text-secondary', 'text-gray-400')}>Category</span>
                   <span className={`font-medium ${t('text-string-dark', 'text-white')}`}>{app.category}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-string-text-secondary">Status</span>
+                  <span className={t('text-string-text-secondary', 'text-gray-400')}>Status</span>
                   <span className="text-string-mint flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-string-mint inline-block"></span>
                     Available
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-string-text-secondary">Access</span>
+                  <span className={t('text-string-text-secondary', 'text-gray-400')}>Access</span>
                   <span className={`font-medium ${t('text-string-dark', 'text-white')}`}>{app.isOfficial ? 'MOE Staff' : 'Open Access'}</span>
                 </div>
               </div>
@@ -654,7 +646,6 @@ export default function App() {
         searchInputRef={searchInputRef}
         isDark={isDark}
         onToggleTheme={toggleTheme}
-        t={t}
       />
 
       <main className="max-w-7xl mx-auto w-full px-6 py-6">
@@ -667,6 +658,7 @@ export default function App() {
             selectedCategory={selectedCategory}
             onSelect={setSelectedCategory}
             totalCount={apps.length}
+            t={t}
           />
 
           <div className="flex-1 min-w-0">
@@ -674,7 +666,7 @@ export default function App() {
               <h2 className={`text-lg font-semibold ${t('text-string-dark', 'text-white')}`}>
                 {selectedCategory || 'All'}
               </h2>
-              <span className="text-sm text-string-text-secondary">{sortedApps.length} apps</span>
+              <span className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>{sortedApps.length} apps</span>
             </div>
 
             {!selectedCategory && !searchQuery && (
@@ -682,7 +674,7 @@ export default function App() {
             )}
 
             {sortedApps.length === 0 ? (
-              <div className="text-center py-12 text-string-text-secondary">
+              <div className={`text-center py-12 ${t('text-string-text-secondary', 'text-gray-400')}`}>
                 No apps found matching your criteria
               </div>
             ) : (
