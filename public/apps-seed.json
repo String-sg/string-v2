@@ -56,6 +56,7 @@
       "name": "OPAL 2.0",
       "slug": "opal",
       "url": "https://idm.opal2.moe.edu.sg/",
+      "logo_url": "/icons/opal2.png",
       "description": "Digital learning space for professional development",
       "tagline": "One Portal All Learners",
       "category": "Professional Development",
@@ -268,8 +269,9 @@
       "name": "Cyber Wellness Portal",
       "slug": "cyber-wellness",
       "url": "https://www.opal2.moe.edu.sg/csl/s/cce-2021-main-sdcd/wiki/page/view?title=Resources%20-%20Cyber%20Wellness",
-      "description": "Resources for teaching cyber wellness and digital citizenship",
-      "tagline": "Cyber wellness resources",
+      "logo_url": "/icons/opal2.png",
+      "description": "Cyber wellness resources on OPAL2",
+      "tagline": "Cyber wellness resources on OPAL2",
       "category": "Teaching",
       "tags": ["cyberwellness", "safety", "digital"],
       "is_official": true,
@@ -279,8 +281,9 @@
       "name": "Singapore Teaching Practice",
       "slug": "stp",
       "url": "https://go.gov.sg/stpwiki",
-      "description": "Wiki for Singapore Teaching Practice framework and resources",
-      "tagline": "Teaching practice guide",
+      "logo_url": "/icons/opal2.png",
+      "description": "Singapore Teaching Practice framework and resources on OPAL2",
+      "tagline": "Teaching practice guide on OPAL2",
       "category": "Professional Development",
       "tags": ["stp", "pedagogy", "framework"],
       "is_official": true,
@@ -386,17 +389,6 @@
       "frequency": 1
     },
     {
-      "name": "TRAISI",
-      "slug": "traisi",
-      "url": "https://traisi.moe.gov.sg/",
-      "description": "Training Administration System for tracking professional development",
-      "tagline": "Training records",
-      "category": "Professional Development",
-      "tags": ["training", "records", "pd"],
-      "is_official": true,
-      "frequency": 1
-    },
-    {
       "name": "EPP (Exam Personal Portal)",
       "slug": "epp",
       "url": "https://myexamduty.seab.gov.sg/",
@@ -430,14 +422,25 @@
       "frequency": 1
     },
     {
-      "name": "Commzgate SMS",
-      "slug": "commzgate",
-      "url": "https://portal.commzgate.com/",
-      "description": "SMS gateway for school communications",
-      "tagline": "SMS platform",
+      "name": "Postman.gov.sg",
+      "slug": "postman-govsg",
+      "url": "https://postman.gov.sg/",
+      "description": "SMS comms (gov.sg)",
+      "tagline": "Gov SMS comms",
       "category": "Communication",
-      "tags": ["sms", "messaging", "alerts"],
-      "is_official": false,
+      "tags": ["sms", "messaging", "government"],
+      "is_official": true,
+      "frequency": 1
+    },
+    {
+      "name": "Postman Legacy",
+      "slug": "postman-legacy",
+      "url": "https://legacy.postman.gov.sg/",
+      "description": "Email comms, SMS comms (via Twilio)",
+      "tagline": "Email & SMS comms",
+      "category": "Communication",
+      "tags": ["email", "sms", "messaging", "twilio"],
+      "is_official": true,
       "frequency": 1
     },
     {
@@ -492,6 +495,17 @@
       "bump_rules": [
         { "type": "time_window", "start": "07:30", "end": "08:30", "priority": 5 }
       ]
+    },
+    {
+      "name": "LangBuddy",
+      "slug": "langbuddy",
+      "url": "https://langbuddy.moe.edu.sg/",
+      "description": "AI-powered companion for Mother Tongue learning",
+      "tagline": "AI Mother Tongue learning",
+      "category": "Teaching",
+      "tags": ["ai", "mother-tongue", "language", "learning"],
+      "is_official": true,
+      "frequency": 0
     }
   ],
   "categories": [

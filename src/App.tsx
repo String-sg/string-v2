@@ -116,23 +116,26 @@ function Header({
   searchInputRef,
   isDark,
   onToggleTheme,
+  onSearchOpen,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
   isDark: boolean;
   onToggleTheme: () => void;
+  onSearchOpen: () => void;
 }) {
   return (
     <header className="bg-string-dark sticky top-0 z-20">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <img
           src="/logo-green.svg"
           alt="String"
           className="h-7"
         />
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop search bar */}
+          <div className="relative hidden sm:block">
             <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -148,6 +151,16 @@ function Header({
               Cmd+K
             </kbd>
           </div>
+          {/* Mobile search icon */}
+          <button
+            onClick={onSearchOpen}
+            className="sm:hidden p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
+            title="Search"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
           <button
             onClick={onToggleTheme}
             className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
@@ -174,7 +187,7 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
     <div className="mb-6">
       <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>{getGreeting()}</h1>
       <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
-        Access your tools and resources. Press <kbd className={`text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-600', 'bg-string-dark text-gray-400')}`}>Cmd+K</kbd> to quick-search.
+        Access your tools and resources.<span className="hidden sm:inline"> Press <kbd className={`text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-600', 'bg-string-dark text-gray-400')}`}>Cmd+K</kbd> to quick-search.</span>
       </p>
     </div>
   );
@@ -183,12 +196,10 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
 function PinnedAppsRow({
   apps,
   onUnpin,
-  onSelectApp,
   t,
 }: {
   apps: App[];
   onUnpin: (id: string) => void;
-  onSelectApp: (app: App) => void;
   t: (l: string, d: string) => string;
 }) {
   if (apps.length === 0) return null;
@@ -202,12 +213,14 @@ function PinnedAppsRow({
         <span className={`text-sm font-semibold ${t('text-string-dark', 'text-white')}`}>Your Pinned Apps</span>
         <span className="bg-string-mint text-string-dark text-xs font-semibold px-2 py-0.5 rounded-full">{apps.length}</span>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-2">
+      <div className="flex flex-col sm:flex-row gap-3 sm:overflow-x-auto pb-2">
         {apps.map((app) => (
-          <button
+          <a
             key={app.id}
-            onClick={() => onSelectApp(app)}
-            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl min-w-[200px] transition-colors ${t(
+            href={app.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
               'bg-white border border-gray-200 hover:border-string-mint',
               'bg-string-surface border border-string-border hover:border-string-mint'
             )}`}
@@ -220,7 +233,7 @@ function PinnedAppsRow({
               <div className="text-xs text-string-text-secondary">{app.category}</div>
             </div>
             <div
-              onClick={(e) => { e.stopPropagation(); onUnpin(app.id); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
               className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 text-string-text-secondary cursor-pointer"
               title="Unpin"
             >
@@ -228,7 +241,7 @@ function PinnedAppsRow({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-          </button>
+          </a>
         ))}
       </div>
     </div>
@@ -249,7 +262,7 @@ function CategorySidebar({
   t: (l: string, d: string) => string;
 }) {
   return (
-    <aside className="w-56 shrink-0">
+    <aside className="hidden md:block w-56 shrink-0">
       <div className={`text-xs font-semibold uppercase tracking-wider mb-3 ${t('text-gray-500', 'text-gray-400')}`}>Categories</div>
       <nav className="flex flex-col gap-0.5">
         <button
@@ -292,12 +305,91 @@ function CategorySidebar({
   );
 }
 
+function CategoryDropdown({
+  categories,
+  selectedCategory,
+  onSelect,
+  totalCount,
+  t,
+}: {
+  categories: { name: string; count: number }[];
+  selectedCategory: string | null;
+  onSelect: (cat: string | null) => void;
+  totalCount: number;
+  t: (l: string, d: string) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  const selectedLabel = selectedCategory || 'All';
+  const selectedCount = selectedCategory
+    ? categories.find((c) => c.name === selectedCategory)?.count ?? 0
+    : totalCount;
+
+  return (
+    <div className="md:hidden mb-4 relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors bg-string-mint/10 text-string-mint-dark border border-string-mint/20`}
+      >
+        {CATEGORY_ICONS[selectedLabel] || DEFAULT_ICON}
+        <span className="flex-1 text-left">{selectedLabel}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-string-mint/20 text-string-mint-dark">{selectedCount}</span>
+        <svg className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className={`absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-20 shadow-lg ${t(
+          'bg-white border border-gray-200',
+          'bg-[#2a2d30] border border-[#3a3f44]'
+        )}`}>
+          <button
+            onClick={() => { onSelect(null); setOpen(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
+              selectedCategory === null
+                ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+            }`}
+          >
+            {DEFAULT_ICON}
+            <span className="flex-1">All</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${
+              selectedCategory === null
+                ? 'bg-string-mint/20 text-string-mint-dark'
+                : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
+            }`}>{totalCount}</span>
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              onClick={() => { onSelect(cat.name); setOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
+                selectedCategory === cat.name
+                  ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+                  : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+              }`}
+            >
+              {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
+              <span className="flex-1">{cat.name}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                selectedCategory === cat.name
+                  ? 'bg-string-mint/20 text-string-mint-dark'
+                  : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
+              }`}>{cat.count}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AppGridCard({
   app,
   isPinned,
   onPin,
   onUnpin,
   onSelect,
+  showCategory,
   t,
 }: {
   app: App;
@@ -305,6 +397,7 @@ function AppGridCard({
   onPin: (id: string) => void;
   onUnpin: (id: string) => void;
   onSelect: (app: App) => void;
+  showCategory: boolean;
   t: (l: string, d: string) => string;
 }) {
   return (
@@ -317,7 +410,7 @@ function AppGridCard({
     >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {app.logoUrl ? (
-          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain" />
+          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-[15px]" />
         ) : (
           getInitials(app.name)
         )}
@@ -325,6 +418,9 @@ function AppGridCard({
       <div className="min-w-0 flex-1">
         <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
         <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
+        {showCategory && (
+          <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
+        )}
       </div>
       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
@@ -413,13 +509,187 @@ function FeaturedSection({
               <div className="min-w-0">
                 <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
                 <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
-                <div className="text-xs text-string-mint mt-0.5">{app.category}</div>
+                <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
     </div>
+  );
+}
+
+function SearchModal({
+  open,
+  onClose,
+  apps,
+  pinnedApps,
+  recentApps,
+  onOpenApp,
+  t,
+}: {
+  open: boolean;
+  onClose: () => void;
+  apps: App[];
+  pinnedApps: App[];
+  recentApps: App[];
+  onOpenApp: (app: App) => void;
+  t: (l: string, d: string) => string;
+}) {
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setQuery('');
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [open]);
+
+  if (!open) return null;
+
+  const filtered = query
+    ? apps.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query.toLowerCase()) ||
+          a.category.toLowerCase().includes(query.toLowerCase()) ||
+          a.tagline?.toLowerCase().includes(query.toLowerCase())
+      )
+    : [];
+
+  const handleSelect = (app: App) => {
+    onOpenApp(app);
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && filtered.length > 0) {
+      handleSelect(filtered[0]);
+    }
+  };
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
+      <div className="fixed inset-x-0 top-0 z-50 flex justify-center pt-[15vh] px-4">
+        <div className={`w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl ${t('bg-white', 'bg-[#1e2124]')}`}>
+          <div className={`flex items-center gap-3 px-4 py-3 border-b ${t('border-gray-200', 'border-[#3a3f44]')}`}>
+            <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search apps, categories..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={`flex-1 bg-transparent text-sm outline-none placeholder-gray-400 ${t('text-string-dark', 'text-white')}`}
+            />
+            <button onClick={onClose} className={`p-1 rounded-lg transition-colors ${t('hover:bg-gray-100 text-gray-400', 'hover:bg-[#2a2d30] text-gray-500')}`}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="max-h-[50vh] overflow-y-auto py-2">
+            {query ? (
+              filtered.length === 0 ? (
+                <div className={`px-4 py-8 text-center text-sm ${t('text-gray-400', 'text-gray-500')}`}>
+                  No apps found
+                </div>
+              ) : (
+                filtered.slice(0, 8).map((app) => (
+                  <button
+                    key={app.id}
+                    onClick={() => handleSelect(app)}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${t(
+                      'hover:bg-gray-50',
+                      'hover:bg-[#2a2d30]'
+                    )}`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
+                      {getInitials(app.name)}
+                    </div>
+                    <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
+                  </button>
+                ))
+              )
+            ) : (
+              <>
+                {pinnedApps.length > 0 && (
+                  <div>
+                    <div className={`flex items-center gap-2 px-4 py-2 text-xs font-medium ${t('text-gray-400', 'text-gray-500')}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                      </svg>
+                      Pinned
+                    </div>
+                    {pinnedApps.map((app) => (
+                      <button
+                        key={app.id}
+                        onClick={() => handleSelect(app)}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${t(
+                          'hover:bg-gray-50',
+                          'hover:bg-[#2a2d30]'
+                        )}`}
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
+                          {getInitials(app.name)}
+                        </div>
+                        <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {recentApps.length > 0 && (
+                  <div>
+                    <div className={`flex items-center gap-2 px-4 py-2 text-xs font-medium ${t('text-gray-400', 'text-gray-500')}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Recent
+                    </div>
+                    {recentApps.map((app) => (
+                      <button
+                        key={app.id}
+                        onClick={() => handleSelect(app)}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${t(
+                          'hover:bg-gray-50',
+                          'hover:bg-[#2a2d30]'
+                        )}`}
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
+                          {getInitials(app.name)}
+                        </div>
+                        <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {pinnedApps.length === 0 && recentApps.length === 0 && (
+                  <div className={`px-4 py-8 text-center text-sm ${t('text-gray-400', 'text-gray-500')}`}>
+                    Type to search apps
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className={`flex items-center gap-4 px-4 py-2.5 border-t text-xs ${t('border-gray-200 text-gray-400', 'border-[#3a3f44] text-gray-500')}`}>
+            <span className="flex items-center gap-1">
+              <kbd className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${t('bg-gray-100 text-gray-500', 'bg-[#2a2d30] text-gray-400')}`}>Esc</kbd>
+              close
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${t('bg-gray-100 text-gray-500', 'bg-[#2a2d30] text-gray-400')}`}>Enter</kbd>
+              open
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -442,7 +712,7 @@ function AppDetailSidebar({
     <>
       {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
@@ -459,7 +729,7 @@ function AppDetailSidebar({
 
             <div className="flex flex-col items-center text-center mb-6">
               <div className="w-16 h-16 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint font-bold text-2xl mb-3">
-                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain" /> : getInitials(app.name)}
+                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain rounded-[15px]" /> : getInitials(app.name)}
               </div>
               <h2 className={`text-xl font-bold ${t('text-string-dark', 'text-white')}`}>{app.name}</h2>
               <p className={`text-sm mt-2 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.description}</p>
@@ -539,6 +809,15 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [recentAppIds, setRecentAppIds] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('string-recent-apps');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem('string-pinned-apps');
@@ -555,18 +834,30 @@ export default function App() {
   }, [pinnedIds]);
 
   useEffect(() => {
+    localStorage.setItem('string-recent-apps', JSON.stringify(recentAppIds));
+  }, [recentAppIds]);
+
+  const addRecentApp = (id: string) => {
+    setRecentAppIds((prev) => [id, ...prev.filter((p) => p !== id)].slice(0, 10));
+  };
+
+  useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        setSearchModalOpen(true);
       }
       if (e.key === 'Escape') {
-        setSelectedApp(null);
+        if (searchModalOpen) {
+          setSearchModalOpen(false);
+        } else {
+          setSelectedApp(null);
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [searchModalOpen]);
 
   useEffect(() => {
     async function fetchApps() {
@@ -646,13 +937,37 @@ export default function App() {
         searchInputRef={searchInputRef}
         isDark={isDark}
         onToggleTheme={toggleTheme}
+        onSearchOpen={() => setSearchModalOpen(true)}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-6 py-6">
+      <SearchModal
+        open={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        apps={apps}
+        pinnedApps={pinnedApps}
+        recentApps={apps.filter((a) => recentAppIds.includes(a.id))}
+        onOpenApp={(app) => {
+          addRecentApp(app.id);
+          window.open(app.url, '_blank');
+        }}
+        t={t}
+      />
+
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
         <GreetingSection t={t} />
-        <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} onSelectApp={setSelectedApp} t={t} />
+        <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} t={t} />
+
+        {/* Mobile category dropdown */}
+        <CategoryDropdown
+          categories={categories.map((c) => ({ name: c, count: categoryCountMap[c] }))}
+          selectedCategory={selectedCategory}
+          onSelect={setSelectedCategory}
+          totalCount={apps.length}
+          t={t}
+        />
 
         <div className="flex gap-6">
+          {/* Desktop category sidebar */}
           <CategorySidebar
             categories={categories.map((c) => ({ name: c, count: categoryCountMap[c] }))}
             selectedCategory={selectedCategory}
@@ -687,6 +1002,7 @@ export default function App() {
                     onPin={handlePin}
                     onUnpin={handleUnpin}
                     onSelect={setSelectedApp}
+                    showCategory={!selectedCategory}
                     t={t}
                   />
                 ))}
