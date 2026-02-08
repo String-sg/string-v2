@@ -332,24 +332,67 @@ function CategoryDropdown({
   totalCount: number;
   t: (l: string, d: string) => string;
 }) {
+  const [open, setOpen] = useState(false);
+  const selectedLabel = selectedCategory || 'All';
+  const selectedCount = selectedCategory
+    ? categories.find((c) => c.name === selectedCategory)?.count ?? 0
+    : totalCount;
+
   return (
-    <div className="md:hidden mb-4">
-      <select
-        value={selectedCategory || ''}
-        onChange={(e) => onSelect(e.target.value || null)}
-        className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium appearance-none cursor-pointer ${t(
-          'bg-white border border-gray-200 text-string-dark',
-          'bg-[#2a2d30] border border-[#3a3f44] text-white'
-        )}`}
-        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+    <div className="md:hidden mb-4 relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors bg-string-mint/10 text-string-mint-dark border border-string-mint/20`}
       >
-        <option value="">All ({totalCount})</option>
-        {categories.map((cat) => (
-          <option key={cat.name} value={cat.name}>
-            {cat.name} ({cat.count})
-          </option>
-        ))}
-      </select>
+        {CATEGORY_ICONS[selectedLabel] || DEFAULT_ICON}
+        <span className="flex-1 text-left">{selectedLabel}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-string-mint/20 text-string-mint-dark">{selectedCount}</span>
+        <svg className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className={`absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-20 shadow-lg ${t(
+          'bg-white border border-gray-200',
+          'bg-[#2a2d30] border border-[#3a3f44]'
+        )}`}>
+          <button
+            onClick={() => { onSelect(null); setOpen(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
+              selectedCategory === null
+                ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+            }`}
+          >
+            {DEFAULT_ICON}
+            <span className="flex-1">All</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${
+              selectedCategory === null
+                ? 'bg-string-mint/20 text-string-mint-dark'
+                : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
+            }`}>{totalCount}</span>
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              onClick={() => { onSelect(cat.name); setOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
+                selectedCategory === cat.name
+                  ? 'bg-string-mint/10 text-string-mint-dark font-medium'
+                  : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+              }`}
+            >
+              {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
+              <span className="flex-1">{cat.name}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                selectedCategory === cat.name
+                  ? 'bg-string-mint/20 text-string-mint-dark'
+                  : t('bg-gray-500/10 text-gray-600', 'bg-gray-500/20 text-gray-400')
+              }`}>{cat.count}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
