@@ -1,32 +1,64 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]';
-import { db } from '../src/db';
-import { appSubmissions, users } from '../src/db/schema';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { appSubmissions } from '../src/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
-export default async function handler(req: NextRequest) {
-  if (req.method === 'POST') {
-    const session = await getServerSession(authOptions);
+// Edge runtime configuration
+export const config = {
+  runtime: 'edge',
+};
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
 
-    try {
-      const body = await req.json();
-      const { name, url, description, logoUrl, category } = body;
+export default async function handler(request: Request) {
+  // Set CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  // Handle preflight OPTIONS request
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: corsHeaders,
+    });
+  }
+
+  try {
+    const sqlClient = neon(connectionString);
+    const db = drizzle(sqlClient);
+
+    if (request.method === 'POST') {
+      const body = await request.json();
+      const { name, url, description, logoUrl, category, submittedByUserId, submittedByEmail } = body;
 
       // Validate required fields
-      if (!name || !url) {
-        return NextResponse.json({ error: 'Name and URL are required' }, { status: 400 });
+      if (!name || !url || !submittedByUserId || !submittedByEmail) {
+        return new Response(
+          JSON.stringify({ error: 'Name, URL, submittedByUserId, and submittedByEmail are required' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       // Validate URL format
       try {
         new URL(url);
       } catch {
-        return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+        return new Response(
+          JSON.stringify({ error: 'Invalid URL format' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       await db.insert(appSubmissions).values({
@@ -35,38 +67,67 @@ export default async function handler(req: NextRequest) {
         description,
         logoUrl,
         category,
-        submittedByUserId: session.user.id,
-        submittedByEmail: session.user.email,
+        submittedByUserId,
+        submittedByEmail,
         status: 'pending'
       });
 
-      return NextResponse.json({ success: true, message: 'App submitted for review' });
-    } catch (error) {
-      console.error('Submission error:', error);
-      return NextResponse.json({ error: 'Failed to submit app' }, { status: 500 });
-    }
-  }
 
-  if (req.method === 'GET') {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return new Response(
+        JSON.stringify({ success: true, message: 'App submitted for review' }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    try {
+    if (request.method === 'GET') {
+      const url = new URL(request.url);
+      const userId = url.searchParams.get('userId');
+
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: 'Missing userId parameter' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
       // Users can only see their own submissions
       const submissions = await db
         .select()
         .from(appSubmissions)
-        .where(eq(appSubmissions.submittedByUserId, session.user.id))
+        .where(eq(appSubmissions.submittedByUserId, userId))
         .orderBy(desc(appSubmissions.submittedAt));
 
-      return NextResponse.json({ submissions });
-    } catch (error) {
-      return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
-    }
-  }
 
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+      return new Response(
+        JSON.stringify({ submissions }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Database error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  }
 }

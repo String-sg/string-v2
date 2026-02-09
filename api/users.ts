@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { userPreferences } from '../src/db/schema';
+import { users } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
 
 // Edge runtime configuration
@@ -33,17 +33,13 @@ export default async function handler(request: Request) {
     const sqlClient = neon(connectionString);
     const db = drizzle(sqlClient);
 
-    // Simple auth check - get user ID from request headers or body
-    // For now, we'll get userId from the request body/query params
-    // TODO: Implement proper JWT/session validation
+    if (request.method === 'POST') {
+      const body = await request.json();
+      const { id, email, name, image, provider = 'google' } = body;
 
-    if (request.method === 'GET') {
-      const url = new URL(request.url);
-      const userId = url.searchParams.get('userId');
-
-      if (!userId) {
+      if (!id || !email) {
         return new Response(
-          JSON.stringify({ error: 'Missing userId parameter' }),
+          JSON.stringify({ error: 'Missing required fields: id, email' }),
           {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -51,19 +47,50 @@ export default async function handler(request: Request) {
         );
       }
 
-      const prefs = await db
+      // Check if user already exists
+      const existingUser = await db
         .select()
-        .from(userPreferences)
-        .where(eq(userPreferences.userId, userId))
+        .from(users)
+        .where(eq(users.id, id))
         .limit(1);
+
+      let user;
+
+      if (existingUser.length === 0) {
+        // Create new user
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            id,
+            email,
+            name: name || null,
+            avatarUrl: image || null,
+            provider,
+            lastLogin: new Date(),
+          })
+          .returning();
+
+        user = newUser;
+        console.log('Created new user:', user.email);
+      } else {
+        // Update existing user's last login
+        const [updatedUser] = await db
+          .update(users)
+          .set({
+            lastLogin: new Date(),
+            name: name || existingUser[0].name,
+            avatarUrl: image || existingUser[0].avatarUrl,
+          })
+          .where(eq(users.id, id))
+          .returning();
+
+        user = updatedUser;
+        console.log('Updated user login:', user.email);
+      }
 
 
       return new Response(
-        JSON.stringify({
-          pinnedApps: prefs[0]?.pinnedApps || [],
-          hiddenApps: prefs[0]?.hiddenApps || [],
-          appArrangement: prefs[0]?.appArrangement || []
-        }),
+        JSON.stringify({ user, success: true }),
         {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -71,13 +98,14 @@ export default async function handler(request: Request) {
       );
     }
 
-    if (request.method === 'PUT') {
-      const body = await request.json();
-      const { userId, pinnedApps, hiddenApps, appArrangement } = body;
+    // GET method - retrieve user by ID
+    if (request.method === 'GET') {
+      const url = new URL(request.url);
+      const userId = url.searchParams.get('id');
 
       if (!userId) {
         return new Response(
-          JSON.stringify({ error: 'Missing userId' }),
+          JSON.stringify({ error: 'Missing user ID' }),
           {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -85,40 +113,25 @@ export default async function handler(request: Request) {
         );
       }
 
-      // Check if user preferences exist
-      const existingPrefs = await db
+      const user = await db
         .select()
-        .from(userPreferences)
-        .where(eq(userPreferences.userId, userId))
+        .from(users)
+        .where(eq(users.id, userId))
         .limit(1);
 
-      if (existingPrefs.length === 0) {
-        // Create new preferences
-        await db
-          .insert(userPreferences)
-          .values({
-            userId,
-            pinnedApps: pinnedApps || [],
-            hiddenApps: hiddenApps || [],
-            appArrangement: appArrangement || [],
-            updatedAt: new Date()
-          });
-      } else {
-        // Update existing preferences
-        await db
-          .update(userPreferences)
-          .set({
-            pinnedApps: pinnedApps || existingPrefs[0].pinnedApps,
-            hiddenApps: hiddenApps || existingPrefs[0].hiddenApps,
-            appArrangement: appArrangement || existingPrefs[0].appArrangement,
-            updatedAt: new Date()
-          })
-          .where(eq(userPreferences.userId, userId));
+
+      if (user.length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'User not found' }),
+          {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
 
-
       return new Response(
-        JSON.stringify({ success: true }),
+        JSON.stringify({ user: user[0] }),
         {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

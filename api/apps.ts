@@ -1,7 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { apps, featuredApps, bumpRules } from '../src/db/schema';
-import { eq, desc, and, gte, lte, sql } from 'drizzle-orm';
+import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
 export const config = {
   runtime: 'edge',
