@@ -30,8 +30,8 @@ export default async function handler(request: Request) {
   }
 
   try {
-    const client = postgres(connectionString);
-    const db = drizzle(client);
+    const sqlClient = neon(connectionString);
+    const db = drizzle(sqlClient);
 
     // Simple auth check - get user ID from request headers or body
     // For now, we'll get userId from the request body/query params
@@ -57,7 +57,6 @@ export default async function handler(request: Request) {
         .where(eq(userPreferences.userId, userId))
         .limit(1);
 
-      await client.end();
 
       return new Response(
         JSON.stringify({
@@ -117,7 +116,6 @@ export default async function handler(request: Request) {
           .where(eq(userPreferences.userId, userId));
       }
 
-      await client.end();
 
       return new Response(
         JSON.stringify({ success: true }),
