@@ -61,6 +61,7 @@ export const users = pgTable('users', {
   name: text('name'),
   avatarUrl: text('avatar_url'),
   provider: text('provider'), // 'google' | 'magic_link'
+  role: text('role').default('user').notNull(), // 'user' | 'admin' | 'moderator'
   createdAt: timestamp('created_at').defaultNow().notNull(),
   lastLogin: timestamp('last_login'),
 });
