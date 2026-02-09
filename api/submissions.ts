@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from './auth/[...nextauth]';
 import { db } from '../src/db';
 import { appSubmissions, users } from '../src/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 export default async function handler(req: NextRequest) {
   if (req.method === 'POST') {
