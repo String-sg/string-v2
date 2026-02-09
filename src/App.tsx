@@ -969,12 +969,6 @@ export default function App() {
           />
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-lg font-semibold ${t('text-string-dark', 'text-white')}`}>
-                {selectedCategory || 'All'}
-              </h2>
-              <span className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>{sortedApps.length} apps</span>
-            </div>
 
             {!selectedCategory && !searchQuery && (
               <FeaturedSection featuredApps={featuredApps} onSelectApp={setSelectedApp} t={t} />
