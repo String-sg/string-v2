@@ -88,7 +88,6 @@ export default async function handler(request: Request) {
         console.log('Updated user login:', user.email);
       }
 
-      await client.end();
 
       return new Response(
         JSON.stringify({ user, success: true }),
@@ -120,7 +119,6 @@ export default async function handler(request: Request) {
         .where(eq(users.id, userId))
         .limit(1);
 
-      await client.end();
 
       if (user.length === 0) {
         return new Response(
