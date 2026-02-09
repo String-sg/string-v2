@@ -24,7 +24,13 @@ export function usePreferences() {
       // Load from localStorage for guests
       const saved = localStorage.getItem('string-preferences');
       if (saved) {
-        setPreferences(JSON.parse(saved));
+        try {
+          const parsed = JSON.parse(saved);
+          setPreferences(parsed);
+        } catch (error) {
+          console.error('Failed to parse guest preferences from localStorage, clearing corrupted value.', error);
+          localStorage.removeItem('string-preferences');
+        }
       }
     }
   }, [isAuthenticated]);

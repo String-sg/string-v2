@@ -1,66 +1,148 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]';
-import { db } from '../src/db';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { userPreferences } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
 
-export default async function handler(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+// Edge runtime configuration
+export const config = {
+  runtime: 'edge',
+};
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+export default async function handler(request: Request) {
+  // Set CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  // Handle preflight OPTIONS request
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: corsHeaders,
+    });
   }
 
-  const userId = session.user.id;
+  try {
+    const client = postgres(connectionString);
+    const db = drizzle(client);
 
-  if (req.method === 'GET') {
-    try {
+    // Simple auth check - get user ID from request headers or body
+    // For now, we'll get userId from the request body/query params
+    // TODO: Implement proper JWT/session validation
+
+    if (request.method === 'GET') {
+      const url = new URL(request.url);
+      const userId = url.searchParams.get('userId');
+
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: 'Missing userId parameter' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
       const prefs = await db
         .select()
         .from(userPreferences)
         .where(eq(userPreferences.userId, userId))
         .limit(1);
 
-      return NextResponse.json({
-        pinnedApps: prefs[0]?.pinnedApps || [],
-        hiddenApps: prefs[0]?.hiddenApps || [],
-        appArrangement: prefs[0]?.appArrangement || []
-      });
-    } catch (error) {
-      return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
+      await client.end();
+
+      return new Response(
+        JSON.stringify({
+          pinnedApps: prefs[0]?.pinnedApps || [],
+          hiddenApps: prefs[0]?.hiddenApps || [],
+          appArrangement: prefs[0]?.appArrangement || []
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
-  }
 
-  if (req.method === 'PUT') {
-    try {
-      const body = await req.json();
-      const { pinnedApps, hiddenApps, appArrangement } = body;
+    if (request.method === 'PUT') {
+      const body = await request.json();
+      const { userId, pinnedApps, hiddenApps, appArrangement } = body;
 
-      await db
-        .insert(userPreferences)
-        .values({
-          userId,
-          pinnedApps: pinnedApps || [],
-          hiddenApps: hiddenApps || [],
-          appArrangement: appArrangement || [],
-          updatedAt: new Date()
-        })
-        .onConflictDoUpdate({
-          target: userPreferences.userId,
-          set: {
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: 'Missing userId' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      // Check if user preferences exist
+      const existingPrefs = await db
+        .select()
+        .from(userPreferences)
+        .where(eq(userPreferences.userId, userId))
+        .limit(1);
+
+      if (existingPrefs.length === 0) {
+        // Create new preferences
+        await db
+          .insert(userPreferences)
+          .values({
+            userId,
             pinnedApps: pinnedApps || [],
             hiddenApps: hiddenApps || [],
             appArrangement: appArrangement || [],
             updatedAt: new Date()
-          }
-        });
+          });
+      } else {
+        // Update existing preferences
+        await db
+          .update(userPreferences)
+          .set({
+            pinnedApps: pinnedApps || existingPrefs[0].pinnedApps,
+            hiddenApps: hiddenApps || existingPrefs[0].hiddenApps,
+            appArrangement: appArrangement || existingPrefs[0].appArrangement,
+            updatedAt: new Date()
+          })
+          .where(eq(userPreferences.userId, userId));
+      }
 
-      return NextResponse.json({ success: true });
-    } catch (error) {
-      return NextResponse.json({ error: 'Failed to update preferences' }, { status: 500 });
+      await client.end();
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
-  }
 
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Database error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  }
 }
