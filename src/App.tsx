@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, type ReactElement } from 'react';
 import { AuthButton } from './components/AuthButton';
+import { Footer } from './components/Footer';
 import { usePreferences } from './hooks/usePreferences';
 
 // ── Types ──────────────────────────────────────────────
@@ -224,8 +225,8 @@ function PinnedAppsRow({
             target="_blank"
             rel="noopener noreferrer"
             className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
-              'bg-white border border-gray-200 hover:border-string-mint',
-              'bg-string-surface border border-string-border hover:border-string-mint'
+              'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
+              'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
             )}`}
           >
             <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
@@ -233,11 +234,11 @@ function PinnedAppsRow({
             </div>
             <div className="text-left min-w-0">
               <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
-              <div className="text-xs text-string-text-secondary">{app.category}</div>
+              <div className={`text-xs ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.category}</div>
             </div>
             <div
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
-              className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 text-string-text-secondary cursor-pointer"
+              className={`absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer`}
               title="Unpin"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1006,6 +1007,8 @@ export default function App() {
         onClose={() => setSelectedApp(null)}
         t={t}
       />
+
+      <Footer t={t} />
     </div>
   );
 }

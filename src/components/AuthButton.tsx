@@ -17,14 +17,7 @@ export function AuthButton() {
   if (isAuthenticated && user) {
     return (
       <div className="relative group">
-        <button className="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
-          {user.image && (
-            <img
-              src={user.image}
-              alt={user.name || 'User'}
-              className="w-6 h-6 rounded-full"
-            />
-          )}
+        <button className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
           <span className="text-sm font-medium text-gray-700">
             {user.name || user.email}
           </span>
