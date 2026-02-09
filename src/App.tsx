@@ -432,7 +432,7 @@ function AppGridCard({
           className={`p-1.5 rounded-lg transition-colors ${
             isPinned
               ? 'text-string-mint bg-string-mint/10'
-              : t('text-gray-400 hover:text-string-mint hover:bg-gray-100', 'text-gray-500 hover:text-string-mint hover:bg-string-surface-hover')
+              : t('text-gray-400 hover:text-string-mint hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')
           }`}
           title={isPinned ? 'Unpin' : 'Pin'}
         >
@@ -445,7 +445,7 @@ function AppGridCard({
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-gray-100', 'text-gray-500 hover:text-white hover:bg-string-surface-hover')}`}
+          className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')}`}
           title="Open in new tab"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -460,10 +460,16 @@ function AppGridCard({
 function FeaturedSection({
   featuredApps,
   onSelectApp,
+  pinnedApps,
+  onPin,
+  onUnpin,
   t,
 }: {
   featuredApps: App[];
   onSelectApp: (app: App) => void;
+  pinnedApps: string[];
+  onPin: (id: string) => void;
+  onUnpin: (id: string) => void;
   t: (l: string, d: string) => string;
 }) {
   if (featuredApps.length === 0) return null;
@@ -482,7 +488,7 @@ function FeaturedSection({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <div
           onClick={() => onSelectApp(primary)}
-          className="lg:col-span-2 relative rounded-2xl p-6 cursor-pointer overflow-hidden bg-gradient-to-br from-string-dark to-string-darker text-white"
+          className="lg:col-span-2 relative rounded-2xl p-6 cursor-pointer overflow-hidden bg-gradient-to-br from-string-dark to-string-darker text-white group"
         >
           <div className="absolute top-4 right-4 w-32 h-32 rounded-full bg-string-mint/10 blur-2xl"></div>
           <div className="relative z-10">
@@ -496,13 +502,41 @@ function FeaturedSection({
             <p className="text-gray-300 text-sm mb-1">{primary.tagline || primary.description}</p>
             <span className="text-xs text-gray-400">{primary.category}</span>
           </div>
+          {/* Action buttons */}
+          <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+            <button
+              onClick={(e) => { e.stopPropagation(); pinnedApps.includes(primary.id) ? onUnpin(primary.id) : onPin(primary.id); }}
+              className={`p-2 rounded-lg transition-colors ${
+                pinnedApps.includes(primary.id)
+                  ? 'text-string-mint bg-string-mint/10'
+                  : 'text-gray-300 hover:text-[#33373B] hover:bg-[#75F8CC]'
+              }`}
+              title={pinnedApps.includes(primary.id) ? 'Unpin' : 'Pin'}
+            >
+              <svg className="w-4 h-4" fill={pinnedApps.includes(primary.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              </svg>
+            </button>
+            <a
+              href={primary.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 rounded-lg transition-colors text-gray-300 hover:text-[#33373B] hover:bg-[#75F8CC]"
+              title="Open in new tab"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          </div>
         </div>
         <div className="flex flex-col gap-3">
           {secondary.map((app) => (
             <div
               key={app.id}
               onClick={() => onSelectApp(app)}
-              className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors flex-1 ${t(
+              className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors flex-1 ${t(
                 'bg-white border border-gray-100 hover:border-string-mint',
                 'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
               )}`}
@@ -510,10 +544,38 @@ function FeaturedSection({
               <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
                 {getInitials(app.name)}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
                 <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
                 <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
+              </div>
+              {/* Action buttons */}
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={(e) => { e.stopPropagation(); pinnedApps.includes(app.id) ? onUnpin(app.id) : onPin(app.id); }}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    pinnedApps.includes(app.id)
+                      ? 'text-string-mint bg-string-mint/10'
+                      : t('text-gray-400 hover:text-string-mint hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')
+                  }`}
+                  title={pinnedApps.includes(app.id) ? 'Unpin' : 'Pin'}
+                >
+                  <svg className="w-4 h-4" fill={pinnedApps.includes(app.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a .563.563 0 00.475-.345L11.48 3.5z" />
+                  </svg>
+                </button>
+                <a
+                  href={app.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')}`}
+                  title="Open in new tab"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
+                </a>
               </div>
             </div>
           ))}
@@ -972,7 +1034,14 @@ export default function App() {
           <div className="flex-1 min-w-0">
 
             {!selectedCategory && !searchQuery && (
-              <FeaturedSection featuredApps={featuredApps} onSelectApp={setSelectedApp} t={t} />
+              <FeaturedSection
+                featuredApps={featuredApps}
+                onSelectApp={setSelectedApp}
+                pinnedApps={preferences.pinnedApps}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
+                t={t}
+              />
             )}
 
             {sortedApps.length === 0 ? (

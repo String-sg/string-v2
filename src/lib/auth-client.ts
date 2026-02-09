@@ -105,7 +105,7 @@ export class AuthClient {
     });
   }
 
-  private handleCredentialResponse(response: any): void {
+  private async handleCredentialResponse(response: any): Promise<void> {
     try {
       // Decode the JWT token to get user info
       const payload = this.parseJWT(response.credential);
@@ -118,6 +118,40 @@ export class AuthClient {
       };
 
       console.log('Google auth successful:', user);
+
+      // Save user to database (only in production or when API is available)
+      try {
+        // Check if we're in development (localhost) or production
+        const isDevelopment = window.location.hostname === 'localhost' ||
+                             window.location.hostname === '127.0.0.1' ||
+                             window.location.hostname.includes('localhost');
+        const apiUrl = isDevelopment ? 'https://string.sg/api/users' : '/api/users';
+
+        const saveResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            provider: 'google',
+          }),
+        });
+
+        if (!saveResponse.ok) {
+          console.warn('Failed to save user to database:', saveResponse.statusText);
+        } else {
+          const result = await saveResponse.json();
+          console.log('User saved to database:', result.user?.email);
+        }
+      } catch (dbError) {
+        console.warn('Database save error (continuing with local auth):', dbError);
+      }
+
+      // Update local state regardless of database save result
       this.user = user;
       localStorage.setItem('string-auth-user', JSON.stringify(user));
       this.notifyListeners();

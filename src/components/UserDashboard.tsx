@@ -100,10 +100,6 @@ export function UserDashboard() {
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <p className="mt-1 text-sm text-gray-900">{user.email}</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Role</label>
-                  <p className="mt-1 text-sm text-gray-900 capitalize">{user.role}</p>
-                </div>
               </div>
             </div>
           )}
