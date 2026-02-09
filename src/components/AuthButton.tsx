@@ -1,8 +1,12 @@
-import { signIn, signOut } from 'next-auth/react';
+import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { SignInModal } from './SignInModal';
 
 export function AuthButton() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
+  const [showSignInModal, setShowSignInModal] = useState(false);
+
+  console.log('AuthButton render - user:', user, 'isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
 
   if (isLoading) {
     return (
@@ -41,7 +45,7 @@ export function AuthButton() {
               Dashboard
             </button>
             <button
-              onClick={() => signOut()}
+              onClick={signOut}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Sign Out
@@ -53,10 +57,11 @@ export function AuthButton() {
   }
 
   return (
-    <button
-      onClick={() => signIn('google')}
-      className="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
-    >
+    <>
+      <button
+        onClick={() => setShowSignInModal(true)}
+        className="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+      >
       <svg className="w-4 h-4" viewBox="0 0 24 24">
         <path
           fill="#4285F4"
@@ -76,6 +81,12 @@ export function AuthButton() {
         />
       </svg>
       <span>Sign in with Google</span>
-    </button>
+      </button>
+
+      <SignInModal
+        isOpen={showSignInModal}
+        onClose={() => setShowSignInModal(false)}
+      />
+    </>
   );
 }

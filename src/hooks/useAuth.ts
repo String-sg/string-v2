@@ -1,13 +1,27 @@
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { auth, type User } from '../lib/auth-client';
 
 export function useAuth() {
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChange((user) => {
+      console.log('Auth state changed in useAuth:', user);
+      setUser(user);
+      setIsLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
 
   return {
-    user: session?.user,
-    isAuthenticated: !!session?.user,
-    isLoading: status === 'loading',
-    isAdmin: session?.user?.role === 'admin',
-    isModerator: session?.user?.role === 'moderator' || session?.user?.role === 'admin'
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    isAdmin: false, // For now, no roles in simple auth
+    isModerator: false,
+    signIn: () => auth.signIn(),
+    signOut: () => auth.signOut()
   };
 }

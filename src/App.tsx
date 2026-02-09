@@ -136,7 +136,6 @@ function Header({
           className="h-7"
         />
         <div className="flex items-center gap-2 sm:gap-3">
-          <AuthButton />
           {/* Desktop search bar */}
           <div className="relative hidden sm:block">
             <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,6 +178,7 @@ function Header({
               </svg>
             )}
           </button>
+          <AuthButton />
         </div>
       </div>
     </header>
