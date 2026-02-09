@@ -72,7 +72,6 @@ export default async function handler(request: Request) {
         status: 'pending'
       });
 
-      await client.end();
 
       return new Response(
         JSON.stringify({ success: true, message: 'App submitted for review' }),
@@ -104,7 +103,6 @@ export default async function handler(request: Request) {
         .where(eq(appSubmissions.submittedByUserId, userId))
         .orderBy(desc(appSubmissions.submittedAt));
 
-      await client.end();
 
       return new Response(
         JSON.stringify({ submissions }),
