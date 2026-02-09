@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { users } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -30,8 +30,8 @@ export default async function handler(request: Request) {
   }
 
   try {
-    const client = postgres(connectionString);
-    const db = drizzle(client);
+    const sqlClient = neon(connectionString);
+    const db = drizzle(sqlClient);
 
     if (request.method === 'POST') {
       const body = await request.json();
