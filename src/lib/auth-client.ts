@@ -220,6 +220,12 @@ export class AuthClient {
     }, 30000);
   }
 
+  setUser(user: User): void {
+    this.user = user;
+    localStorage.setItem('string-auth-user', JSON.stringify(user));
+    this.notifyListeners();
+  }
+
   async signOut(): Promise<void> {
     this.user = null;
     localStorage.removeItem('string-auth-user');

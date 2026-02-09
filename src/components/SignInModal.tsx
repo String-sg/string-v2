@@ -111,9 +111,7 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
       }
 
       // Update auth state
-      (auth as any).user = user;
-      localStorage.setItem('string-auth-user', JSON.stringify(user));
-      (auth as any).notifyListeners();
+      auth.setUser(user);
 
       // Close modal
       onClose();

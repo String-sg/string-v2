@@ -31,6 +31,27 @@ export function usePreferences() {
           console.error('Failed to parse guest preferences from localStorage, clearing corrupted value.', error);
           localStorage.removeItem('string-preferences');
         }
+      } else {
+        // Migration: check for old pinned apps key and migrate to new preferences structure
+        const oldPinnedApps = localStorage.getItem('string-pinned-apps');
+        if (oldPinnedApps) {
+          try {
+            const parsedPinnedApps = JSON.parse(oldPinnedApps);
+            const migratedPreferences = {
+              pinnedApps: parsedPinnedApps,
+              hiddenApps: [],
+              appArrangement: []
+            };
+            setPreferences(migratedPreferences);
+            // Save migrated preferences and remove old key
+            localStorage.setItem('string-preferences', JSON.stringify(migratedPreferences));
+            localStorage.removeItem('string-pinned-apps');
+            console.log('Migrated pinned apps to new preferences structure');
+          } catch (error) {
+            console.error('Failed to migrate old pinned apps, clearing corrupted value.', error);
+            localStorage.removeItem('string-pinned-apps');
+          }
+        }
       }
     }
   }, [isAuthenticated]);
