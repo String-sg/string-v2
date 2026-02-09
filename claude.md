@@ -37,17 +37,23 @@
 - [x] Featured app section with time-based bumping
 - [x] Responsive design
 
-### 🔲 Phase 4: PWA Support (NEXT)
+### ✅ Phase 4: Authentication (COMPLETE)
+- [x] NextAuth.js + Google OAuth integration
+- [x] User roles (user/admin/moderator)
+- [x] Database session management
+- [x] Type-safe session handling
+
+### 🔲 Phase 5: User Features (NEXT)
+- [ ] Persistent pinned apps (user preferences)
+- [ ] App submission form for users
+- [ ] User dashboard/profile
+
+### 🔲 Phase 6: PWA Support
 - [ ] manifest.json for installability
 - [ ] Service worker for offline caching
 - [ ] Install prompt on mobile
 
-### 🔲 Phase 5: Authentication
-- [ ] Google OAuth integration
-- [ ] Magic Link email auth
-- [ ] Sync local preferences to account
-
-### 🔲 Phase 6: Chrome Extension
+### 🔲 Phase 7: Chrome Extension
 - [ ] Manifest V3 setup
 - [ ] New tab override + popup
 - [ ] Drag-and-drop arrangement
@@ -63,7 +69,7 @@
 | Database | NeonDB (PostgreSQL) | ✅ |
 | ORM | Drizzle | ✅ |
 | API | Vercel Edge Functions | ✅ |
-| Auth | Google OAuth + Magic Link | 🔲 |
+| Auth | NextAuth.js + Google OAuth | ✅ |
 | Hosting | Vercel | Ready |
 | Extension | Chrome Manifest V3 | 🔲 |
 | Mobile | PWA → Capacitor later | 🔲 |
@@ -82,7 +88,9 @@
 ```
 string-v2/
 ├── api/
-│   └── apps.ts              # GET /api/apps - Edge function ✅
+│   ├── apps.ts              # GET /api/apps - Edge function ✅
+│   └── auth/
+│       └── [...nextauth].ts # NextAuth.js configuration ✅
 ├── data/
 │   ├── schools.json         # 320 MOE schools ✅
 │   └── apps-seed.json       # 42 apps with metadata ✅
@@ -93,6 +101,10 @@ string-v2/
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle schema (8 tables) ✅
 │   │   └── index.ts         # DB connection ✅
+│   ├── lib/
+│   │   └── auth.ts          # Auth utilities ✅
+│   ├── types/
+│   │   └── next-auth.d.ts   # NextAuth type extensions ✅
 │   ├── App.tsx              # Main landing page ✅
 │   ├── main.tsx             # React entry ✅
 │   └── index.css            # Tailwind styles ✅

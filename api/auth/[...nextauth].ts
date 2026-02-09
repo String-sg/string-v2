@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from '../../src/db';
 import { users } from '../../src/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db),
