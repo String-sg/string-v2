@@ -128,17 +128,18 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#33373B' }}>
+              <svg className="w-10 h-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 264">
+                <path fill="#75f8cc" d="M175,28a31.64,31.64,0,0,1-30.07,21.4H90.33A55.81,55.81,0,0,0,89.78,161h1.91a28.67,28.67,0,0,0,20.3-8.3l20-19.8v0l-41.27-.2c-15.12-.08-28.25-12.5-28.17-27.63A27.5,27.5,0,0,1,90.19,77.71l54.6,0A59.72,59.72,0,0,0,182.87,64.3,58.84,58.84,0,0,0,191.26,56a59.7,59.7,0,0,0,12.87-28Z"/>
+                <path fill="#75f8cc" d="M213.58,121.36a55.59,55.59,0,0,0-39.36-16.53h-1.91a28.62,28.62,0,0,0-20.3,8.29l-20,19.8,41.23.2c15.14.08,28.27,12.52,28.19,27.67a27.48,27.48,0,0,1-27.62,27.36l-56.25,0a59.64,59.64,0,0,0-38.14,13.46A57.17,57.17,0,0,0,71,209.91A59.39,59.39,0,0,0,58.52,236H88a31.69,31.69,0,0,1,29.43-19.59l56.23,0a55.79,55.79,0,0,0,39.91-95.07Z"/>
               </svg>
             </div>
 
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Your AI workspace
+              Simplified Access to Tools
             </h1>
             <p className="text-gray-500 text-lg">
-              Log in to your String account
+              Log in to String
             </p>
           </div>
 
