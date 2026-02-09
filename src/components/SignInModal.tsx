@@ -38,7 +38,6 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
         google.accounts.id.renderButton(googleButtonRef.current, {
           theme: 'outline',
           size: 'large',
-          width: '100%',
           text: 'continue_with',
           shape: 'rectangular'
         });
