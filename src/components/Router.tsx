@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { UserDashboard } from './UserDashboard';
+import { Terms } from './Terms';
+import { Privacy } from './Privacy';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -20,6 +22,14 @@ export function Router({ children }: RouterProps) {
   // Simple client-side routing
   if (currentPath === '/dashboard') {
     return <UserDashboard />;
+  }
+
+  if (currentPath === '/terms') {
+    return <Terms />;
+  }
+
+  if (currentPath === '/privacy') {
+    return <Privacy />;
   }
 
   return <>{children}</>;
