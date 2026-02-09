@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef, type ReactElement } from 'react';
+import { AuthButton } from './components/AuthButton';
+import { usePreferences } from './hooks/usePreferences';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -176,6 +178,7 @@ function Header({
               </svg>
             )}
           </button>
+          <AuthButton />
         </div>
       </div>
     </header>
@@ -818,20 +821,9 @@ export default function App() {
       return [];
     }
   });
-  const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
-    try {
-      const stored = localStorage.getItem('string-pinned-apps');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { isDark, toggle: toggleTheme, t } = useTheme();
-
-  useEffect(() => {
-    localStorage.setItem('string-pinned-apps', JSON.stringify(pinnedIds));
-  }, [pinnedIds]);
+  const { preferences, togglePinnedApp } = usePreferences();
 
   useEffect(() => {
     localStorage.setItem('string-recent-apps', JSON.stringify(recentAppIds));
@@ -916,10 +908,10 @@ export default function App() {
   });
 
   const sortedApps = [...filteredApps].sort((a, b) => b.frequency - a.frequency);
-  const pinnedApps = apps.filter((a) => pinnedIds.includes(a.id));
+  const pinnedApps = apps.filter((a) => preferences.pinnedApps.includes(a.id));
 
-  const handlePin = (id: string) => setPinnedIds((prev) => [...prev, id]);
-  const handleUnpin = (id: string) => setPinnedIds((prev) => prev.filter((p) => p !== id));
+  const handlePin = (id: string) => togglePinnedApp(id);
+  const handleUnpin = (id: string) => togglePinnedApp(id);
 
   if (loading) {
     return (
@@ -977,12 +969,6 @@ export default function App() {
           />
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-lg font-semibold ${t('text-string-dark', 'text-white')}`}>
-                {selectedCategory || 'All'}
-              </h2>
-              <span className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>{sortedApps.length} apps</span>
-            </div>
 
             {!selectedCategory && !searchQuery && (
               <FeaturedSection featuredApps={featuredApps} onSelectApp={setSelectedApp} t={t} />
@@ -998,7 +984,7 @@ export default function App() {
                   <AppGridCard
                     key={app.id}
                     app={app}
-                    isPinned={pinnedIds.includes(app.id)}
+                    isPinned={preferences.pinnedApps.includes(app.id)}
                     onPin={handlePin}
                     onUnpin={handleUnpin}
                     onSelect={setSelectedApp}
@@ -1014,7 +1000,7 @@ export default function App() {
 
       <AppDetailSidebar
         app={selectedApp}
-        isPinned={selectedApp ? pinnedIds.includes(selectedApp.id) : false}
+        isPinned={selectedApp ? preferences.pinnedApps.includes(selectedApp.id) : false}
         onPin={handlePin}
         onUnpin={handleUnpin}
         onClose={() => setSelectedApp(null)}
