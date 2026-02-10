@@ -128,6 +128,7 @@ function Header({
   onToggleTheme: () => void;
   onSearchOpen: () => void;
 }) {
+  const { isAuthenticated } = useAuth();
   return (
     <header className="bg-string-dark sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -164,6 +165,23 @@ function Header({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
+
+          {/* Add App button for authenticated users */}
+          {isAuthenticated && (
+            <button
+              onClick={() => {
+                window.history.pushState({}, '', '/dashboard?tab=submit');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+              className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
+              title="Add new app"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </button>
+          )}
+
           <button
             onClick={onToggleTheme}
             className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
@@ -238,7 +256,7 @@ function PinnedAppsRow({
             </div>
             <div
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
-              className={`absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer`}
+              className={`absolute top-1.5 right-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer`}
               title="Unpin"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -426,7 +444,7 @@ function AppGridCard({
           <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
         )}
       </div>
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
           onClick={(e) => { e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
           className={`p-1.5 rounded-lg transition-colors ${
@@ -503,7 +521,7 @@ function FeaturedSection({
             <span className="text-xs text-gray-400">{primary.category}</span>
           </div>
           {/* Action buttons */}
-          <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+          <div className="absolute top-4 right-4 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20">
             <button
               onClick={(e) => { e.stopPropagation(); pinnedApps.includes(primary.id) ? onUnpin(primary.id) : onPin(primary.id); }}
               className={`p-2 rounded-lg transition-colors ${
@@ -550,7 +568,7 @@ function FeaturedSection({
                 <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
               </div>
               {/* Action buttons */}
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={(e) => { e.stopPropagation(); pinnedApps.includes(app.id) ? onUnpin(app.id) : onPin(app.id); }}
                   className={`p-1.5 rounded-lg transition-colors ${

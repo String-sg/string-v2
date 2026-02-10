@@ -10,7 +10,7 @@ interface AppSubmissionForm {
 }
 
 export function AppSubmissionForm() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
     name: '',
     url: '',
@@ -44,10 +44,17 @@ export function AppSubmissionForm() {
     setMessage('');
 
     try {
+      // Include user information in submission
+      const submissionData = {
+        ...form,
+        submittedByUserId: user?.id,
+        submittedByEmail: user?.email
+      };
+
       const response = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(submissionData)
       });
 
       const data = await response.json();
