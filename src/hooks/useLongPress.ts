@@ -21,7 +21,7 @@ export function useLongPress({ onLongPress, delay = 500 }: UseLongPressOptions) 
     }, delay);
   }, [onLongPress, delay]);
 
-  const clear = useCallback((event?: React.TouchEvent | React.MouseEvent) => {
+  const clear = useCallback((_event?: React.TouchEvent | React.MouseEvent) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;

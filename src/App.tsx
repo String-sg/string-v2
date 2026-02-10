@@ -3,6 +3,7 @@ import { AuthButton } from './components/AuthButton';
 import { Footer } from './components/Footer';
 import { usePreferences } from './hooks/usePreferences';
 import { useLongPress } from './hooks/useLongPress';
+import { useAuth } from './hooks/useAuth';
 
 // ── Types ──────────────────────────────────────────────
 
