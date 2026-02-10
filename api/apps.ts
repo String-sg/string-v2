@@ -7,7 +7,7 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(request: Request) {
+export default async function handler(_request: Request) {
   try {
     const sqlClient = neon(process.env.DATABASE_URL!);
     const db = drizzle(sqlClient);
