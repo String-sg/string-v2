@@ -136,56 +136,6 @@ export function UserDashboard() {
     }
   };
 
-  const loadProfileData = async () => {
-    if (!user?.id) return;
-
-    try {
-      setProfileLoading(true);
-      const response = await fetch(`/api/profile/manage?userId=${user.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProfileData(data);
-      }
-    } catch (error) {
-      console.error('Failed to load profile data:', error);
-    } finally {
-      setProfileLoading(false);
-    }
-  };
-
-  const toggleAppVisibility = async (appId: string, submissionId: string | null, appType: 'pinned' | 'submitted', isVisible: boolean) => {
-    if (!user?.id) return;
-
-    try {
-      const response = await fetch('/api/profile/manage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          appId: appType === 'pinned' ? appId : null,
-          submissionId: appType === 'submitted' ? submissionId : null,
-          appType,
-          isVisible,
-        }),
-      });
-
-      if (response.ok) {
-        // Reload profile data to reflect changes
-        loadProfileData();
-      }
-    } catch (error) {
-      console.error('Failed to update app visibility:', error);
-    }
-  };
-
   if (!isAuthenticated || !user) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
