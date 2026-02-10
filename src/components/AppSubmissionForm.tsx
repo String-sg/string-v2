@@ -44,12 +44,19 @@ export function AppSubmissionForm() {
     setMessage('');
 
     try {
+      // Validate user information
+      if (!user?.id || !user?.email) {
+        setMessage('Authentication error. Please sign out and sign in again.');
+        return;
+      }
+
       // Include user information in submission
       const submissionData = {
         ...form,
-        submittedByUserId: user?.id,
-        submittedByEmail: user?.email
+        submittedByUserId: user.id,
+        submittedByEmail: user.email
       };
+
 
       const response = await fetch('/api/submissions', {
         method: 'POST',
@@ -69,9 +76,11 @@ export function AppSubmissionForm() {
           category: ''
         });
       } else {
+        console.error('Submission error:', data); // Debug log
         setMessage(data.error || 'Failed to submit app');
       }
     } catch (error) {
+      console.error('Network error:', error); // Debug log
       setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);

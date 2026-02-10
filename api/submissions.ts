@@ -61,6 +61,8 @@ export default async function handler(request: Request) {
         );
       }
 
+      console.log('Inserting submission:', { name, url, description, logoUrl, category, submittedByUserId, submittedByEmail });
+
       await db.insert(appSubmissions).values({
         name,
         url,
@@ -123,7 +125,10 @@ export default async function handler(request: Request) {
   } catch (error) {
     console.error('Database error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
