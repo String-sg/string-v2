@@ -16,7 +16,18 @@ export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'submissions' | 'submit'>('profile');
+
+  // Initialize active tab based on URL query parameter
+  const getInitialTab = (): 'profile' | 'submissions' | 'submit' => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'submit' || tabParam === 'submissions') {
+      return tabParam as 'submit' | 'submissions';
+    }
+    return 'profile';
+  };
+
+  const [activeTab, setActiveTab] = useState<'profile' | 'submissions' | 'submit'>(getInitialTab);
 
   useEffect(() => {
     if (isAuthenticated && activeTab === 'submissions') {
