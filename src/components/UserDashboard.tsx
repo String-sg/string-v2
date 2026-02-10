@@ -80,12 +80,11 @@ export function UserDashboard() {
 
     try {
       setProfileLoading(true);
-      const response = await fetch('/api/profile/manage', {
+      const response = await fetch(`/api/profile/manage?userId=${user.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }),
       });
 
       if (response.ok) {

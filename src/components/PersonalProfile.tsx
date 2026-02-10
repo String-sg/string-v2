@@ -97,7 +97,7 @@ export function PersonalProfile({ slug }: { slug: string }) {
           </h1>
           <p className="text-gray-600 mb-4">
             {error === 'Profile not found'
-              ? 'This profile doesn\\'t exist or has been removed.'
+              ? "This profile doesn't exist or has been removed."
               : 'Something went wrong while loading this profile.'}
           </p>
           <button

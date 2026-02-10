@@ -32,8 +32,8 @@ export default async function handler(request: Request) {
 
     if (request.method === 'GET') {
       // Get user's current profile configuration
-      const body = await request.json();
-      const { userId } = body;
+      const url = new URL(request.url);
+      const userId = url.searchParams.get('userId');
 
       if (!userId) {
         return new Response(JSON.stringify({ error: 'User ID is required' }), {
