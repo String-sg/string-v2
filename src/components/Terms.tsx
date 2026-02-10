@@ -17,9 +17,9 @@ function useTheme() {
   return { isDark, toggle, t };
 }
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-function Header({ isDark, onToggleTheme, t }: { isDark: boolean; onToggleTheme: () => void; t: (l: string, d: string) => string }) {
+function Header({ isDark, onToggleTheme }: { isDark: boolean; onToggleTheme: () => void }) {
   return (
     <header className="bg-string-dark sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -61,7 +61,7 @@ export function Terms() {
 
   return (
     <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
-      <Header isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+      <Header isDark={isDark} onToggleTheme={toggleTheme} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className={`${t('bg-white', 'bg-[#2a2d30]')} rounded-2xl p-8 shadow-sm`}>

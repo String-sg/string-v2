@@ -37,16 +37,19 @@
 - [x] Featured app section with time-based bumping
 - [x] Responsive design
 
-### ✅ Phase 4: Authentication (COMPLETE)
-- [x] NextAuth.js + Google OAuth integration
-- [x] User roles (user/admin/moderator)
-- [x] Database session management
-- [x] Type-safe session handling
+### ✅ Phase 4: Authentication & User Features (COMPLETE)
+- [x] Google OAuth integration with client-side auth
+- [x] Persistent pinned apps (localStorage + user preferences)
+- [x] App submission form for authenticated users
+- [x] User dashboard with profile/submissions/submit tabs
+- [x] Mobile-responsive pin/unpin with long-press interactions
 
-### 🔲 Phase 5: User Features (NEXT)
-- [ ] Persistent pinned apps (user preferences)
-- [ ] App submission form for users
-- [ ] User dashboard/profile
+### 🔲 Phase 5: Personal Profile Pages (NEXT)
+- [ ] Email-prefix slug generation (e.g., `string.sg/lee-kh`)
+- [ ] Public profile API (`/api/users/[slug]`)
+- [ ] Personal launcher page (`/[slug]`) showing pinned + submitted apps
+- [ ] Inline visibility controls with WYSIWYG public preview toggle
+- [ ] Profile app management (add/remove from public profile)
 
 ### 🔲 Phase 6: PWA Support
 - [ ] manifest.json for installability
@@ -218,21 +221,64 @@ npm run db:studio
 
 ## Next Steps (Resume Here)
 
-### 1. Add PWA Support
+### 1. Implement Personal Profile Pages (Phase 5)
+
+#### Database Schema Updates
+```sql
+-- Add slug to users table
+ALTER TABLE users ADD COLUMN slug VARCHAR(255) UNIQUE;
+
+-- Create profile apps table for public visibility control
+CREATE TABLE user_profile_apps (
+  user_id VARCHAR(255) REFERENCES users(id),
+  app_id VARCHAR(255),
+  app_type VARCHAR(20), -- 'pinned' or 'submitted'
+  is_visible BOOLEAN DEFAULT true,
+  display_order INTEGER,
+  PRIMARY KEY (user_id, app_id, app_type)
+);
+```
+
+#### API Routes to Create
+```typescript
+// /api/users/[slug].ts - Get public profile data
+GET /api/users/john-doe
+Response: { user: {...}, apps: [...] }
+
+// /api/profile/apps.ts - Manage profile apps visibility
+POST /api/profile/apps { appId, type, isVisible }
+```
+
+#### Components to Create
+```typescript
+// PersonalLauncherPage.tsx - Public profile view
+// ProfileManagement.tsx - Inline visibility controls
+// PublicPreviewToggle.tsx - WYSIWYG toggle component
+```
+
+#### Implementation Approach
+1. **Email-prefix slug generation**: Extract username from email (before @)
+2. **API-first**: Public profiles served via `/api/users/[slug]`
+3. **Dynamic routing**: `[slug].tsx` catches all profile URLs
+4. **Public by default**: Profiles are public, apps visible by default
+5. **Inline controls**: Toggle visibility with immediate preview
+6. **Two app sources**: Pinned apps + submitted (approved) apps
+7. **Profile-specific**: Users can hide apps from profile (different from unpinning)
+
+#### User Flow
+1. User signs in → slug auto-generated from email prefix
+2. Profile automatically public at `string.sg/{slug}`
+3. Dashboard shows "Profile Preview" toggle
+4. When preview mode ON: Shows public view with visibility controls
+5. Long-press on mobile reveals "Hide from profile" option
+6. Desktop hover shows visibility toggle icon
+
+### 2. Add PWA Support
 ```bash
 # Create these files:
 public/manifest.json    # PWA manifest
 public/sw.js           # Service worker
 ```
-- Add manifest link to index.html
-- Configure workbox for offline caching
-- Add install prompt component
-
-### 2. Implement Auth
-- Install: `npm install next-auth` or custom auth
-- Add Google OAuth credentials
-- Add Magic Link email flow
-- Create `/api/auth/[...nextauth].ts`
 
 ### 3. Build Chrome Extension
 ```bash

@@ -1,6 +1,6 @@
 import { navigateTo } from './Router';
 
-export function Footer({ t }: { t: (l: string, d: string) => string }) {
+export function Footer({ t }: { t: (l: any, d: any) => any }) {
   return (
     <footer className={`mt-16 border-t ${t('border-gray-200 bg-white', 'border-[#3a3f44] bg-[#2a2d30]')}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
