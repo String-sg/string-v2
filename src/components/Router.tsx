@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { UserDashboard } from './UserDashboard';
 import { Terms } from './Terms';
 import { Privacy } from './Privacy';
+import { PersonalProfile } from './PersonalProfile';
+import { isReservedSlug } from '../lib/slug-utils';
 
 interface RouterProps {
   children: React.ReactNode;
