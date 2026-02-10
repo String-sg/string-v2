@@ -60,7 +60,7 @@ export function Privacy() {
 
   return (
     <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
-      <Header isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+      <Header isDark={isDark} onToggleTheme={toggleTheme} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className={`${t('bg-white', 'bg-[#2a2d30]')} rounded-2xl p-8 shadow-sm`}>
