@@ -39,7 +39,8 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
           theme: 'outline',
           size: 'large',
           text: 'continue_with',
-          shape: 'rectangular'
+          shape: 'rectangular',
+          width: 400
         });
       }
     } catch (error) {
