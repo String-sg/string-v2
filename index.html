@@ -14,9 +14,16 @@
         const measurementId = '%VITE_GA_MEASUREMENT_ID%';
         const isProduction = '%MODE%' === 'production';
 
-        // Skip if no measurement ID or in development mode
-        if (!measurementId || measurementId === 'your-google-analytics-id' || !isProduction) {
-          console.log('Google Analytics: Skipped (development mode or no measurement ID)');
+        // Check if GA is enabled
+        const enableGA = '%VITE_ENABLE_GA%' === 'true';
+
+        // Skip if no measurement ID, disabled, or in development mode
+        if (!measurementId || measurementId === 'your-google-analytics-id' || !enableGA || !isProduction) {
+          console.log('Google Analytics: Skipped', {
+            hasId: !!measurementId,
+            enabled: enableGA,
+            production: isProduction
+          });
           return;
         }
 
