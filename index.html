@@ -27,25 +27,55 @@
           return;
         }
 
-        // Load Google Analytics
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-        document.head.appendChild(script);
+        // Load Google Analytics with error handling
+        try {
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
 
-        // Initialize gtag
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = gtag;
-        gtag('js', new Date());
-        gtag('config', measurementId);
+          script.onerror = function() {
+            console.warn('Google Analytics: Script failed to load (blocked)');
+          };
 
-        console.log('Google Analytics: Loaded with ID', measurementId);
+          document.head.appendChild(script);
+
+          // Initialize gtag with error handling
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){
+            try {
+              dataLayer.push(arguments);
+            } catch (e) {
+              console.warn('Google Analytics: gtag call failed', e);
+            }
+          }
+          window.gtag = gtag;
+
+          gtag('js', new Date());
+          gtag('config', measurementId);
+
+          console.log('Google Analytics: Loaded with ID', measurementId);
+        } catch (error) {
+          console.warn('Google Analytics: Failed to initialize', error);
+        }
       })();
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading fallback -->
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui;">
+        <div style="text-align: center;">
+          <div style="width: 40px; height: 40px; border: 4px solid #f3f4f6; border-top: 4px solid #75f8cc; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+          <div style="color: #6b7280;">Loading String...</div>
+        </div>
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
