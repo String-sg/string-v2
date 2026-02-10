@@ -27,7 +27,7 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
 
       // Initialize Google Identity Services
       await google.accounts.id.initialize({
-        client_id: '250451703266-8kl9vsuh2vg1e7spofthsskfaueg5fqh.apps.googleusercontent.com',
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
         auto_select: false
       });
