@@ -35,11 +35,17 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
       // Render the actual Google button directly in our modal
       if (googleButtonRef.current) {
         googleButtonRef.current.innerHTML = ''; // Clear existing content
+
+        // Calculate responsive width based on container
+        const containerWidth = googleButtonRef.current.offsetWidth;
+        const buttonWidth = Math.min(400, containerWidth - 32); // 16px padding each side
+
         google.accounts.id.renderButton(googleButtonRef.current, {
           theme: 'outline',
           size: 'large',
           text: 'continue_with',
-          shape: 'rectangular'
+          shape: 'rectangular',
+          width: buttonWidth
         });
       }
     } catch (error) {
