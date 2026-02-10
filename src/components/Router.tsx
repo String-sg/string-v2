@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { UserDashboard } from './UserDashboard';
 import { Terms } from './Terms';
 import { Privacy } from './Privacy';
+import { PersonalProfile } from './PersonalProfile';
+import { isReservedSlug } from '../lib/slug-utils';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -30,6 +32,22 @@ export function Router({ children }: RouterProps) {
 
   if (currentPath === '/privacy') {
     return <Privacy />;
+  }
+
+  // Check for user profile routes (e.g., /lee-kh)
+  // Must be a single path segment (no nested routes)
+  if (currentPath !== '/' && currentPath.startsWith('/')) {
+    const pathSegments = currentPath.split('/').filter(Boolean);
+
+    // Only match single-segment paths
+    if (pathSegments.length === 1) {
+      const slug = pathSegments[0];
+
+      // Only render profile if it's not a reserved slug
+      if (!isReservedSlug(slug)) {
+        return <PersonalProfile slug={slug} />;
+      }
+    }
   }
 
   return <>{children}</>;

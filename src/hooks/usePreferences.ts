@@ -8,7 +8,7 @@ interface UserPreferences {
 }
 
 export function usePreferences() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>({
     pinnedApps: [],
     hiddenApps: [],
@@ -54,12 +54,14 @@ export function usePreferences() {
         }
       }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.id]);
 
   const loadPreferences = async () => {
+    if (!user?.id) return;
+
     try {
       setLoading(true);
-      const response = await fetch('/api/preferences');
+      const response = await fetch(`/api/preferences?userId=${encodeURIComponent(user.id)}`);
       if (response.ok) {
         const data = await response.json();
         setPreferences(data);
@@ -75,13 +77,13 @@ export function usePreferences() {
     const newPreferences = { ...preferences, ...updates };
     setPreferences(newPreferences);
 
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.id) {
       // Save to database
       try {
         await fetch('/api/preferences', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newPreferences)
+          body: JSON.stringify({ ...newPreferences, userId: user.id })
         });
       } catch (error) {
         console.error('Failed to save preferences:', error);

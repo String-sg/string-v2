@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
+import { generateSlugFromEmail, generateUniqueSlug, isReservedSlug } from '../src/lib/slug-utils';
 
 // Edge runtime configuration
 export const config = {
@@ -57,6 +58,10 @@ export default async function handler(request: Request) {
       let user;
 
       if (existingUser.length === 0) {
+        // Generate unique slug from email
+        const baseSlug = generateSlugFromEmail(email);
+        const uniqueSlug = await generateUniqueSlug(db, baseSlug);
+
         // Create new user
         const [newUser] = await db
           .insert(users)
@@ -66,12 +71,13 @@ export default async function handler(request: Request) {
             name: name || null,
             avatarUrl: image || null,
             provider,
+            slug: uniqueSlug,
             lastLogin: new Date(),
           })
           .returning();
 
         user = newUser;
-        console.log('Created new user:', user.email);
+        console.log('Created new user:', user.email, 'with slug:', user.slug);
       } else {
         // Update existing user's last login
         const [updatedUser] = await db
