@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AuthButton } from './AuthButton';
 import { navigateTo } from './Router';
 
@@ -18,7 +18,7 @@ function useTheme() {
   return { isDark, toggle, t };
 }
 
-function Header({ isDark, onToggleTheme, t }: { isDark: boolean; onToggleTheme: () => void; t: (l: string, d: string) => string }) {
+function Header({ isDark, onToggleTheme }: { isDark: boolean; onToggleTheme: () => void }) {
   return (
     <header className="bg-string-dark sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">

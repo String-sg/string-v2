@@ -8,7 +8,6 @@ import {
   uuid,
   time,
   date,
-  primaryKey,
 } from 'drizzle-orm/pg-core';
 
 // Apps table - core app directory
