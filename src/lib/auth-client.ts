@@ -86,7 +86,7 @@ export class AuthClient {
 
     const google = (window as any).google;
     await google.accounts.id.initialize({
-      client_id: '250451703266-8kl9vsuh2vg1e7spofthsskfaueg5fqh.apps.googleusercontent.com',
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       callback: this.handleCredentialResponse.bind(this),
       auto_select: false,
       cancel_on_tap_outside: true

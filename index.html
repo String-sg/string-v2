@@ -8,12 +8,40 @@
     <title>String - App Launcher for Educators</title>
 
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z710HPP78G"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-Z710HPP78G');
+      // Only load Google Analytics if measurement ID is provided and not in development
+      (function() {
+        const measurementId = '%VITE_GA_MEASUREMENT_ID%';
+        const isProduction = '%MODE%' === 'production';
+
+        // Check if GA is enabled
+        const enableGA = '%VITE_ENABLE_GA%' === 'true';
+
+        // Skip if no measurement ID, disabled, or in development mode
+        if (!measurementId || measurementId === 'your-google-analytics-id' || !enableGA || !isProduction) {
+          console.log('Google Analytics: Skipped', {
+            hasId: !!measurementId,
+            enabled: enableGA,
+            production: isProduction
+          });
+          return;
+        }
+
+        // Load Google Analytics
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+        document.head.appendChild(script);
+
+        // Initialize gtag
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', measurementId);
+
+        console.log('Google Analytics: Loaded with ID', measurementId);
+      })();
     </script>
   </head>
   <body>
