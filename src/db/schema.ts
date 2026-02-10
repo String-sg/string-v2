@@ -58,6 +58,7 @@ export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: text('email').notNull().unique(),
   name: text('name'),
+  slug: text('slug').unique(), // e.g., 'lee-kh' from email prefix
   avatarUrl: text('avatar_url'),
   provider: text('provider'), // 'google' | 'magic_link'
   role: text('role').default('user').notNull(), // 'user' | 'admin' | 'moderator'
@@ -96,6 +97,18 @@ export const appSubmissions = pgTable('app_submissions', {
   status: text('status').default('pending').notNull(), // 'pending' | 'approved' | 'rejected'
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
   reviewedAt: timestamp('reviewed_at'),
+});
+
+// User profile apps - controls which apps are visible on public profiles
+export const userProfileApps = pgTable('user_profile_apps', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  appId: uuid('app_id').references(() => apps.id, { onDelete: 'cascade' }),
+  submissionId: uuid('submission_id').references(() => appSubmissions.id, { onDelete: 'cascade' }),
+  appType: text('app_type').notNull(), // 'pinned' or 'submitted'
+  isVisible: boolean('is_visible').default(true).notNull(),
+  displayOrder: integer('display_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // Categories table
