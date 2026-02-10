@@ -30,7 +30,7 @@ export default async function handler(request: Request) {
   }
 
   try {
-    const sqlClient = neon(connectionString);
+    const sqlClient = neon(connectionString!);
     const db = drizzle(sqlClient);
 
     // Simple auth check - get user ID from request headers or body
