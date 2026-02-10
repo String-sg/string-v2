@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, type ReactElement } from 'react';
 import { AuthButton } from './components/AuthButton';
 import { Footer } from './components/Footer';
 import { usePreferences } from './hooks/usePreferences';
+import { useLongPress } from './hooks/useLongPress';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -215,6 +216,83 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
   );
 }
 
+function PinnedAppCard({
+  app,
+  onUnpin,
+  t
+}: {
+  app: App;
+  onUnpin: (id: string) => void;
+  t: (l: string, d: string) => string;
+}) {
+  const [showUnpin, setShowUnpin] = useState(false);
+
+  const longPressProps = useLongPress({
+    onLongPress: () => {
+      setShowUnpin(true);
+      // Auto-hide after 3 seconds
+      setTimeout(() => setShowUnpin(false), 3000);
+    },
+    delay: 500
+  });
+
+  const handleClick = (e: React.MouseEvent) => {
+    // If unpin button is showing and we're on mobile, don't navigate
+    if (showUnpin && window.innerWidth < 640) {
+      e.preventDefault();
+      setShowUnpin(false);
+      return;
+    }
+
+    // Allow normal navigation
+    longPressProps.onClick?.(e);
+  };
+
+  return (
+    <a
+      href={app.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
+        'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
+        'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
+      )}`}
+      {...longPressProps}
+      onClick={handleClick}
+    >
+      <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
+        {getInitials(app.name)}
+      </div>
+      <div className="text-left min-w-0">
+        <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
+        <div className={`text-xs ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.category}</div>
+      </div>
+
+      {/* Mobile: Show unpin button after long press, Desktop: Show on hover */}
+      <div
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
+        className={`absolute top-1.5 right-1.5 transition-all duration-200 p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer ${
+          showUnpin ? 'opacity-100 scale-100' : 'opacity-0 scale-75 sm:opacity-0 sm:group-hover:opacity-100 sm:scale-100'
+        }`}
+        title="Unpin"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+
+      {/* Long press hint - show briefly on first interaction */}
+      {showUnpin && (
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 sm:hidden">
+          <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+            Tap × to unpin
+          </div>
+        </div>
+      )}
+    </a>
+  );
+}
+
 function PinnedAppsRow({
   apps,
   onUnpin,
@@ -237,33 +315,12 @@ function PinnedAppsRow({
       </div>
       <div className="flex flex-col sm:flex-row gap-3 sm:overflow-x-auto pb-2">
         {apps.map((app) => (
-          <a
+          <PinnedAppCard
             key={app.id}
-            href={app.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
-              'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
-              'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
-            )}`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
-              {getInitials(app.name)}
-            </div>
-            <div className="text-left min-w-0">
-              <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
-              <div className={`text-xs ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.category}</div>
-            </div>
-            <div
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
-              className={`absolute top-1.5 right-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer`}
-              title="Unpin"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-          </a>
+            app={app}
+            onUnpin={onUnpin}
+            t={t}
+          />
         ))}
       </div>
     </div>
