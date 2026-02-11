@@ -261,29 +261,40 @@ export function UserDashboard() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg border">
-        <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6" aria-label="Tabs">
-            {[
-              { id: 'profile', name: 'Profile' },
-              { id: 'submissions', name: 'My Submissions' },
-              { id: 'submit', name: 'Submit App' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </nav>
+    <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
+      <DashboardHeader isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>Dashboard</h1>
+          <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
+            Manage your profile, submissions, and apps.
+          </p>
         </div>
+
+        <div className={`${t('bg-white border border-gray-100', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl overflow-hidden`}>
+          <div className={`border-b ${t('border-gray-200', 'border-[#3a3f44]')}`}>
+            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+              {[
+                { id: 'profile', name: 'Profile' },
+                { id: 'submissions', name: 'My Submissions' },
+                { id: 'submit', name: 'Submit App' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-string-mint text-string-mint'
+                      : `border-transparent ${t('text-gray-500 hover:text-gray-700 hover:border-gray-300', 'text-gray-400 hover:text-gray-200 hover:border-gray-600')}`
+                  }`}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </nav>
+          </div>
 
         <div className="p-6">
           {activeTab === 'profile' && (
