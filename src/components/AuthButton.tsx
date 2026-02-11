@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { SignInModal } from './SignInModal';
 
+// Generate slug from email prefix (before @)
+function generateSlug(email: string): string {
+  return email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '-');
+}
+
 export function AuthButton() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -28,6 +33,12 @@ export function AuthButton() {
             <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
               {user.email}
             </div>
+            <a
+              href={`/${generateSlug(user.email)}`}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              My Launcher
+            </a>
             <button
               onClick={() => {
                 window.history.pushState({}, '', '/dashboard');
