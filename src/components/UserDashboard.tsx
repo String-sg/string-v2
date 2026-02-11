@@ -22,6 +22,81 @@ function useTheme() {
   return { isDark, toggle, t };
 }
 
+// Header component consistent with main app
+function DashboardHeader({
+  isDark,
+  onToggleTheme,
+  t
+}: {
+  isDark: boolean;
+  onToggleTheme: () => void;
+  t: (l: string, d: string) => string;
+}) {
+  const { user, signOut } = useAuth();
+
+  return (
+    <header className="bg-string-dark sticky top-0 z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <button
+          onClick={() => {
+            window.history.pushState({}, '', '/');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
+          className="flex items-center gap-2 text-gray-400 hover:text-string-mint transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <img
+            src="/logo-green.svg"
+            alt="String"
+            className="h-6"
+          />
+        </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onToggleTheme}
+            className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+              </svg>
+            )}
+          </button>
+
+          {user && (
+            <div className="relative group">
+              <button className="flex items-center bg-string-mint text-string-dark rounded-lg px-3 py-2 hover:bg-string-mint-light transition-colors text-sm font-medium">
+                {user.name || user.email}
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <div className="py-1">
+                  <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
+                    {user.email}
+                  </div>
+                  <button
+                    onClick={signOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
 interface Submission {
   id: string;
   name: string;
@@ -69,6 +144,7 @@ export function UserDashboard() {
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const { isDark, toggle: toggleTheme, t } = useTheme();
 
   // Initialize active tab based on URL query parameter
   const getInitialTab = (): 'profile' | 'submissions' | 'submit' => {
@@ -158,9 +234,14 @@ export function UserDashboard() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Sign In Required</h3>
-        <p className="text-gray-600">Please sign in to access your dashboard.</p>
+      <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
+        <DashboardHeader isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+        <div className="max-w-4xl mx-auto p-6 pt-12">
+          <div className={`${t('bg-white border border-gray-200', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl p-8 text-center`}>
+            <h3 className={`text-lg font-semibold ${t('text-gray-800', 'text-white')} mb-2`}>Sign In Required</h3>
+            <p className={`${t('text-gray-600', 'text-gray-400')}`}>Please sign in to access your dashboard.</p>
+          </div>
+        </div>
       </div>
     );
   }
