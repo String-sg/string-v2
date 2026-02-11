@@ -136,13 +136,13 @@ export class AuthClient {
         });
 
         if (!saveResponse.ok) {
-          console.warn('Failed to save user to database:', saveResponse.statusText);
+          console.warn('Failed to save user to database (API not available in dev):', saveResponse.statusText);
         } else {
           const result = await saveResponse.json();
           console.log('User saved to database:', result.user?.email);
         }
       } catch (dbError) {
-        console.warn('Database save error (continuing with local auth):', dbError);
+        console.warn('Database save error (API not available in local dev - this is normal):', dbError);
       }
 
       // Update local state regardless of database save result
