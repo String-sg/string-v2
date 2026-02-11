@@ -121,13 +121,7 @@ export class AuthClient {
 
       // Save user to database (only in production or when API is available)
       try {
-        // Check if we're in development (localhost) or production
-        const isDevelopment = window.location.hostname === 'localhost' ||
-                             window.location.hostname === '127.0.0.1' ||
-                             window.location.hostname.includes('localhost');
-        const apiUrl = isDevelopment ? 'https://string.sg/api/users' : '/api/users';
-
-        const saveResponse = await fetch(apiUrl, {
+        const saveResponse = await fetch('/api/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
