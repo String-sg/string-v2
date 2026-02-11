@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { SignInModal } from './SignInModal';
-
-// Generate slug from email prefix (before @)
-function generateSlug(email: string): string {
-  return email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '-');
-}
+import { generateSlugFromEmail } from '../lib/slug-utils';
 
 export function AuthButton() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -34,7 +30,7 @@ export function AuthButton() {
               {user.email}
             </div>
             <a
-              href={`/${generateSlug(user.email)}`}
+              href={`/${generateSlugFromEmail(user.email)}`}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               My Launcher
