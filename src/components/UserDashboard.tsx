@@ -73,8 +73,10 @@ function DashboardHeader({
 
           {user && (
             <div className="relative group">
-              <button className="flex items-center bg-string-mint text-string-dark rounded-lg px-3 py-2 hover:bg-string-mint-light transition-colors text-sm font-medium">
-                {user.name || user.email}
+              <button className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
+                <span className="text-sm font-medium text-gray-700">
+                  {user.name || user.email}
+                </span>
               </button>
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <div className="py-1">
@@ -274,7 +276,7 @@ export function UserDashboard() {
         </div>
 
         <div className={`${t('bg-white border border-gray-100', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl overflow-hidden`}>
-          <div className={`border-b ${t('border-gray-200', 'border-[#3a3f44]')}`}>
+          <div className="bg-string-dark border-b border-[#3a3f44]">
             <nav className="flex space-x-8 px-6" aria-label="Tabs">
               {[
                 { id: 'profile', name: 'Profile' },
@@ -287,7 +289,7 @@ export function UserDashboard() {
                   className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
                       ? 'border-string-mint text-string-mint'
-                      : `border-transparent ${t('text-gray-500 hover:text-gray-700 hover:border-gray-300', 'text-gray-400 hover:text-gray-200 hover:border-gray-600')}`
+                      : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
                   }`}
                 >
                   {tab.name}
@@ -505,5 +507,6 @@ export function UserDashboard() {
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
