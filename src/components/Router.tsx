@@ -3,6 +3,7 @@ import { UserDashboard } from './UserDashboard';
 import { Terms } from './Terms';
 import { Privacy } from './Privacy';
 import { PersonalProfile } from './PersonalProfile';
+import { DevProfileMock } from './DevProfileMock';
 import { isReservedSlug } from '../lib/slug-utils';
 
 interface RouterProps {
@@ -45,7 +46,13 @@ export function Router({ children }: RouterProps) {
 
       // Only render profile if it's not a reserved slug
       if (!isReservedSlug(slug)) {
-        return <PersonalProfile slug={slug} />;
+        // Use dev mock in development, real profile in production
+        const isDevelopment = window.location.hostname === 'localhost' ||
+                             window.location.hostname === '127.0.0.1';
+
+        return isDevelopment ?
+          <DevProfileMock slug={slug} /> :
+          <PersonalProfile slug={slug} />;
       }
     }
   }
