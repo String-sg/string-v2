@@ -97,8 +97,25 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
       {/* Profile Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* Apps Section */}
+        <div className="space-y-8">
+          <h2 className="text-2xl font-bold text-string-dark">
+            {profile.name || 'User'}'s Apps
+          </h2>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {apps.map((app) => (
+              <AppCard
+                key={`${app.type}-${app.id}`}
+                app={app}
+                onClick={() => handleAppClick(app)}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Profile Header */}
-        <Card className="p-8 mb-8">
+        <Card className="p-8 mt-16">
           <div className="flex items-start gap-6">
             {/* Avatar */}
             <div className="w-20 h-20 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint text-2xl font-bold shrink-0">
@@ -134,28 +151,11 @@ export function DevProfileMock({ slug }: { slug: string }) {
           </div>
         </Card>
 
-        {/* Apps Section */}
-        <div className="space-y-8">
-          <h2 className="text-2xl font-bold text-string-dark">
-            {profile.name || 'User'}'s Apps
-          </h2>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {apps.map((app) => (
-              <AppCard
-                key={`${app.type}-${app.id}`}
-                app={app}
-                onClick={() => handleAppClick(app)}
-              />
-            ))}
-          </div>
-        </div>
-
         {/* Footer */}
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center">
+        <div className="mt-16 pt-8 border-t border-gray-200 text-center">
           <p className="text-sm text-gray-500">
             Powered by{' '}
-            <a href="/" className="text-blue-500 hover:text-blue-600 font-medium">
+            <a href="/" className="text-string-mint hover:text-string-mint-light font-medium transition-colors">
               String
             </a>
           </p>
