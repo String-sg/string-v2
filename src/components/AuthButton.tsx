@@ -21,9 +21,6 @@ export function AuthButton() {
     };
   }, [menuRef]);
 
-
-  console.log('AuthButton render - user:', user, 'isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
-
   if (isLoading) {
     return (
       <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
