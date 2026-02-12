@@ -37,7 +37,7 @@ export function DashboardHeader({
             <img
               src="/logo-green.svg"
               alt="String"
-              className="h-6"
+              className="h-6 hidden sm:block"
             />
           </button>
 
@@ -51,7 +51,7 @@ export function DashboardHeader({
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
-              My Submissions
+              Submissions
             </button>
             <button
               onClick={() => onTabChange('profile')}
@@ -98,7 +98,13 @@ export function DashboardHeader({
             {/* User menu */}
             {user && (
               <div className="relative group">
-                <button className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
+                {/* Mobile: Circular avatar with initial */}
+                <button className="sm:hidden w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                  {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0)?.toUpperCase()}
+                </button>
+
+                {/* Desktop: Full name/email */}
+                <button className="hidden sm:flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
                   <span className="text-sm font-medium text-gray-700">
                     {user.name || user.email}
                   </span>

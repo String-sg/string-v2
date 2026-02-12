@@ -18,7 +18,13 @@ export function AuthButton() {
   if (isAuthenticated && user) {
     return (
       <div className="relative group">
-        <button className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
+        {/* Mobile: Circular avatar with initial */}
+        <button className="sm:hidden w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0)?.toUpperCase()}
+        </button>
+
+        {/* Desktop: Full name/email */}
+        <button className="hidden sm:flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
           <span className="text-sm font-medium text-gray-700">
             {user.name || user.email}
           </span>
