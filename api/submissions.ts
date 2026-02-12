@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { appSubmissions } from '../src/db/schema';
+import { appSubmissions, users } from '../src/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 // Edge runtime configuration
@@ -62,6 +62,29 @@ export default async function handler(request: Request) {
       }
 
       console.log('Inserting submission:', { name, url, description, logoUrl, category, submittedByUserId, submittedByEmail });
+
+      // Ensure user exists in database before creating submission
+      try {
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, submittedByUserId))
+          .limit(1);
+
+        if (existingUser.length === 0) {
+          // Create user if doesn't exist
+          await db.insert(users).values({
+            id: submittedByUserId,
+            email: submittedByEmail,
+            name: null, // Will be updated from OAuth data
+            slug: null, // Will be generated later
+          });
+          console.log('Created new user:', submittedByUserId);
+        }
+      } catch (userError) {
+        console.error('Error checking/creating user:', userError);
+        // Continue anyway - if user creation fails, the FK constraint will handle it
+      }
 
       await db.insert(appSubmissions).values({
         name,
