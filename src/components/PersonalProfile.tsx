@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
+import { Modal } from './Modal';
+import { AppSubmissionForm } from './AppSubmissionForm';
 
 interface ProfileApp {
   id: string;
@@ -26,9 +29,14 @@ interface ProfileData {
 }
 
 export function PersonalProfile({ slug }: { slug: string }) {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+
+  // Check if viewing own profile
+  const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
 
   useEffect(() => {
     loadProfile();
@@ -63,6 +71,16 @@ export function PersonalProfile({ slug }: { slug: string }) {
   const handleAppClick = (app: ProfileApp) => {
     // Track app launch if needed
     window.open(app.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleAddApp = () => {
+    setSubmitModalOpen(true);
+  };
+
+  const handleSubmitSuccess = () => {
+    setSubmitModalOpen(false);
+    // Refresh profile data
+    loadProfile();
   };
 
   if (loading) {
@@ -135,6 +153,8 @@ export function PersonalProfile({ slug }: { slug: string }) {
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
+          isOwnProfile={isOwnProfile}
+          onAddApp={handleAddApp}
         />
 
         <ProfileHeader
@@ -145,6 +165,18 @@ export function PersonalProfile({ slug }: { slug: string }) {
 
         <ProfileFooter />
       </main>
+
+      {/* Add App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Add App to Profile"
+      >
+        <AppSubmissionForm
+          onSuccess={handleSubmitSuccess}
+          fromProfile={true}
+        />
+      </Modal>
     </div>
   );
 }
