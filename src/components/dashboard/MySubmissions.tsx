@@ -14,9 +14,10 @@ interface Submission {
 
 interface MySubmissionsProps {
   t: (light: string, dark: string) => string;
+  onSubmitApp: () => void;
 }
 
-export function MySubmissions({ t }: MySubmissionsProps) {
+export function MySubmissions({ t, onSubmitApp }: MySubmissionsProps) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
 
