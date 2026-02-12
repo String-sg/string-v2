@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
 interface AppSubmissionForm {
@@ -13,6 +13,12 @@ interface AppSubmissionFormProps {
   onSuccess?: () => void;
 }
 
+interface ExistingApp {
+  id: string;
+  name: string;
+  url: string;
+}
+
 export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
@@ -24,6 +30,9 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [existingApps, setExistingApps] = useState<ExistingApp[]>([]);
+  const [filteredApps, setFilteredApps] = useState<ExistingApp[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const categories = [
     'Administration',
@@ -35,6 +44,48 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
     'Productivity',
     'IT Support'
   ];
+
+  // Fetch existing apps on mount
+  useEffect(() => {
+    const fetchApps = async () => {
+      try {
+        const response = await fetch('/api/apps');
+        if (response.ok) {
+          const data = await response.json();
+          const apps = data.apps.map((app: any) => ({
+            id: app.id,
+            name: app.name,
+            url: app.url
+          }));
+          setExistingApps(apps);
+        }
+      } catch (error) {
+        console.error('Failed to fetch apps:', error);
+      }
+    };
+    fetchApps();
+  }, []);
+
+  // Filter apps based on input
+  const handleNameChange = (value: string) => {
+    setForm(prev => ({ ...prev, name: value }));
+    
+    if (value.length >= 2) {
+      const matches = existingApps.filter(app =>
+        app.name.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5);
+      setFilteredApps(matches);
+      setShowSuggestions(matches.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectApp = (app: ExistingApp) => {
+    setForm(prev => ({ ...prev, name: app.name, url: app.url }));
+    setShowSuggestions(false);
+    setMessage('Note: This app already exists. Consider if you really need to submit it again.');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,18 +158,18 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg border p-6 space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">Submit New App</h2>
-
+    <form onSubmit={handleSubmit} className="space-y-4">
       {message && (
-        <div className={`p-3 rounded ${message.includes('successfully')
-          ? 'bg-green-50 text-green-700'
-          : 'bg-red-50 text-red-700'}`}>
+        <div className={`p-3 rounded-lg ${message.includes('successfully')
+          ? 'bg-green-50 text-green-700 border border-green-200'
+          : message.includes('Note:')
+          ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+          : 'bg-red-50 text-red-700 border border-red-200'}`}>
           {message}
         </div>
       )}
 
-      <div>
+      <div className="relative">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           App Name *
         </label>
@@ -126,9 +177,32 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
           type="text"
           required
           value={form.name}
-          onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => handleNameChange(e.target.value)}
+          onFocus={() => {
+            if (form.name.length >= 2 && filteredApps.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         />
+        
+        {/* Autocomplete dropdown */}
+        {showSuggestions && (
+          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            {filteredApps.map((app) => (
+              <button
+                key={app.id}
+                type="button"
+                onClick={() => selectApp(app)}
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+              >
+                <div className="font-medium text-sm text-gray-900">{app.name}</div>
+                <div className="text-xs text-gray-500 truncate">{app.url}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -141,7 +215,7 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
           value={form.url}
           onChange={(e) => setForm(prev => ({ ...prev, url: e.target.value }))}
           placeholder="https://..."
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         />
       </div>
 
@@ -152,7 +226,7 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
         <select
           value={form.category}
           onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value }))}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         >
           <option value="">Select a category...</option>
           {categories.map(cat => (
@@ -169,7 +243,7 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
           value={form.description}
           onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
           rows={3}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         />
       </div>
 
@@ -182,14 +256,14 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
           value={form.logoUrl}
           onChange={(e) => setForm(prev => ({ ...prev, logoUrl: e.target.value }))}
           placeholder="https://..."
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-string-mint text-string-dark py-2.5 px-4 rounded-xl font-medium hover:bg-string-mint-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? 'Submitting...' : 'Submit App'}
       </button>

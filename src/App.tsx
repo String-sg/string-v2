@@ -3,6 +3,8 @@ import { AuthButton } from './components/AuthButton';
 import { Footer } from './components/Footer';
 import { PinButton } from './components/ui/PinButton';
 import { LaunchButton } from './components/ui/LaunchButton';
+import { Modal } from './components/ui/Modal';
+import { AppSubmissionForm } from './components/AppSubmissionForm';
 import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
@@ -124,6 +126,7 @@ function Header({
   isDark,
   onToggleTheme,
   onSearchOpen,
+  onOpenSubmitModal,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -131,6 +134,7 @@ function Header({
   isDark: boolean;
   onToggleTheme: () => void;
   onSearchOpen: () => void;
+  onOpenSubmitModal: () => void;
 }) {
   const { isAuthenticated } = useAuth();
   return (
@@ -173,12 +177,9 @@ function Header({
           {/* Add App button for authenticated users */}
           {isAuthenticated && (
             <button
-              onClick={() => {
-                window.history.pushState({}, '', '/dashboard?tab=submit');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }}
-              className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
-              title="Add new app"
+              onClick={onOpenSubmitModal}
+              className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400 hover:text-string-mint"
+              title="Submit new app"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -996,6 +997,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [recentAppIds, setRecentAppIds] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem('string-recent-apps');
@@ -1096,6 +1098,12 @@ export default function App() {
   const handlePin = (id: string) => togglePinnedApp(id);
   const handleUnpin = (id: string) => togglePinnedApp(id);
 
+  const handleSubmitSuccess = () => {
+    setSubmitModalOpen(false);
+    // Optionally refresh apps list
+    // fetchApps();
+  };
+
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${t('bg-string-bg', 'bg-string-darker')}`}>
@@ -1113,6 +1121,7 @@ export default function App() {
         isDark={isDark}
         onToggleTheme={toggleTheme}
         onSearchOpen={() => setSearchModalOpen(true)}
+        onOpenSubmitModal={() => setSubmitModalOpen(true)}
       />
 
       <SearchModal
@@ -1196,6 +1205,16 @@ export default function App() {
         onClose={() => setSelectedApp(null)}
         t={t}
       />
+
+      {/* Submit App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Submit New App"
+        size="lg"
+      >
+        <AppSubmissionForm onSuccess={handleSubmitSuccess} />
+      </Modal>
 
       <Footer t={t} />
     </div>
