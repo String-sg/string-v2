@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Submission {
   id: string;
@@ -22,13 +22,7 @@ export function MySubmissions({ t, onSubmitApp, userId }: MySubmissionsProps) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (userId) {
-      loadSubmissions();
-    }
-  }, [userId]);
-
-  const loadSubmissions = async () => {
+  const loadSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/submissions?userId=${encodeURIComponent(userId)}`);
@@ -41,7 +35,13 @@ export function MySubmissions({ t, onSubmitApp, userId }: MySubmissionsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      loadSubmissions();
+    }
+  }, [userId, loadSubmissions]);
 
   const getStatusBadge = (status: string) => {
     const styles = {
