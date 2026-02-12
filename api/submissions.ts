@@ -61,42 +61,34 @@ export default async function handler(request: Request) {
         );
       }
 
-      console.log('Inserting submission:', { name, url, description, logoUrl, category, submittedByUserId, submittedByEmail });
-
       // Ensure user exists in database before creating submission
-      try {
-        const existingUser = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, submittedByUserId))
-          .limit(1);
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, submittedByUserId))
+        .limit(1);
 
-        if (existingUser.length === 0) {
-          // Create user if doesn't exist
-          await db.insert(users).values({
-            id: submittedByUserId,
-            email: submittedByEmail,
-            name: null, // Will be updated from OAuth data
-            slug: null, // Will be generated later
-          });
-          console.log('Created new user:', submittedByUserId);
-        }
-      } catch (userError) {
-        console.error('Error checking/creating user:', userError);
-        // Continue anyway - if user creation fails, the FK constraint will handle it
+      if (existingUser.length === 0) {
+        // Create user if doesn't exist
+        await db.insert(users).values({
+          id: submittedByUserId,
+          email: submittedByEmail,
+          name: null,
+          slug: null,
+        });
       }
 
+      // Insert submission
       await db.insert(appSubmissions).values({
         name,
         url,
-        description,
-        logoUrl,
-        category,
+        description: description || null,
+        logoUrl: logoUrl || null,
+        category: category || null,
         submittedByUserId,
         submittedByEmail,
         status: 'pending'
       });
-
 
       return new Response(
         JSON.stringify({ success: true, message: 'App submitted for review' }),
