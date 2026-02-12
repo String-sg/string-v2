@@ -4,7 +4,7 @@ import { Header } from './ui/Header';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
-import { Modal } from './Modal';
+import { Modal } from './ui/Modal';
 import { AppSubmissionForm } from './AppSubmissionForm';
 
 // Mock profile data for development
@@ -108,6 +108,8 @@ export function DevProfileMock({ slug }: { slug: string }) {
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
+          isOwnProfile={isOwnProfile}
+          onAddApp={handleAddApp}
         />
 
         <ProfileHeader
@@ -118,6 +120,18 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
         <ProfileFooter />
       </main>
+
+      {/* Add App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Add App to Profile"
+      >
+        <AppSubmissionForm
+          onSuccess={handleSubmitSuccess}
+          fromProfile={true}
+        />
+      </Modal>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
-import { Modal } from './Modal';
+import { Modal } from './ui/Modal';
 import { AppSubmissionForm } from './AppSubmissionForm';
 
 interface ProfileApp {
