@@ -29,13 +29,13 @@ export function Footer({ t }: { t: (l: any, d: any) => any }) {
               onClick={() => navigateTo('/privacy')}
               className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
             >
-              Privacy Policy
+              Privacy
             </button>
             <button
               onClick={() => navigateTo('/terms')}
               className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
             >
-              Terms & Conditions
+              Terms
             </button>
             <a
               href="https://www.linkedin.com/company/77759625"

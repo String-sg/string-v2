@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 interface DashboardHeaderProps {
@@ -18,6 +19,20 @@ export function DashboardHeader({
   onSubmitApp
 }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
 
   return (
     <header className="bg-string-dark sticky top-0 z-20">
@@ -97,19 +112,20 @@ export function DashboardHeader({
 
             {/* User menu */}
             {user && (
-              <div className="relative group">
-                {/* Mobile: Circular avatar with initial */}
-                <button className="sm:hidden w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                  {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0)?.toUpperCase()}
-                </button>
-
-                {/* Desktop: Full name/email */}
-                <button className="hidden sm:flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
-                  <span className="text-sm font-medium text-gray-700">
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="flex items-center bg-white border border-gray-300 rounded-full sm:rounded-lg w-8 h-8 sm:w-auto sm:h-auto justify-center hover:bg-gray-50 transition-colors sm:px-3 sm:py-2"
+                >
+                  <span className="sm:hidden text-sm font-medium text-gray-700">
+                    {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0)?.toUpperCase()}
+                  </span>
+                  <span className="hidden sm:block text-sm font-medium text-gray-700">
                     {user.name || user.email}
                   </span>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+
+                <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 z-10 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                   <div className="py-1">
                     <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
                       {user.email}
