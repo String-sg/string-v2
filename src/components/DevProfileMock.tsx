@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Card } from './ui/Card';
-import { AppCard } from './ui/AppCard';
 import { Header } from './ui/Header';
+import { AppsList } from './profile/AppsList';
+import { ProfileHeader } from './profile/ProfileHeader';
+import { ProfileFooter } from './profile/ProfileFooter';
 
 // Mock profile data for development
 const mockProfileData = {
@@ -36,15 +37,6 @@ const mockProfileData = {
   ]
 };
 
-function getInitials(name: string | null): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
-}
 
 export function DevProfileMock({ slug }: { slug: string }) {
   const { user } = useAuth();
@@ -97,69 +89,19 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
       {/* Profile Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Apps Section */}
-        <div className="space-y-8">
-          <h2 className="text-2xl font-bold text-string-dark">
-            {profile.name || 'User'}'s Apps
-          </h2>
+        <AppsList
+          apps={apps}
+          userName={profile.name}
+          onAppClick={handleAppClick}
+        />
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {apps.map((app) => (
-              <AppCard
-                key={`${app.type}-${app.id}`}
-                app={app}
-                onClick={() => handleAppClick(app)}
-              />
-            ))}
-          </div>
-        </div>
+        <ProfileHeader
+          profile={profile}
+          appsCount={apps.length}
+          className="mt-16"
+        />
 
-        {/* Profile Header */}
-        <Card className="p-8 mt-16">
-          <div className="flex items-start gap-6">
-            {/* Avatar */}
-            <div className="w-20 h-20 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint text-2xl font-bold shrink-0">
-              {profile.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.name || 'User'}
-                  className="w-20 h-20 rounded-2xl object-cover"
-                />
-              ) : (
-                getInitials(profile.name)
-              )}
-            </div>
-
-            {/* Profile Info */}
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-string-dark mb-2">
-                {profile.name || 'String User'}
-              </h1>
-              <p className="text-gray-600 mb-4">
-                Member since {new Date(profile.memberSince).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long'
-                })}
-              </p>
-
-              {apps.length > 0 && (
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-string-mint/10 text-string-dark text-sm font-medium">
-                  Sharing {apps.length} app{apps.length !== 1 ? 's' : ''}
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-500">
-            Powered by{' '}
-            <a href="/" className="text-string-mint hover:text-string-mint-light font-medium transition-colors">
-              String
-            </a>
-          </p>
-        </div>
+        <ProfileFooter />
       </main>
     </div>
   );

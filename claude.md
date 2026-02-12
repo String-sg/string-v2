@@ -1,7 +1,7 @@
 # String.sg v2 - Development Plan
 
-**Last Updated:** 2026-02-01
-**Status:** Phase 3 Ready - Backend + Frontend Complete
+**Last Updated:** 2026-02-12
+**Status:** Phase 4 Complete + UI Design System Established
 
 ---
 
@@ -43,6 +43,11 @@
 - [x] App submission form for authenticated users
 - [x] User dashboard with profile/submissions/submit tabs
 - [x] Mobile-responsive pin/unpin with long-press interactions
+- [x] **UI Design System**: String brand colors (#75F8CC mint, #33373B dark, #C0F4FB light)
+- [x] **Component Architecture**: Reusable UI components (Button, Card, AppCard, Header)
+- [x] **Profile Components**: Abstracted ProfileHeader, AppsList, ProfileFooter for dev/prod consistency
+- [x] **Profile UX**: Apps ordered by user contributions first, profile info moved to bottom
+- [x] **Development Mode**: DevProfileMock component for local testing without API dependencies
 
 ### 🔲 Phase 5: Personal Profile Pages (NEXT)
 - [ ] Email-prefix slug generation (e.g., `string.sg/lee-kh`)
@@ -68,7 +73,8 @@
 | Layer | Technology | Status |
 |-------|------------|--------|
 | Frontend | React 19 + Vite 7 + TypeScript | ✅ |
-| Styling | Tailwind CSS 4 | ✅ |
+| Styling | Tailwind CSS 4 + String Design System | ✅ |
+| Components | Abstracted UI Library (Button, Card, etc.) | ✅ |
 | Database | NeonDB (PostgreSQL) | ✅ |
 | ORM | Drizzle | ✅ |
 | API | Vercel Edge Functions | ✅ |
