@@ -83,7 +83,7 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
       {/* Header */}
       <Header
-        title=""
+        title={`${profile.name || 'User'}'s Apps`}
         subtitle={`string.sg/${profile.slug}`}
       />
 

@@ -107,6 +107,19 @@ string-v2/
 │   ├── scrape-schools.ts    # School directory scraper ✅
 │   └── seed-apps.ts         # Database seeder ✅
 ├── src/
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── Button.tsx       # Reusable button component ✅
+│   │   │   ├── Card.tsx         # Reusable card component ✅
+│   │   │   ├── AppCard.tsx      # App display card ✅
+│   │   │   └── Header.tsx       # Navigation header ✅
+│   │   ├── profile/
+│   │   │   ├── ProfileHeader.tsx # Profile info component ✅
+│   │   │   ├── AppsList.tsx     # Apps grid with sorting ✅
+│   │   │   └── ProfileFooter.tsx # Branded footer ✅
+│   │   ├── DevProfileMock.tsx   # Development profile mock ✅
+│   │   ├── PersonalProfile.tsx  # Production profile page ✅
+│   │   └── UserDashboard.tsx    # User dashboard ✅
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle schema (8 tables) ✅
 │   │   └── index.ts         # DB connection ✅
@@ -117,6 +130,7 @@ string-v2/
 │   ├── App.tsx              # Main landing page ✅
 │   ├── main.tsx             # React entry ✅
 │   └── index.css            # Tailwind styles ✅
+├── STYLING.md               # Design system documentation ✅
 ├── drizzle.config.ts        # Drizzle config ✅
 ├── vite.config.ts           # Vite config ✅
 ├── tailwind.config.js       # Tailwind config ✅
@@ -255,11 +269,23 @@ Response: { user: {...}, apps: [...] }
 POST /api/profile/apps { appId, type, isVisible }
 ```
 
-#### Components to Create
+#### Components Architecture ✅ COMPLETE
 ```typescript
-// PersonalLauncherPage.tsx - Public profile view
-// ProfileManagement.tsx - Inline visibility controls
-// PublicPreviewToggle.tsx - WYSIWYG toggle component
+// ProfileHeader.tsx - Profile info display (abstracted) ✅
+// AppsList.tsx - Apps grid with contribution ordering ✅
+// ProfileFooter.tsx - Branded footer with SVG logo ✅
+// DevProfileMock.tsx - Development testing component ✅
+// PersonalProfile.tsx - Production profile page ✅
+
+// UI Components Library ✅
+// Button.tsx, Card.tsx, AppCard.tsx, Header.tsx ✅
+
+// Design Features ✅
+- User contributions ordered first before pinned apps
+- Profile info moved to bottom for content-first UX
+- String dark navbar (#33373B) for better contrast
+- SVG logo in footer for improved readability
+- Abstracted components prevent dev/prod inconsistencies
 ```
 
 #### Implementation Approach

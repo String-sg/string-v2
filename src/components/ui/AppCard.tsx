@@ -43,7 +43,7 @@ export function AppCard({ app, onClick }: AppCardProps) {
 
         {/* App Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-string-dark truncate group-hover:text-string-mint transition-colors">
+          <h3 className="font-semibold text-string-dark truncate">
             {app.name}
           </h3>
           <p className="text-sm text-gray-600 line-clamp-2 mt-1">
@@ -62,8 +62,8 @@ export function AppCard({ app, onClick }: AppCardProps) {
         </div>
 
         {/* Launch Icon */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <svg className="w-5 h-5 text-gray-400 group-hover:text-string-mint transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 group-hover:bg-string-mint group-hover:text-string-dark transition-all duration-200">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
         </div>

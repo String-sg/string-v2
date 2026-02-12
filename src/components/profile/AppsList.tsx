@@ -42,20 +42,14 @@ export function AppsList({ apps, userName, onAppClick }: AppsListProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-string-dark">
-        {userName || 'User'}'s Apps
-      </h2>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {sortedApps.map((app) => (
-          <AppCard
-            key={`${app.type}-${app.id}`}
-            app={app}
-            onClick={() => onAppClick(app)}
-          />
-        ))}
-      </div>
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {sortedApps.map((app) => (
+        <AppCard
+          key={`${app.type}-${app.id}`}
+          app={app}
+          onClick={() => onAppClick(app)}
+        />
+      ))}
     </div>
   );
 }

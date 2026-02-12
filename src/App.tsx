@@ -267,7 +267,7 @@ function PinnedAppCard({
       {/* Desktop: Show unpin button on hover */}
       <div
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
-        className={`absolute top-1.5 right-1.5 transition-all duration-200 p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer opacity-0 scale-75 sm:group-hover:opacity-100 sm:scale-100`}
+        className={`absolute top-1.5 right-1.5 transition-all duration-200 p-1 rounded-lg hover:bg-string-mint hover:text-string-dark ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer opacity-0 scale-75 sm:group-hover:opacity-100 sm:scale-100`}
         title="Unpin"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1182,7 +1182,7 @@ export default function App() {
                 No apps found matching your criteria
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedApps.map((app) => (
                   <AppGridCard
                     key={app.id}
