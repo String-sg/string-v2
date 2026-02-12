@@ -9,7 +9,11 @@ interface AppSubmissionForm {
   category: string;
 }
 
-export function AppSubmissionForm() {
+interface AppSubmissionFormProps {
+  onSuccess?: () => void;
+}
+
+export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
     name: '',
@@ -75,6 +79,12 @@ export function AppSubmissionForm() {
           logoUrl: '',
           category: ''
         });
+        // Call onSuccess callback if provided
+        if (onSuccess) {
+          setTimeout(() => {
+            onSuccess();
+          }, 1500); // Give user time to see success message
+        }
       } else {
         console.error('Submission error:', data); // Debug log
         setMessage(data.error || 'Failed to submit app');

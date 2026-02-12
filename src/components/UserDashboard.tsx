@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { AppSubmissionForm } from './AppSubmissionForm';
+import { DashboardHeader } from './ui/DashboardHeader';
+import { MySubmissions } from './dashboard/MySubmissions';
+import { Modal } from './ui/Modal';
 
 // Theme helper function (consistent with main app)
 function useTheme() {
@@ -22,82 +25,6 @@ function useTheme() {
   return { isDark, toggle, t };
 }
 
-// Header component consistent with main app
-function DashboardHeader({
-  isDark,
-  onToggleTheme,
-  t
-}: {
-  isDark: boolean;
-  onToggleTheme: () => void;
-  t: (l: string, d: string) => string;
-}) {
-  const { user, signOut } = useAuth();
-
-  return (
-    <header className="bg-string-dark sticky top-0 z-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <button
-          onClick={() => {
-            window.history.pushState({}, '', '/');
-            window.dispatchEvent(new PopStateEvent('popstate'));
-          }}
-          className="flex items-center gap-2 text-gray-400 hover:text-string-mint transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <img
-            src="/logo-green.svg"
-            alt="String"
-            className="h-6"
-          />
-        </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onToggleTheme}
-            className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {isDark ? (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-              </svg>
-            )}
-          </button>
-
-          {user && (
-            <div className="relative group">
-              <button className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors">
-                <span className="text-sm font-medium text-gray-700">
-                  {user.name || user.email}
-                </span>
-              </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                <div className="py-1">
-                  <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
-                    {user.email}
-                  </div>
-                  <button
-                    onClick={signOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
-  );
-}
 
 interface Submission {
   id: string;
@@ -142,47 +69,48 @@ interface ProfileData {
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const { isDark, toggle: toggleTheme, t } = useTheme();
 
-  // Initialize active tab based on URL query parameter
-  const getInitialTab = (): 'profile' | 'submissions' | 'submit' => {
+  // Initialize active tab based on URL query parameter - default to submissions
+  const getInitialTab = (): 'profile' | 'submissions' => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam === 'submit' || tabParam === 'submissions') {
-      return tabParam as 'submit' | 'submissions';
+    if (tabParam === 'profile') {
+      return 'profile';
     }
-    return 'profile';
+    return 'submissions';
   };
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'submissions' | 'submit'>(getInitialTab);
+  const [activeTab, setActiveTab] = useState<'profile' | 'submissions'>(getInitialTab);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && activeTab === 'submissions') {
-      loadSubmissions();
-    }
     if (isAuthenticated && activeTab === 'profile') {
       loadProfileData();
     }
   }, [isAuthenticated, activeTab]);
 
-  const loadSubmissions = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/submissions');
-      if (response.ok) {
-        const data = await response.json();
-        setSubmissions(data.submissions);
-      }
-    } catch (error) {
-      console.error('Failed to load submissions:', error);
-    } finally {
-      setLoading(false);
-    }
+  // Handle tab changes and update URL
+  const handleTabChange = (tab: 'profile' | 'submissions') => {
+    setActiveTab(tab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    window.history.pushState({}, '', url);
   };
+
+  // Handle submit app modal
+  const handleSubmitApp = () => {
+    setShowSubmitModal(true);
+  };
+
+  const handleSubmitSuccess = () => {
+    setShowSubmitModal(false);
+    // Switch to submissions tab to see the new submission
+    handleTabChange('submissions');
+  };
+
 
   const loadProfileData = async () => {
     if (!user?.id) return;
@@ -237,7 +165,14 @@ export function UserDashboard() {
   if (!isAuthenticated || !user) {
     return (
       <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
-        <DashboardHeader isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+        <DashboardHeader
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
+          t={t}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          onSubmitApp={handleSubmitApp}
+        />
         <div className="max-w-4xl mx-auto p-6 pt-12">
           <div className={`${t('bg-white border border-gray-200', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl p-8 text-center`}>
             <h3 className={`text-lg font-semibold ${t('text-gray-800', 'text-white')} mb-2`}>Sign In Required</h3>
@@ -248,59 +183,23 @@ export function UserDashboard() {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      pending: t('bg-yellow-100 text-yellow-800', 'bg-yellow-900/20 text-yellow-400'),
-      approved: 'bg-string-mint/20 text-string-mint-dark',
-      rejected: t('bg-red-100 text-red-800', 'bg-red-900/20 text-red-400')
-    };
-
-    return (
-      <span className={`px-2 py-1 text-xs rounded-lg font-medium ${styles[status as keyof typeof styles]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
-  };
 
   return (
     <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
-      <DashboardHeader isDark={isDark} onToggleTheme={toggleTheme} t={t} />
+      <DashboardHeader
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
+        t={t}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onSubmitApp={handleSubmitApp}
+      />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>Dashboard</h1>
-          <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
-            Manage your profile, submissions, and apps.
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
-        <div className={`${t('bg-white border border-gray-100', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl overflow-hidden`}>
-          <div className="bg-string-dark border-b border-[#3a3f44]">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
-              {[
-                { id: 'profile', name: 'Profile' },
-                { id: 'submissions', name: 'My Submissions' },
-                { id: 'submit', name: 'Submit App' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-string-mint text-string-mint'
-                      : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
-                  }`}
-                >
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="p-6">
-            {activeTab === 'profile' && (
-              <div className="space-y-6">
+        {activeTab === 'profile' && (
+          <div className="space-y-6">
+            <div className={`${t('bg-white border border-gray-100', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl p-6`}>
                 <h2 className={`text-xl font-semibold ${t('text-string-dark', 'text-white')}`}>Profile Settings</h2>
 
                 {/* Basic Profile Info */}
@@ -444,7 +343,7 @@ export function UserDashboard() {
                         Pin apps from the homepage or submit new apps to customize your profile.
                       </p>
                       <button
-                        onClick={() => setActiveTab('submit')}
+                        onClick={() => setShowSubmitModal(true)}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-string-dark bg-string-mint hover:bg-string-mint-light transition-colors"
                       >
                         Submit an App
@@ -454,58 +353,22 @@ export function UserDashboard() {
                 </div>
               ) : null}
             </div>
-          )}
-
-          {activeTab === 'submissions' && (
-            <div className="space-y-4">
-              <h2 className={`text-xl font-semibold ${t('text-string-dark', 'text-white')}`}>My Submissions</h2>
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-string-mint"></div>
-                </div>
-              ) : submissions.length === 0 ? (
-                <div className={`${t('bg-gray-50', 'bg-string-darker')} rounded-xl p-8 text-center`}>
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${t('bg-gray-200', 'bg-[#3a3f44]')} flex items-center justify-center`}>
-                    <svg className={`w-8 h-8 ${t('text-gray-400', 'text-gray-500')}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <h3 className={`text-lg font-medium ${t('text-string-dark', 'text-white')} mb-2`}>No Submissions Yet</h3>
-                  <p className={`${t('text-gray-600', 'text-gray-400')} mb-4`}>You haven't submitted any apps yet.</p>
-                  <button
-                    onClick={() => setActiveTab('submit')}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-string-dark bg-string-mint hover:bg-string-mint-light transition-colors"
-                  >
-                    Submit Your First App
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {submissions.map((submission) => (
-                    <div key={submission.id} className={`${t('bg-white border border-gray-200', 'bg-[#2a2d30] border border-[#3a3f44]')} rounded-xl p-4 transition-colors hover:border-string-mint`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className={`font-medium ${t('text-string-dark', 'text-white')}`}>{submission.name}</h3>
-                        {getStatusBadge(submission.status)}
-                      </div>
-                      <p className={`text-sm ${t('text-gray-600', 'text-gray-400')} mb-2`}>{submission.description}</p>
-                      <div className={`flex justify-between items-center text-xs ${t('text-gray-500', 'text-gray-400')}`}>
-                        <span>Category: {submission.category || 'Uncategorized'}</span>
-                        <span>Submitted: {new Date(submission.submittedAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-            {activeTab === 'submit' && (
-              <div>
-                <AppSubmissionForm />
-              </div>
-            )}
           </div>
-        </div>
+        )}
+
+        {activeTab === 'submissions' && (
+          <MySubmissions t={t} />
+        )}
+
+        {/* Submit App Modal */}
+        <Modal
+          isOpen={showSubmitModal}
+          onClose={() => setShowSubmitModal(false)}
+          title="Submit New App"
+          size="lg"
+        >
+          <AppSubmissionForm onSuccess={handleSubmitSuccess} />
+        </Modal>
       </div>
     </div>
   );
