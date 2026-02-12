@@ -4,6 +4,8 @@ import { Header } from './ui/Header';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
+import { Modal } from './ui/Modal';
+import { AppSubmissionForm } from './AppSubmissionForm';
 
 // Mock profile data for development
 const mockProfileData = {
@@ -41,9 +43,22 @@ const mockProfileData = {
 export function DevProfileMock({ slug }: { slug: string }) {
   const { user } = useAuth();
   const [loading] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+
+  // Check if viewing own profile
+  const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
 
   const handleAppClick = (app: any) => {
     window.open(app.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleAddApp = () => {
+    setSubmitModalOpen(true);
+  };
+
+  const handleSubmitSuccess = () => {
+    setSubmitModalOpen(false);
+    // TODO: Refresh profile data
   };
 
   // Use real user data if available, otherwise use mock
@@ -93,6 +108,8 @@ export function DevProfileMock({ slug }: { slug: string }) {
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
+          isOwnProfile={isOwnProfile}
+          onAddApp={handleAddApp}
         />
 
         <ProfileHeader
@@ -103,6 +120,18 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
         <ProfileFooter />
       </main>
+
+      {/* Add App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Add App to Profile"
+      >
+        <AppSubmissionForm
+          onSuccess={handleSubmitSuccess}
+          fromProfile={true}
+        />
+      </Modal>
     </div>
   );
 }

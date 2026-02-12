@@ -5,7 +5,7 @@ export function ProfileFooter() {
         Powered by{' '}
         <a href="/" className="text-string-mint hover:text-string-mint-light font-medium transition-colors">
           <img
-            src="/Brand Guidelines/4. Svg Separate Files/primary_dark.svg"
+            src="/logo-dark.svg"
             alt="String"
             className="h-4 inline"
           />

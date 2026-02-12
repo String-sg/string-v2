@@ -1074,6 +1074,27 @@ export default function App() {
     fetchApps();
   }, []);
 
+  // Auto-pin app from query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    
+    if (pinId && apps.length > 0) {
+      // Check if app exists and isn't already pinned
+      const appExists = apps.some(app => app.id === pinId);
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      
+      if (appExists && !alreadyPinned) {
+        togglePinnedApp(pinId);
+        // Show a brief success message (optional)
+        console.log('App pinned successfully!');
+      }
+      
+      // Clean up URL (remove query param)
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [apps, preferences.pinnedApps, togglePinnedApp]);
+
   const categories = [...new Set(apps.map((a) => a.category))].sort();
   const categoryCountMap = categories.reduce((acc, cat) => {
     acc[cat] = apps.filter((a) => a.category === cat).length;

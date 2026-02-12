@@ -11,6 +11,7 @@ interface AppSubmissionForm {
 
 interface AppSubmissionFormProps {
   onSuccess?: () => void;
+  fromProfile?: boolean;
 }
 
 interface ExistingApp {
@@ -19,7 +20,7 @@ interface ExistingApp {
   url: string;
 }
 
-export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
+export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmissionFormProps = {}) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
     name: '',
@@ -33,6 +34,7 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   const [existingApps, setExistingApps] = useState<ExistingApp[]>([]);
   const [filteredApps, setFilteredApps] = useState<ExistingApp[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedExistingApp, setSelectedExistingApp] = useState<ExistingApp | null>(null);
 
   const categories = [
     'Administration',
@@ -84,7 +86,13 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
   const selectApp = (app: ExistingApp) => {
     setForm(prev => ({ ...prev, name: app.name, url: app.url }));
     setShowSuggestions(false);
-    setMessage('Note: This app already exists. Consider if you really need to submit it again.');
+    setSelectedExistingApp(app);
+    
+    if (fromProfile) {
+      setMessage('existing-app'); // Special flag for existing app
+    } else {
+      setMessage('Note: This app already exists. Consider if you really need to submit it again.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -159,13 +167,31 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {message && (
+      {message && message !== 'existing-app' && (
         <div className={`p-3 rounded-lg ${message.includes('successfully')
           ? 'bg-green-50 text-green-700 border border-green-200'
           : message.includes('Note:')
           ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
           : 'bg-red-50 text-red-700 border border-red-200'}`}>
           {message}
+        </div>
+      )}
+
+      {/* Special message for existing apps from profile */}
+      {fromProfile && message === 'existing-app' && selectedExistingApp && (
+        <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+          <p className="text-yellow-800 text-sm mb-3">
+            <strong>This app already exists in the library.</strong>
+          </p>
+          <a
+            href={`/?pin=${selectedExistingApp.id}`}
+            className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark rounded-lg hover:bg-string-mint-light transition-colors text-sm font-medium"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            Pin it to your homepage →
+          </a>
         </div>
       )}
 
@@ -262,7 +288,7 @@ export function AppSubmissionForm({ onSuccess }: AppSubmissionFormProps = {}) {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (fromProfile && message === 'existing-app')}
         className="w-full bg-string-mint text-string-dark py-2.5 px-4 rounded-xl font-medium hover:bg-string-mint-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? 'Submitting...' : 'Submit App'}
