@@ -121,13 +121,7 @@ export class AuthClient {
 
       // Save user to database (only in production or when API is available)
       try {
-        // Check if we're in development (localhost) or production
-        const isDevelopment = window.location.hostname === 'localhost' ||
-                             window.location.hostname === '127.0.0.1' ||
-                             window.location.hostname.includes('localhost');
-        const apiUrl = isDevelopment ? 'https://string.sg/api/users' : '/api/users';
-
-        const saveResponse = await fetch(apiUrl, {
+        const saveResponse = await fetch('/api/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -142,13 +136,13 @@ export class AuthClient {
         });
 
         if (!saveResponse.ok) {
-          console.warn('Failed to save user to database:', saveResponse.statusText);
+          console.warn('Failed to save user to database (API not available in dev):', saveResponse.statusText);
         } else {
           const result = await saveResponse.json();
           console.log('User saved to database:', result.user?.email);
         }
       } catch (dbError) {
-        console.warn('Database save error (continuing with local auth):', dbError);
+        console.warn('Database save error (API not available in local dev - this is normal):', dbError);
       }
 
       // Update local state regardless of database save result

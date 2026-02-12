@@ -4,8 +4,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "dev:api": "vercel dev",
+    "dev": "concurrently \"npm run api\" \"npm run client\"",
+    "client": "vite",
+    "api": "tsx server/dev-server.js",
+    "dev:vercel": "vercel dev",
     "build": "vite build",
     "preview": "vite preview",
     "db:generate": "drizzle-kit generate",
@@ -21,6 +23,7 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "cheerio": "^1.2.0",
+    "concurrently": "^9.2.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",

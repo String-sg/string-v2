@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { appSubmissions } from '../src/db/schema';
+import { appSubmissions, users } from '../src/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 // Edge runtime configuration
@@ -61,17 +61,34 @@ export default async function handler(request: Request) {
         );
       }
 
+      // Ensure user exists in database before creating submission
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, submittedByUserId))
+        .limit(1);
+
+      if (existingUser.length === 0) {
+        // Create user if doesn't exist
+        await db.insert(users).values({
+          id: submittedByUserId,
+          email: submittedByEmail,
+          name: null,
+          slug: null,
+        });
+      }
+
+      // Insert submission
       await db.insert(appSubmissions).values({
         name,
         url,
-        description,
-        logoUrl,
-        category,
+        description: description || null,
+        logoUrl: logoUrl || null,
+        category: category || null,
         submittedByUserId,
         submittedByEmail,
         status: 'pending'
       });
-
 
       return new Response(
         JSON.stringify({ success: true, message: 'App submitted for review' }),
@@ -123,7 +140,10 @@ export default async function handler(request: Request) {
   } catch (error) {
     console.error('Database error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

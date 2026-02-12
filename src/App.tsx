@@ -1,8 +1,12 @@
 import { useEffect, useState, useRef, type ReactElement } from 'react';
 import { AuthButton } from './components/AuthButton';
 import { Footer } from './components/Footer';
+import { PinButton } from './components/ui/PinButton';
+import { LaunchButton } from './components/ui/LaunchButton';
+import { Modal } from './components/ui/Modal';
+import { AppSubmissionForm } from './components/AppSubmissionForm';
 import { usePreferences } from './hooks/usePreferences';
-import { useLongPress } from './hooks/useLongPress';
+import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
 
 // ── Types ──────────────────────────────────────────────
@@ -122,6 +126,7 @@ function Header({
   isDark,
   onToggleTheme,
   onSearchOpen,
+  onOpenSubmitModal,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -129,6 +134,7 @@ function Header({
   isDark: boolean;
   onToggleTheme: () => void;
   onSearchOpen: () => void;
+  onOpenSubmitModal: () => void;
 }) {
   const { isAuthenticated } = useAuth();
   return (
@@ -171,12 +177,9 @@ function Header({
           {/* Add App button for authenticated users */}
           {isAuthenticated && (
             <button
-              onClick={() => {
-                window.history.pushState({}, '', '/dashboard?tab=submit');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }}
-              className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400"
-              title="Add new app"
+              onClick={onOpenSubmitModal}
+              className="p-2 rounded-lg transition-colors hover:bg-string-darker text-gray-400 hover:text-string-mint"
+              title="Submit new app"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -226,41 +229,36 @@ function PinnedAppCard({
   onUnpin: (id: string) => void;
   t: (l: string, d: string) => string;
 }) {
-  const [showUnpin, setShowUnpin] = useState(false);
-
-  const longPressProps = useLongPress({
-    onLongPress: () => {
-      setShowUnpin(true);
-      // Auto-hide after 3 seconds
-      setTimeout(() => setShowUnpin(false), 3000);
-    },
-    delay: 500
+  const swipeProps = useSwipe({
+    onSwipeLeft: () => {},  // Show menu on swipe left
+    threshold: 100
   });
 
   const handleClick = (e: React.MouseEvent) => {
-    // If unpin button is showing and we're on mobile, don't navigate
-    if (showUnpin && window.innerWidth < 640) {
+    // If swipe menu is open, close it instead of navigating
+    if (swipeProps.isSwipeMenuOpen) {
       e.preventDefault();
-      setShowUnpin(false);
+      swipeProps.closeSwipeMenu();
       return;
     }
 
     // Allow normal navigation
-    longPressProps.onClick?.(e);
+    swipeProps.onClick(e);
   };
 
   return (
-    <a
-      href={app.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-colors ${t(
-        'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
-        'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
-      )}`}
-      {...longPressProps}
-      onClick={handleClick}
-    >
+    <div className="relative overflow-hidden rounded-xl">
+      <a
+        href={app.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl sm:min-w-[200px] transition-all duration-200 ${t(
+          'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
+          'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
+        )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
+        {...swipeProps}
+        onClick={handleClick}
+      >
       <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {getInitials(app.name)}
       </div>
@@ -269,28 +267,44 @@ function PinnedAppCard({
         <div className={`text-xs ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.category}</div>
       </div>
 
-      {/* Mobile: Show unpin button after long press, Desktop: Show on hover */}
+      {/* Desktop: Show unpin button on hover */}
       <div
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
-        className={`absolute top-1.5 right-1.5 transition-all duration-200 p-1 rounded-full hover:bg-red-100 hover:text-red-500 ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer ${
-          showUnpin ? 'opacity-100 scale-100' : 'opacity-0 scale-75 sm:opacity-0 sm:group-hover:opacity-100 sm:scale-100'
-        }`}
+        className={`absolute top-1.5 right-1.5 transition-all duration-200 p-1 rounded-lg hover:bg-string-mint hover:text-string-dark ${t('text-string-text-secondary', 'text-gray-400')} cursor-pointer opacity-0 scale-75 sm:group-hover:opacity-100 sm:scale-100`}
         title="Unpin"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
+      </a>
 
-      {/* Long press hint - show briefly on first interaction */}
-      {showUnpin && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 sm:hidden">
-          <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-            Tap × to unpin
-          </div>
-        </div>
-      )}
-    </a>
+      {/* Mobile swipe menu */}
+      <div className={`absolute top-0 right-0 h-full flex items-center transition-all duration-200 ${
+        swipeProps.isSwipeMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnpin(app.id); }}
+          className="h-full px-3 bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+          title="Unpin"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+          </svg>
+        </button>
+        <a
+          href={app.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="h-full px-3 bg-string-mint text-string-dark flex items-center justify-center hover:bg-string-mint-light transition-colors"
+          title="Open App"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -480,14 +494,30 @@ function AppGridCard({
   showCategory: boolean;
   t: (l: string, d: string) => string;
 }) {
+  const swipeProps = useSwipe({
+    onSwipeLeft: () => {},  // Show menu on swipe left
+    threshold: 100
+  });
+
+  const handleClick = () => {
+    // If swipe menu is open, close it instead of selecting
+    if (swipeProps.isSwipeMenuOpen) {
+      swipeProps.closeSwipeMenu();
+      return;
+    }
+    onSelect(app);
+  };
+
   return (
-    <div
-      onClick={() => onSelect(app)}
-      className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors ${t(
-        'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
-        'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
-      )}`}
-    >
+    <div className="relative overflow-hidden rounded-xl">
+      <div
+        onClick={handleClick}
+        className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-200 ${t(
+          'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
+          'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
+        )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
+        {...swipeProps}
+      >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {app.logoUrl ? (
           <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-[15px]" />
@@ -502,13 +532,44 @@ function AppGridCard({
           <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
         )}
       </div>
-      <div className="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        {/* Desktop action buttons - show on hover */}
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 sm:group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => { e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
+            className={`p-1.5 rounded-lg transition-colors ${
+              isPinned
+                ? 'text-string-mint bg-string-mint/10'
+                : t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')
+            }`}
+            title={isPinned ? 'Unpin' : 'Pin'}
+          >
+            <svg className="w-4 h-4" fill={isPinned ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+          </button>
+          <a
+            href={app.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')}`}
+            title="Open in new tab"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        </a>
+      </div>
+      </div>
+
+      {/* Mobile swipe menu */}
+      <div className={`absolute top-0 right-0 h-full flex items-center transition-all duration-200 ${
+        swipeProps.isSwipeMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
         <button
-          onClick={(e) => { e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
-          className={`p-1.5 rounded-lg transition-colors ${
-            isPinned
-              ? 'text-string-mint bg-string-mint/10'
-              : t('text-gray-400 hover:text-string-mint hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
+          className={`h-full px-3 flex items-center justify-center hover:opacity-80 transition-colors ${
+            isPinned ? 'bg-red-500 text-white' : 'bg-string-mint text-string-dark'
           }`}
           title={isPinned ? 'Unpin' : 'Pin'}
         >
@@ -520,13 +581,12 @@ function AppGridCard({
           href={app.url}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')}`}
-          title="Open in new tab"
+          className="h-full px-3 bg-string-mint text-string-dark flex items-center justify-center hover:bg-string-mint-light transition-colors"
+          title="Open App"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-          </svg>
+        </svg>
         </a>
       </div>
     </div>
@@ -580,31 +640,16 @@ function FeaturedSection({
           </div>
           {/* Action buttons */}
           <div className="absolute top-4 right-4 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20">
-            <button
-              onClick={(e) => { e.stopPropagation(); pinnedApps.includes(primary.id) ? onUnpin(primary.id) : onPin(primary.id); }}
-              className={`p-2 rounded-lg transition-colors ${
-                pinnedApps.includes(primary.id)
-                  ? 'text-string-mint bg-string-mint/10'
-                  : 'text-gray-300 hover:text-[#33373B] hover:bg-[#75F8CC]'
-              }`}
-              title={pinnedApps.includes(primary.id) ? 'Unpin' : 'Pin'}
-            >
-              <svg className="w-4 h-4" fill={pinnedApps.includes(primary.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-              </svg>
-            </button>
-            <a
-              href={primary.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 rounded-lg transition-colors text-gray-300 hover:text-[#33373B] hover:bg-[#75F8CC]"
-              title="Open in new tab"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-              </svg>
-            </a>
+            <PinButton
+              isPinned={pinnedApps.includes(primary.id)}
+              onPin={() => onPin(primary.id)}
+              onUnpin={() => onUnpin(primary.id)}
+              className="text-gray-300"
+            />
+            <LaunchButton
+              url={primary.url}
+              className="text-gray-300"
+            />
           </div>
         </div>
         <div className="flex flex-col gap-3">
@@ -626,13 +671,13 @@ function FeaturedSection({
                 <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
               </div>
               {/* Action buttons */}
-              <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={(e) => { e.stopPropagation(); pinnedApps.includes(app.id) ? onUnpin(app.id) : onPin(app.id); }}
                   className={`p-1.5 rounded-lg transition-colors ${
                     pinnedApps.includes(app.id)
                       ? 'text-string-mint bg-string-mint/10'
-                      : t('text-gray-400 hover:text-string-mint hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')
+                      : t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')
                   }`}
                   title={pinnedApps.includes(app.id) ? 'Unpin' : 'Pin'}
                 >
@@ -645,7 +690,7 @@ function FeaturedSection({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-gray-100', 'text-gray-500 hover:text-[#33373B] hover:bg-[#75F8CC]')}`}
+                  className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')}`}
                   title="Open in new tab"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -952,6 +997,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [recentAppIds, setRecentAppIds] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem('string-recent-apps');
@@ -1052,6 +1098,12 @@ export default function App() {
   const handlePin = (id: string) => togglePinnedApp(id);
   const handleUnpin = (id: string) => togglePinnedApp(id);
 
+  const handleSubmitSuccess = () => {
+    setSubmitModalOpen(false);
+    // Optionally refresh apps list
+    // fetchApps();
+  };
+
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${t('bg-string-bg', 'bg-string-darker')}`}>
@@ -1069,6 +1121,7 @@ export default function App() {
         isDark={isDark}
         onToggleTheme={toggleTheme}
         onSearchOpen={() => setSearchModalOpen(true)}
+        onOpenSubmitModal={() => setSubmitModalOpen(true)}
       />
 
       <SearchModal
@@ -1125,7 +1178,7 @@ export default function App() {
                 No apps found matching your criteria
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedApps.map((app) => (
                   <AppGridCard
                     key={app.id}
@@ -1152,6 +1205,16 @@ export default function App() {
         onClose={() => setSelectedApp(null)}
         t={t}
       />
+
+      {/* Submit App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Submit New App"
+        size="lg"
+      >
+        <AppSubmissionForm onSuccess={handleSubmitSuccess} />
+      </Modal>
 
       <Footer t={t} />
     </div>

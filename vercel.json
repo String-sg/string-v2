@@ -1,7 +1,18 @@
 {
   "devCommand": "vite",
   "framework": "vite",
+  "headers": [
+    {
+      "source": "/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    }
+  ],
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/" }
+    { "source": "/((?!api/|_next/|icons/|logo|favicon|assets/|\\.(?:ico|png|jpg|jpeg|svg|gif|webp|css|js|json)$).*)", "destination": "/" }
   ]
 }
