@@ -14,9 +14,10 @@ interface Submission {
 
 interface MySubmissionsProps {
   t: (light: string, dark: string) => string;
+  onSubmitApp: () => void;
 }
 
-export function MySubmissions({ t }: MySubmissionsProps) {
+export function MySubmissions({ t, onSubmitApp }: MySubmissionsProps) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -69,13 +70,17 @@ export function MySubmissions({ t }: MySubmissionsProps) {
   if (submissions.length === 0) {
     return (
       <div className={`${t('bg-gray-50', 'bg-string-darker')} rounded-xl p-8 text-center`}>
-        <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${t('bg-gray-200', 'bg-[#3a3f44]')} flex items-center justify-center`}>
-          <svg className={`w-8 h-8 ${t('text-gray-400', 'text-gray-500')}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <h3 className={`text-lg font-medium ${t('text-string-dark', 'text-white')} mb-2`}>No submissions yet</h3>
+        <p className={`${t('text-gray-600', 'text-gray-400')} mb-6`}>Submit your first app below</p>
+        <button
+          onClick={onSubmitApp}
+          className={`w-16 h-16 mx-auto rounded-full ${t('bg-gray-200 hover:bg-gray-300', 'bg-[#3a3f44] hover:bg-[#454a4f]')} flex items-center justify-center transition-colors cursor-pointer group`}
+          title="Submit new app"
+        >
+          <svg className={`w-8 h-8 ${t('text-gray-400 group-hover:text-gray-600', 'text-gray-500 group-hover:text-gray-300')} transition-colors`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-        </div>
-        <h3 className={`text-lg font-medium ${t('text-string-dark', 'text-white')} mb-2`}>No Submissions Yet</h3>
-        <p className={`${t('text-gray-600', 'text-gray-400')} mb-4`}>You haven't submitted any apps yet.</p>
+        </button>
       </div>
     );
   }

@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { appSubmissions } from '../src/db/schema.ts';
+import { appSubmissions, users } from '../src/db/schema.ts';
 import { eq, desc } from 'drizzle-orm';
 import dotenv from 'dotenv';
+import { generateSlugFromEmail } from '../src/lib/slug-utils.ts';
 
 dotenv.config();
 
@@ -22,6 +23,45 @@ if (!connectionString) {
 
 const sqlClient = neon(connectionString);
 const db = drizzle(sqlClient);
+
+// POST /api/users
+app.post('/api/users', async (req, res) => {
+  try {
+    const { id, email, name, image, provider } = req.body;
+    if (!id || !email) {
+      return res.status(400).json({ error: 'id and email are required' });
+    }
+
+    const slug = generateSlugFromEmail(email);
+
+    console.log('Upserting user:', { id, email, name, slug });
+
+    const result = await db.insert(users).values({
+      id: id,
+      email: email,
+      name: name,
+      avatarUrl: image,
+      provider: provider,
+      slug: slug,
+      lastLogin: new Date(),
+    }).onConflictDoUpdate({
+      target: users.id,
+      set: {
+        name: name,
+        avatarUrl: image,
+        lastLogin: new Date(),
+      }
+    }).returning();
+
+    res.json({ success: true, user: result[0] });
+  } catch (error) {
+    console.error('Database error in /api/users:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: error.message,
+    });
+  }
+});
 
 // POST /api/submissions
 app.post('/api/submissions', async (req, res) => {

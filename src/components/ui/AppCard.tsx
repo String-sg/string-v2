@@ -49,16 +49,6 @@ export function AppCard({ app, onClick }: AppCardProps) {
           <p className="text-sm text-gray-600 line-clamp-2 mt-1">
             {app.tagline || app.description || 'No description available'}
           </p>
-          <div className="flex items-center gap-2 mt-3">
-            <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-string-mint/10 text-string-dark">
-              {app.category}
-            </span>
-            {app.type === 'submitted' && (
-              <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-string-light/50 text-string-dark">
-                Contributed
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Launch Icon */}

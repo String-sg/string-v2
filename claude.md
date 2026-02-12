@@ -48,7 +48,12 @@
 - [x] **Profile Components**: Abstracted ProfileHeader, AppsList, ProfileFooter for dev/prod consistency
 - [x] **Profile UX**: Apps ordered by user contributions first, profile info moved to bottom
 - [x] **Development Mode**: DevProfileMock component for local testing without API dependencies
-- [x] **Styling Abstractions**: Complete UI component library with consistent patterns (see Component Library section below)
+- [x] **Submission UX Improvements**:
+  - Enhanced empty submissions state with actionable CTA (clickable + icon)
+  - App name autocomplete to prevent duplicate submissions
+  - Fixed modal styling to match String brand guidelines (mint green buttons)
+  - Removed duplicate title in submission form
+  - Submission modal accessible from both homepage and dashboard + buttons
 
 ### 🔲 Phase 5: Personal Profile Pages (NEXT)
 - [ ] Email-prefix slug generation (e.g., `string.sg/lee-kh`)
@@ -113,11 +118,15 @@ string-v2/
 │   │   │   ├── Button.tsx       # Reusable button component ✅
 │   │   │   ├── Card.tsx         # Reusable card component ✅
 │   │   │   ├── AppCard.tsx      # App display card ✅
-│   │   │   └── Header.tsx       # Navigation header ✅
+│   │   │   ├── Header.tsx       # Navigation header ✅
+│   │   │   └── Modal.tsx        # Modal component ✅
 │   │   ├── profile/
 │   │   │   ├── ProfileHeader.tsx # Profile info component ✅
 │   │   │   ├── AppsList.tsx     # Apps grid with sorting ✅
 │   │   │   └── ProfileFooter.tsx # Branded footer ✅
+│   │   ├── dashboard/
+│   │   │   └── MySubmissions.tsx # User submissions tab ✅
+│   │   ├── AppSubmissionForm.tsx # App submission form with autocomplete ✅
 │   │   ├── DevProfileMock.tsx   # Development profile mock ✅
 │   │   ├── PersonalProfile.tsx  # Production profile page ✅
 │   │   └── UserDashboard.tsx    # User dashboard ✅
@@ -877,13 +886,35 @@ mkdir extension
 
 ---
 
+## Recent Improvements (2026-02-12)
+
+### App Submission UX Overhaul
+**Problem:** Submission flow was disconnected and modal didn't follow brand guidelines
+**Solution:**
+1. **Enhanced Empty State** - MySubmissions tab now shows actionable CTA with clickable + icon
+2. **Autocomplete for Duplicates** - App name field queries existing apps and warns users about duplicates
+3. **Brand Consistency** - Updated all modal styling to use String mint (#75F8CC) instead of generic blue
+4. **Unified Access** - Submission modal accessible from both homepage + button and dashboard
+5. **Cleaner UI** - Removed duplicate title, modal header now serves as the only title
+
+**Technical Details:**
+- `AppSubmissionForm.tsx`: Added autocomplete dropdown with real-time filtering
+- `MySubmissions.tsx`: Enhanced empty state with interactive + button
+- `App.tsx`: Added modal state and wired + button in header
+- All inputs now use `focus:ring-string-mint` for consistent brand experience
+
+---
+
 ## UGC Workflow
 
-1. User submits app via form
-2. Saved with `status: 'pending'`
-3. **Submitter sees their app immediately**
-4. Admin reviews via Drizzle Studio
-5. Approved → visible globally
+1. User clicks + icon (homepage or dashboard)
+2. Modal opens with app submission form
+3. User types app name → autocomplete suggests existing apps to prevent duplicates
+4. If selecting existing app → yellow warning appears
+5. Form validates and submits with `status: 'pending'`
+6. **Submitter sees their app immediately in dashboard**
+7. Admin reviews via Drizzle Studio
+8. Approved → visible globally in app directory
 
 ---
 

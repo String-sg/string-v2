@@ -55,7 +55,7 @@ export const featuredApps = pgTable('featured_apps', {
 
 // Users table
 export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
   name: text('name'),
   slug: text('slug').unique(), // e.g., 'lee-kh' from email prefix
@@ -69,7 +69,7 @@ export const users = pgTable('users', {
 // User preferences - app arrangement and settings
 export const userPreferences = pgTable('user_preferences', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull().unique(),
+  userId: text('user_id').notNull().unique(), // Removed FK - OAuth IDs are text
   appArrangement: jsonb('app_arrangement').$type<string[]>().default([]), // Ordered app IDs
   hiddenApps: jsonb('hidden_apps').$type<string[]>().default([]),
   pinnedApps: jsonb('pinned_apps').$type<string[]>().default([]),
@@ -79,7 +79,7 @@ export const userPreferences = pgTable('user_preferences', {
 // User app launches - for analytics
 export const userAppLaunches = pgTable('user_app_launches', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id'), // Removed FK - OAuth IDs are text
   appId: uuid('app_id').references(() => apps.id, { onDelete: 'cascade' }).notNull(),
   launchedAt: timestamp('launched_at').defaultNow().notNull(),
 });
@@ -92,7 +92,7 @@ export const appSubmissions = pgTable('app_submissions', {
   description: text('description'),
   logoUrl: text('logo_url'),
   category: text('category'),
-  submittedByUserId: uuid('submitted_by_user_id').references(() => users.id, { onDelete: 'set null' }),
+  submittedByUserId: text('submitted_by_user_id'), // Removed FK constraint - OAuth IDs are text
   submittedByEmail: text('submitted_by_email'),
   status: text('status').default('pending').notNull(), // 'pending' | 'approved' | 'rejected'
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
@@ -104,7 +104,7 @@ export const appSubmissions = pgTable('app_submissions', {
 // User profile apps - controls which apps are visible on public profiles
 export const userProfileApps = pgTable('user_profile_apps', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  userId: text('user_id').notNull(), // Removed FK - OAuth IDs are text
   appId: uuid('app_id').references(() => apps.id, { onDelete: 'cascade' }),
   submissionId: uuid('submission_id').references(() => appSubmissions.id, { onDelete: 'cascade' }),
   appType: text('app_type').notNull(), // 'pinned' or 'submitted'
