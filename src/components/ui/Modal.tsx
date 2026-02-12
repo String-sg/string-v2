@@ -13,13 +13,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
 
-  // Save focus and restore on close
+  // Save focus on open
   useEffect(() => {
     if (isOpen) {
       previousFocusRef.current = document.activeElement as HTMLElement;
-    } else if (previousFocusRef.current) {
-      previousFocusRef.current.focus();
-      previousFocusRef.current = null;
     }
   }, [isOpen]);
 
@@ -29,15 +26,13 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
     const modal = modalRef.current;
     const focusableElements = modal.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), [contenteditable]:not([contenteditable="false"]), audio[controls], video[controls], details > summary'
     );
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    // Focus first element on open
-    if (firstElement) {
-      firstElement.focus();
-    }
+    // Focus modal container for better screen reader experience
+    modal.focus();
 
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
@@ -58,7 +53,15 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
     };
 
     modal.addEventListener('keydown', handleTab);
-    return () => modal.removeEventListener('keydown', handleTab);
+    
+    return () => {
+      modal.removeEventListener('keydown', handleTab);
+      // Restore focus when modal closes
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+        previousFocusRef.current = null;
+      }
+    };
   }, [isOpen]);
 
   // Close modal on escape key
@@ -111,6 +114,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
+          tabIndex={-1}
           className={`relative w-full ${sizeClasses[size]} bg-white rounded-xl shadow-xl`}
         >
           {/* Header */}
