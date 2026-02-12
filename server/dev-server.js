@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { appSubmissions, users } from '../src/db/schema.ts';
+import { appSubmissions, users, apps } from '../src/db/schema.ts';
 import { eq, desc } from 'drizzle-orm';
 import dotenv from 'dotenv';
 import { generateSlugFromEmail } from '../src/lib/slug-utils.ts';
@@ -122,6 +122,23 @@ app.get('/api/submissions', async (req, res) => {
       .orderBy(desc(appSubmissions.submittedAt));
 
     res.json({ submissions });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: error.message
+    });
+  }
+});
+
+// GET /api/apps
+app.get('/api/apps', async (req, res) => {
+  try {
+    const allApps = await db
+      .select()
+      .from(apps);
+
+    res.json({ apps: allApps });
   } catch (error) {
     console.error('Database error:', error);
     res.status(500).json({
