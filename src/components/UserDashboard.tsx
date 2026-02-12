@@ -357,7 +357,7 @@ export function UserDashboard() {
         )}
 
         {activeTab === 'submissions' && (
-          <MySubmissions t={t} onSubmitApp={handleSubmitApp} />
+          <MySubmissions t={t} onSubmitApp={handleSubmitApp} userId={user.id} />
         )}
 
         {/* Submit App Modal */}

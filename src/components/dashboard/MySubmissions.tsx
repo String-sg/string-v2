@@ -15,20 +15,23 @@ interface Submission {
 interface MySubmissionsProps {
   t: (light: string, dark: string) => string;
   onSubmitApp: () => void;
+  userId: string;
 }
 
-export function MySubmissions({ t, onSubmitApp }: MySubmissionsProps) {
+export function MySubmissions({ t, onSubmitApp, userId }: MySubmissionsProps) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadSubmissions();
-  }, []);
+    if (userId) {
+      loadSubmissions();
+    }
+  }, [userId]);
 
   const loadSubmissions = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/submissions');
+      const response = await fetch(`/api/submissions?userId=${encodeURIComponent(userId)}`);
       if (response.ok) {
         const data = await response.json();
         setSubmissions(data.submissions);
