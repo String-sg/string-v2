@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { PersonalProfile } from './PersonalProfile';
 
 interface ProfileModalProps {
   slug: string;
