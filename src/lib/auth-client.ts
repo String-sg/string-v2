@@ -121,6 +121,7 @@ export class AuthClient {
 
       // Save user to database (only in production or when API is available)
       try {
+        console.log('Calling API at:', window.location.origin + '/api/users');
         const saveResponse = await fetch('/api/users', {
           method: 'POST',
           headers: {
