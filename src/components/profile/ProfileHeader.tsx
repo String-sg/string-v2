@@ -7,7 +7,9 @@ interface ProfileHeaderProps {
     avatarUrl: string | null;
     memberSince: string;
   };
-  appsCount: number;
+  apps: Array<{
+    type?: 'pinned' | 'submitted';
+  }>;
   className?: string;
 }
 
@@ -21,7 +23,9 @@ function getInitials(name: string | null): string {
     .substring(0, 2);
 }
 
-export function ProfileHeader({ profile, appsCount, className = '' }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderProps) {
+  // Only count apps that the user has uniquely contributed (submitted)
+  const contributedAppsCount = apps.filter(app => app.type === 'submitted').length;
   return (
     <Card className={`p-8 ${className}`}>
       <div className="flex items-start gap-6">
@@ -50,9 +54,9 @@ export function ProfileHeader({ profile, appsCount, className = '' }: ProfileHea
             })}
           </p>
 
-          {appsCount > 0 && (
+          {contributedAppsCount > 0 && (
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-string-mint/10 text-string-dark text-sm font-medium">
-              Sharing {appsCount} app{appsCount !== 1 ? 's' : ''}
+              Contributed {contributedAppsCount} app{contributedAppsCount !== 1 ? 's' : ''}
             </div>
           )}
         </div>

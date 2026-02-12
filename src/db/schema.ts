@@ -97,6 +97,8 @@ export const appSubmissions = pgTable('app_submissions', {
   status: text('status').default('pending').notNull(), // 'pending' | 'approved' | 'rejected'
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
   reviewedAt: timestamp('reviewed_at'),
+  viewCount: integer('view_count').default(0).notNull(),
+  clickCount: integer('click_count').default(0).notNull(),
 });
 
 // User profile apps - controls which apps are visible on public profiles

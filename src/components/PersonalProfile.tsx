@@ -139,7 +139,7 @@ export function PersonalProfile({ slug }: { slug: string }) {
 
         <ProfileHeader
           profile={profile}
-          appsCount={apps.length}
+          apps={apps}
           className="mt-16"
         />
 
