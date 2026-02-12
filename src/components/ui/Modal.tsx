@@ -1,5 +1,7 @@
 import { useEffect, useRef, useId } from 'react';
 
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), [contenteditable]:not([contenteditable="false"]), audio[controls], video[controls], details > summary';
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,9 +27,14 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
     if (!isOpen || !modalRef.current) return;
 
     const modal = modalRef.current;
-    const focusableElements = modal.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), [contenteditable]:not([contenteditable="false"]), audio[controls], video[controls], details > summary'
-    );
+    const focusableElements = modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+    
+    // Handle case with no focusable elements
+    if (focusableElements.length === 0) {
+      modal.focus();
+      return;
+    }
+    
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -59,7 +66,6 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       // Restore focus when modal closes
       if (previousFocusRef.current) {
         previousFocusRef.current.focus();
-        previousFocusRef.current = null;
       }
     };
   }, [isOpen]);
