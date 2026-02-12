@@ -243,7 +243,7 @@ function PinnedAppCard({
     }
 
     // Allow normal navigation
-    swipeProps.onClick(e);
+    swipeProps.handlers.onClick(e);
   };
 
   return (
@@ -256,7 +256,9 @@ function PinnedAppCard({
           'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
           'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
         )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
-        {...swipeProps}
+        onTouchStart={swipeProps.handlers.onTouchStart}
+        onTouchMove={swipeProps.handlers.onTouchMove}
+        onTouchEnd={swipeProps.handlers.onTouchEnd}
         onClick={handleClick}
       >
       <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
@@ -516,7 +518,9 @@ function AppGridCard({
           'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
           'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
         )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
-        {...swipeProps}
+        onTouchStart={swipeProps.handlers.onTouchStart}
+        onTouchMove={swipeProps.handlers.onTouchMove}
+        onTouchEnd={swipeProps.handlers.onTouchEnd}
       >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {app.logoUrl ? (

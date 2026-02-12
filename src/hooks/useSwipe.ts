@@ -63,11 +63,15 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwip
     setIsSwipeMenuOpen(false);
   }, []);
 
-  return {
+  const handlers = {
     onTouchStart,
     onTouchMove,
     onTouchEnd,
     onClick,
+  };
+
+  return {
+    handlers,
     isSwipeMenuOpen,
     closeSwipeMenu,
     setIsSwipeMenuOpen
