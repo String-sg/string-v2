@@ -1271,6 +1271,12 @@ export default function App() {
       </Modal>
 
       <Footer t={t} />
+
+      <ToastContainer
+        toasts={toasts}
+        onRemove={removeToast}
+        t={t}
+      />
     </div>
   );
 }
