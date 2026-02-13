@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { usePreferences } from '../hooks/usePreferences';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
@@ -30,6 +31,7 @@ interface ProfileData {
 
 export function PersonalProfile({ slug }: { slug: string }) {
   const { user } = useAuth();
+  const { preferences, togglePinnedApp } = usePreferences();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +43,51 @@ export function PersonalProfile({ slug }: { slug: string }) {
   useEffect(() => {
     loadProfile();
   }, [slug]);
+
+  // Handle pin and addToProfile query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    const addToProfile = params.get('addToProfile');
+
+    if (pinId && addToProfile === 'true' && isOwnProfile && user) {
+      // Pin to homepage
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      if (!alreadyPinned) {
+        togglePinnedApp(pinId);
+      }
+
+      // Add to profile (make API call)
+      addAppToProfile(pinId);
+
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+      
+      // Reload profile to show new app
+      setTimeout(() => loadProfile(), 500);
+    }
+  }, [slug, isOwnProfile, user, preferences.pinnedApps, togglePinnedApp]);
+
+  const addAppToProfile = async (appId: string) => {
+    if (!user?.id) {
+      console.error('User ID not available');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/profile/add-app', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appId, userId: user.id })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to add app to profile');
+      }
+    } catch (error) {
+      console.error('Error adding app to profile:', error);
+    }
+  };
 
   const loadProfile = async () => {
     try {

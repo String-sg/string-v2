@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { usePreferences } from '../hooks/usePreferences';
 import { Header } from './ui/Header';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
@@ -42,11 +43,49 @@ const mockProfileData = {
 
 export function DevProfileMock({ slug }: { slug: string }) {
   const { user } = useAuth();
+  const { preferences, togglePinnedApp } = usePreferences();
   const [loading] = useState(false);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [mockApps, setMockApps] = useState(mockProfileData.apps);
 
   // Check if viewing own profile
   const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
+
+  // Handle pin and addToProfile query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    const addToProfile = params.get('addToProfile');
+
+    if (pinId && addToProfile === 'true' && isOwnProfile) {
+      // Pin to homepage
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      if (!alreadyPinned) {
+        togglePinnedApp(pinId);
+      }
+
+      // In dev mode, just add a mock app to the list
+      const newMockApp = {
+        id: pinId,
+        name: `App ${pinId}`,
+        url: `https://example.com/${pinId}`,
+        logoUrl: null,
+        description: 'Added from autocomplete',
+        tagline: 'Pinned app',
+        category: 'Productivity',
+        type: 'pinned' as const,
+      };
+      
+      setMockApps(prev => {
+        // Don't add if already exists
+        if (prev.some(app => app.id === pinId)) return prev;
+        return [...prev, newMockApp];
+      });
+
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [slug, isOwnProfile, preferences.pinnedApps, togglePinnedApp]);
 
   const handleAppClick = (app: any) => {
     window.open(app.url, '_blank', 'noopener,noreferrer');
@@ -69,7 +108,7 @@ export function DevProfileMock({ slug }: { slug: string }) {
       avatarUrl: user?.image || mockProfileData.profile.avatarUrl,
       memberSince: mockProfileData.profile.memberSince,
     },
-    apps: mockProfileData.apps
+    apps: mockApps
   };
 
   const { profile, apps } = profileData;

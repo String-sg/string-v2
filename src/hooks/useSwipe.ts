@@ -1,16 +1,18 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 
 interface UseSwipeOptions {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  autoCloseDelay?: number; // milliseconds to auto-close after opening (default: 2000ms)
 }
 
-export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwipeOptions) {
+export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoCloseDelay = 2000 }: UseSwipeOptions) {
   const [isSwipeMenuOpen, setIsSwipeMenuOpen] = useState(false);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const touchEnd = useRef<{ x: number; y: number } | null>(null);
   const swipeCompleted = useRef(false);
+  const autoCloseTimer = useRef<NodeJS.Timeout | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     touchEnd.current = null;

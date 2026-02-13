@@ -183,15 +183,20 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
           <p className="text-yellow-800 text-sm mb-3">
             <strong>This app already exists in the library.</strong>
           </p>
-          <a
-            href={`/?pin=${selectedExistingApp.id}`}
+          <button
+            type="button"
+            onClick={() => {
+              // Pin to homepage
+              const currentUrl = window.location.pathname;
+              window.location.href = `${currentUrl}?pin=${selectedExistingApp.id}&addToProfile=true`;
+            }}
             className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark rounded-lg hover:bg-string-mint-light transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
-            Pin it to your homepage →
-          </a>
+            Add to profile and homepage →
+          </button>
         </div>
       )}
 
