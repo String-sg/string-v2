@@ -499,13 +499,20 @@ function AppGridCard({
     threshold: 100
   });
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     // If swipe menu is open, close it instead of selecting
     if (swipeProps.isSwipeMenuOpen) {
       swipeProps.closeSwipeMenu();
       return;
     }
-    onSelect(app);
+
+    // Call swipe onClick first to handle any touch/swipe prevention
+    swipeProps.onClick(e);
+
+    // Only proceed if the event wasn't prevented by swipe handler
+    if (!e.defaultPrevented) {
+      onSelect(app);
+    }
   };
 
   return (
@@ -516,7 +523,9 @@ function AppGridCard({
           'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
           'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
         )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
-        {...swipeProps}
+        onTouchStart={swipeProps.onTouchStart}
+        onTouchMove={swipeProps.onTouchMove}
+        onTouchEnd={swipeProps.onTouchEnd}
       >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {app.logoUrl ? (
@@ -1134,7 +1143,7 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
+    <div className={`min-h-screen flex flex-col ${t('bg-string-bg', 'bg-string-darker')}`}>
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -1158,7 +1167,7 @@ export default function App() {
         t={t}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
         <GreetingSection t={t} />
         <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} t={t} />
 

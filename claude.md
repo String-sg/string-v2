@@ -1,7 +1,7 @@
 # String.sg v2 - Development Plan
 
-**Last Updated:** 2026-02-12
-**Status:** Phase 4 Complete + UI Design System Established
+**Last Updated:** 2026-02-13
+**Status:** Phase 5 In Progress - Profile App Management
 
 ---
 
@@ -55,12 +55,21 @@
   - Removed duplicate title in submission form
   - Submission modal accessible from both homepage and dashboard + buttons
 
-### 🔲 Phase 5: Personal Profile Pages (NEXT)
-- [ ] Email-prefix slug generation (e.g., `string.sg/lee-kh`)
-- [ ] Public profile API (`/api/users/[slug]`)
-- [ ] Personal launcher page (`/[slug]`) showing pinned + submitted apps
+### 🔄 Phase 5: Personal Profile Pages (IN PROGRESS)
+- [x] Email-prefix slug generation (e.g., `string.sg/lee-kh`) ✅
+- [x] Public profile API (`/api/profile/[slug]`) ✅
+- [x] Personal launcher page (`/[slug]`) showing pinned + submitted apps ✅
+- [x] DevProfileMock for local development without API ✅
+- [x] **Profile App Management** (NEW):
+  - [x] "+ Add App" button shown when viewing own profile (replaces empty state)
+  - [x] Modal with app submission form (with autocomplete)
+  - [x] Autocomplete detects existing apps and prevents duplicates
+  - [x] Smart redirect: clicking existing app redirects back to profile
+  - [x] Auto-pin to homepage + auto-add to profile via query params
+  - [x] `/api/profile/add-app` endpoint to add apps to user_profile_apps
+  - [x] Profile refreshes to show newly added app
 - [ ] Inline visibility controls with WYSIWYG public preview toggle
-- [ ] Profile app management (add/remove from public profile)
+- [ ] Hide/show apps from profile (different from unpinning)
 
 ### 🔲 Phase 6: PWA Support
 - [ ] manifest.json for installability
@@ -104,8 +113,13 @@
 string-v2/
 ├── api/
 │   ├── apps.ts              # GET /api/apps - Edge function ✅
-│   └── auth/
-│       └── [...nextauth].ts # NextAuth.js configuration ✅
+│   ├── profile/
+│   │   ├── [slug].ts        # GET /api/profile/[slug] - Public profile data ✅
+│   │   ├── manage.ts        # Profile management API ✅
+│   │   └── add-app.ts       # POST /api/profile/add-app - Add app to profile ✅
+│   ├── submissions.ts       # POST /api/submissions - Submit new app ✅
+│   ├── users.ts             # POST /api/users - Create/update user ✅
+│   └── preferences.ts       # User preferences API ✅
 ├── data/
 │   ├── schools.json         # 320 MOE schools ✅
 │   └── apps-seed.json       # 42 apps with metadata ✅

@@ -42,6 +42,14 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoClose
       if (deltaX > 0 && onSwipeLeft) {
         onSwipeLeft();
         setIsSwipeMenuOpen(true);
+
+        // Set up auto-close timer
+        if (autoCloseTimer.current) {
+          clearTimeout(autoCloseTimer.current);
+        }
+        autoCloseTimer.current = setTimeout(() => {
+          setIsSwipeMenuOpen(false);
+        }, autoCloseDelay);
       } else if (deltaX < 0 && onSwipeRight) {
         onSwipeRight();
         setIsSwipeMenuOpen(false);
@@ -50,7 +58,7 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoClose
 
     touchStart.current = null;
     touchEnd.current = null;
-  }, [onSwipeLeft, onSwipeRight, threshold]);
+  }, [onSwipeLeft, onSwipeRight, threshold, autoCloseDelay]);
 
   const onClick = useCallback((e: React.MouseEvent) => {
     // Only prevent click if an actual swipe gesture completed
