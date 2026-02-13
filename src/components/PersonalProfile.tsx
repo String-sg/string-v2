@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePreferences } from '../hooks/usePreferences';
+import { useToast } from '../hooks/useToast';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
+import { ToastContainer } from './ToastContainer';
 import { Modal } from './ui/Modal';
 import { AppSubmissionForm } from './AppSubmissionForm';
 

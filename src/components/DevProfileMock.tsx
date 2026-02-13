@@ -125,7 +125,7 @@ export function DevProfileMock({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Development Banner */}
       <div className="bg-string-mint/10 border-b border-string-mint/20 px-4 py-3">
         <div className="max-w-7xl mx-auto">
@@ -135,14 +135,8 @@ export function DevProfileMock({ slug }: { slug: string }) {
         </div>
       </div>
 
-      {/* Header */}
-      <Header
-        title={`${profile.name || 'User'}'s Apps`}
-        subtitle={`string.sg/${profile.slug}`}
-      />
-
       {/* Profile Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <AppsList
           apps={apps}
           userName={profile.name}
@@ -156,9 +150,9 @@ export function DevProfileMock({ slug }: { slug: string }) {
           apps={apps}
           className="mt-16"
         />
-
-        <ProfileFooter />
       </main>
+
+      <ProfileFooter profile={profile} />
 
       {/* Add App Modal */}
       <Modal
