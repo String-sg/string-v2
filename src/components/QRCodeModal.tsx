@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from './ui/Modal';
-import QRCodeLib from 'qrcode.js';
+import QRCode from 'qrcode';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -10,54 +10,59 @@ interface QRCodeModalProps {
 }
 
 export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Create trackable URL with analytics parameters
   const trackableUrl = `${url}?utm_source=qr&utm_medium=scan&utm_campaign=profile_share&utm_content=${username}`;
 
   useEffect(() => {
-    if (isOpen && canvasRef.current) {
+    if (isOpen) {
       generateQRCode();
     }
   }, [isOpen, trackableUrl]);
 
   const generateQRCode = async () => {
-    if (!canvasRef.current) return;
+    if (isGenerating) return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    setIsGenerating(true);
+    try {
+      // Generate QR code with String branding
+      const qrDataURL = await QRCode.toDataURL(trackableUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#33373B', // String dark color
+          light: '#FFFFFF'
+        },
+        errorCorrectionLevel: 'H' // High error correction for logo overlay
+      });
 
-    // Set canvas size
-    canvas.width = 300;
-    canvas.height = 300;
+      // Create canvas to add String logo overlay
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    // Generate QR code
-    const qr = new QRCodeLib({
-      text: trackableUrl,
-      width: 300,
-      height: 300,
-      colorDark: '#33373B', // String dark color
-      colorLight: '#FFFFFF',
-      correctLevel: QRCodeLib.CorrectLevel.H, // High error correction for logo overlay
-    });
+      canvas.width = 300;
+      canvas.height = 300;
 
-    // Draw QR code
-    qr.makeCode(trackableUrl);
+      // Draw QR code
+      const qrImage = new Image();
+      qrImage.onload = () => {
+        ctx.drawImage(qrImage, 0, 0, 300, 300);
 
-    // Create QR code image
-    const qrImage = new Image();
-    qrImage.onload = () => {
-      ctx.drawImage(qrImage, 0, 0, 300, 300);
+        // Add String logo in the center
+        addStringLogo(ctx);
 
-      // Add String logo in the center
-      addStringLogo(ctx);
-
-      // Convert to data URL for download
-      setQrDataUrl(canvas.toDataURL());
-    };
-    qrImage.src = qr.toDataURL();
+        // Set the final data URL
+        setQrDataUrl(canvas.toDataURL());
+        setIsGenerating(false);
+      };
+      qrImage.src = qrDataURL;
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      setIsGenerating(false);
+    }
   };
 
   const addStringLogo = (ctx: CanvasRenderingContext2D) => {
@@ -102,12 +107,21 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
     <Modal isOpen={isOpen} onClose={onClose} title="QR Code">
       <div className="flex flex-col items-center space-y-6 p-4">
         {/* QR Code Display */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <canvas
-            ref={canvasRef}
-            className="block"
-            style={{ imageRendering: 'pixelated' }}
-          />
+        <div className="bg-white p-4 rounded-xl shadow-sm flex items-center justify-center" style={{ width: 308, height: 308 }}>
+          {isGenerating ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-string-mint"></div>
+            </div>
+          ) : qrDataUrl ? (
+            <img
+              src={qrDataUrl}
+              alt="QR Code"
+              className="block"
+              style={{ width: 300, height: 300, imageRendering: 'pixelated' }}
+            />
+          ) : (
+            <div className="text-gray-500 text-sm">Generating QR code...</div>
+          )}
         </div>
 
         {/* URL Display */}
