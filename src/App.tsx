@@ -5,9 +5,11 @@ import { PinButton } from './components/ui/PinButton';
 import { LaunchButton } from './components/ui/LaunchButton';
 import { Modal } from './components/ui/Modal';
 import { AppSubmissionForm } from './components/AppSubmissionForm';
+import { ToastContainer } from './components/ToastContainer';
 import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
+import { useToast } from './hooks/useToast';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -1020,6 +1022,7 @@ export default function App() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { isDark, toggle: toggleTheme, t } = useTheme();
   const { preferences, togglePinnedApp } = usePreferences();
+  const { toasts, addToast, removeToast } = useToast();
 
   useEffect(() => {
     localStorage.setItem('string-recent-apps', JSON.stringify(recentAppIds));
@@ -1127,8 +1130,27 @@ export default function App() {
   const sortedApps = [...filteredApps].sort((a, b) => b.frequency - a.frequency);
   const pinnedApps = apps.filter((a) => preferences.pinnedApps.includes(a.id));
 
-  const handlePin = (id: string) => togglePinnedApp(id);
-  const handleUnpin = (id: string) => togglePinnedApp(id);
+  const handlePin = (id: string) => {
+    togglePinnedApp(id);
+    const app = apps.find(a => a.id === id);
+    if (app) {
+      // Check if we're on mobile (screen width < 640px)
+      if (window.innerWidth < 640) {
+        addToast(`${app.name} pinned`, 'success');
+      }
+    }
+  };
+
+  const handleUnpin = (id: string) => {
+    togglePinnedApp(id);
+    const app = apps.find(a => a.id === id);
+    if (app) {
+      // Check if we're on mobile (screen width < 640px)
+      if (window.innerWidth < 640) {
+        addToast(`${app.name} unpinned`, 'info');
+      }
+    }
+  };
 
   const handleSubmitSuccess = () => {
     setSubmitModalOpen(false);
