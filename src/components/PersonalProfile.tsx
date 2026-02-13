@@ -172,30 +172,9 @@ export function PersonalProfile({ slug }: { slug: string }) {
   const { profile, apps } = profileData;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => window.location.href = '/'}
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              String
-            </button>
-
-            <div className="text-sm text-gray-500">
-              string.sg/{profile.slug}
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Profile Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-8">
         <AppsList
           apps={apps}
           userName={profile.name}
@@ -209,9 +188,9 @@ export function PersonalProfile({ slug }: { slug: string }) {
           apps={apps}
           className="mt-16"
         />
-
-        <ProfileFooter />
       </main>
+
+      <ProfileFooter profile={profile} />
 
       {/* Add App Modal */}
       <Modal

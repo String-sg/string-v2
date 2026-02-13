@@ -52,11 +52,11 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
         ctx.drawImage(qrImage, 0, 0, 300, 300);
 
         // Add String logo in the center
-        addStringLogo(ctx);
-
-        // Set the final data URL
-        setQrDataUrl(canvas.toDataURL());
-        setIsGenerating(false);
+        addStringLogo(ctx, () => {
+          // Set the final data URL after logo is added
+          setQrDataUrl(canvas.toDataURL());
+          setIsGenerating(false);
+        });
       };
       qrImage.src = qrDataURL;
     } catch (error) {
@@ -65,24 +65,36 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
     }
   };
 
-  const addStringLogo = (ctx: CanvasRenderingContext2D) => {
+  const addStringLogo = (ctx: CanvasRenderingContext2D, callback: () => void) => {
     // Create a white background circle for the logo
     const centerX = 150;
     const centerY = 150;
-    const logoSize = 40;
+    const logoSize = 48;
 
     // White background circle
     ctx.beginPath();
-    ctx.arc(centerX, centerY, logoSize / 2 + 5, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, logoSize / 2 + 8, 0, 2 * Math.PI);
     ctx.fillStyle = '#FFFFFF';
     ctx.fill();
 
-    // Draw String logo (simplified S shape)
-    ctx.fillStyle = '#75F8CC'; // String mint color
-    ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('S', centerX, centerY);
+    // Load and draw the actual String logo SVG
+    const logoImg = new Image();
+    logoImg.onload = () => {
+      const logoX = centerX - logoSize / 2;
+      const logoY = centerY - logoSize / 2;
+      ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+      callback(); // Call the callback after logo is drawn
+    };
+    logoImg.onerror = () => {
+      // Fallback to text 'S' if SVG fails to load
+      ctx.fillStyle = '#75F8CC';
+      ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('S', centerX, centerY);
+      callback();
+    };
+    logoImg.src = '/mark_green.svg';
   };
 
   const downloadQRCode = () => {
