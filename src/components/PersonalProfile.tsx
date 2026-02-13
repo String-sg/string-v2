@@ -34,6 +34,7 @@ interface ProfileData {
 export function PersonalProfile({ slug }: { slug: string }) {
   const { user } = useAuth();
   const { preferences, togglePinnedApp } = usePreferences();
+  const { toasts, removeToast } = useToast();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -192,7 +193,7 @@ export function PersonalProfile({ slug }: { slug: string }) {
         />
       </main>
 
-      <ProfileFooter profile={profile} />
+      <ProfileFooter />
 
       {/* Add App Modal */}
       <Modal
@@ -205,6 +206,13 @@ export function PersonalProfile({ slug }: { slug: string }) {
           fromProfile={true}
         />
       </Modal>
+
+      {/* Toast Container */}
+      <ToastContainer
+        toasts={toasts}
+        onRemove={removeToast}
+        t={(light, dark) => light} // Use light theme for profile pages
+      />
     </div>
   );
 }
