@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { usePreferences } from '../hooks/usePreferences';
+import { useToast } from '../hooks/useToast';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
+import { ToastContainer } from './ToastContainer';
 import { Modal } from './ui/Modal';
 import { AppSubmissionForm } from './AppSubmissionForm';
 
@@ -30,6 +33,8 @@ interface ProfileData {
 
 export function PersonalProfile({ slug }: { slug: string }) {
   const { user } = useAuth();
+  const { preferences, togglePinnedApp } = usePreferences();
+  const { toasts, removeToast } = useToast();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +46,51 @@ export function PersonalProfile({ slug }: { slug: string }) {
   useEffect(() => {
     loadProfile();
   }, [slug]);
+
+  // Handle pin and addToProfile query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    const addToProfile = params.get('addToProfile');
+
+    if (pinId && addToProfile === 'true' && isOwnProfile && user) {
+      // Pin to homepage
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      if (!alreadyPinned) {
+        togglePinnedApp(pinId);
+      }
+
+      // Add to profile (make API call)
+      addAppToProfile(pinId);
+
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+      
+      // Reload profile to show new app
+      setTimeout(() => loadProfile(), 500);
+    }
+  }, [slug, isOwnProfile, user, preferences.pinnedApps, togglePinnedApp]);
+
+  const addAppToProfile = async (appId: string) => {
+    if (!user?.id) {
+      console.error('User ID not available');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/profile/add-app', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appId, userId: user.id })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to add app to profile');
+      }
+    } catch (error) {
+      console.error('Error adding app to profile:', error);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -125,30 +175,9 @@ export function PersonalProfile({ slug }: { slug: string }) {
   const { profile, apps } = profileData;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => window.location.href = '/'}
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              String
-            </button>
-
-            <div className="text-sm text-gray-500">
-              string.sg/{profile.slug}
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Profile Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-8">
         <AppsList
           apps={apps}
           userName={profile.name}
@@ -162,9 +191,9 @@ export function PersonalProfile({ slug }: { slug: string }) {
           apps={apps}
           className="mt-16"
         />
-
-        <ProfileFooter />
       </main>
+
+      <ProfileFooter />
 
       {/* Add App Modal */}
       <Modal
@@ -177,6 +206,13 @@ export function PersonalProfile({ slug }: { slug: string }) {
           fromProfile={true}
         />
       </Modal>
+
+      {/* Toast Container */}
+      <ToastContainer
+        toasts={toasts}
+        onRemove={removeToast}
+        t={(light, dark) => light} // Use light theme for profile pages
+      />
     </div>
   );
 }
