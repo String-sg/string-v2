@@ -70,7 +70,20 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoClose
   }, []);
 
   const closeSwipeMenu = useCallback(() => {
+    if (autoCloseTimer.current) {
+      clearTimeout(autoCloseTimer.current);
+      autoCloseTimer.current = null;
+    }
     setIsSwipeMenuOpen(false);
+  }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimer.current) {
+        clearTimeout(autoCloseTimer.current);
+      }
+    };
   }, []);
 
   return {

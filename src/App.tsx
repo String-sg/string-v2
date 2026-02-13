@@ -231,7 +231,8 @@ function PinnedAppCard({
 }) {
   const swipeProps = useSwipe({
     onSwipeLeft: () => {},  // Show menu on swipe left
-    threshold: 100
+    threshold: 100,
+    autoCloseDelay: 1500
   });
 
   const handleClick = (e: React.MouseEvent) => {
@@ -496,7 +497,8 @@ function AppGridCard({
 }) {
   const swipeProps = useSwipe({
     onSwipeLeft: () => {},  // Show menu on swipe left
-    threshold: 100
+    threshold: 100,
+    autoCloseDelay: 1500
   });
 
   const handleClick = (e: React.MouseEvent) => {
