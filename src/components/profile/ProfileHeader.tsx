@@ -45,10 +45,10 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
   };
 
   return (
-    <Card className={`p-8 ${className}`}>
+    <div className={`bg-string-dark rounded-2xl p-8 ${className}`}>
       <div className="flex items-start gap-6">
         {/* Avatar */}
-        <div className="w-20 h-20 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint text-2xl font-bold shrink-0">
+        <div className="w-20 h-20 rounded-2xl bg-black/20 flex items-center justify-center text-string-mint text-2xl font-bold shrink-0 hidden sm:flex">
           <svg
             className="w-12 h-12"
             xmlns="http://www.w3.org/2000/svg"
@@ -67,10 +67,10 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
 
         {/* Profile Info */}
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-string-dark mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             {profile.name || 'String User'}
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-300 mb-4">
             Member since {new Date(profile.memberSince).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long'
@@ -79,10 +79,10 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
 
           {/* Profile URL with action buttons */}
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-sm text-gray-500">{profileUrl}</span>
+            <span className="text-sm text-gray-400">{profileUrl}</span>
             <button
               onClick={copyProfileUrl}
-              className="p-2 text-gray-400 hover:text-string-mint hover:bg-string-mint/10 rounded-lg transition-colors touch-manipulation"
+              className="p-2 text-gray-300 hover:text-string-dark hover:bg-string-mint rounded-lg transition-colors touch-manipulation"
               title="Copy profile URL"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -91,7 +91,7 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
             </button>
             <button
               onClick={() => setQrModalOpen(true)}
-              className="p-2 text-gray-400 hover:text-string-mint hover:bg-string-mint/10 rounded-lg transition-colors touch-manipulation"
+              className="p-2 text-gray-300 hover:text-string-dark hover:bg-string-mint rounded-lg transition-colors touch-manipulation"
               title="Generate QR code"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -102,7 +102,7 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
           </div>
 
           {contributedAppsCount > 0 && (
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-string-mint/10 text-string-dark text-sm font-medium">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-string-mint/20 text-string-mint text-sm font-medium">
               Contributed {contributedAppsCount} app{contributedAppsCount !== 1 ? 's' : ''}
             </div>
           )}
@@ -116,6 +116,6 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
         url={fullUrl}
         username={profile.slug}
       />
-    </Card>
+    </div>
   );
 }
