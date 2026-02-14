@@ -36,9 +36,9 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
       if (googleButtonRef.current) {
         googleButtonRef.current.innerHTML = ''; // Clear existing content
 
-        // Calculate responsive width based on container
+        // Calculate responsive width based on container (full width)
         const containerWidth = googleButtonRef.current.offsetWidth;
-        const buttonWidth = Math.min(400, containerWidth - 32); // 16px padding each side
+        const buttonWidth = Math.min(400, containerWidth);
 
         google.accounts.id.renderButton(googleButtonRef.current, {
           theme: 'outline',
@@ -144,12 +144,12 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-50"
+        className="fixed inset-0 bg-black/50 z-[60]"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
           {/* Close button */}
           <button
