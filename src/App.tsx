@@ -910,9 +910,9 @@ function AppDetailSidebar({
 }) {
   return (
     <>
-      {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
+      {app && <div className="fixed inset-0 bg-black/40 z-20" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-30 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
