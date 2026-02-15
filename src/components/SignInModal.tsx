@@ -36,9 +36,9 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
       if (googleButtonRef.current) {
         googleButtonRef.current.innerHTML = ''; // Clear existing content
 
-        // Calculate responsive width based on container
+        // Calculate responsive width based on container (full width)
         const containerWidth = googleButtonRef.current.offsetWidth;
-        const buttonWidth = Math.min(400, containerWidth - 32); // 16px padding each side
+        const buttonWidth = Math.min(400, containerWidth);
 
         google.accounts.id.renderButton(googleButtonRef.current, {
           theme: 'outline',
