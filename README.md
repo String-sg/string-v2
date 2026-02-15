@@ -2,13 +2,23 @@
 
 A consolidated app launcher for educators that surfaces relevant apps at point-of-need.
 
+## Features
+
+- **Curated App Directory**: 42+ education apps used across Singapore MOE schools
+- **Personal Profiles**: Public profile pages showing your pinned and submitted apps
+- **Smart Submission**: Autocomplete prevents duplicate submissions
+- **Profile App Management**: Add apps to your profile directly from existing library
+- **Google OAuth**: Secure authentication with Google accounts
+- **Mobile-Optimized**: Responsive design with touch-friendly interactions
+
 ## Tech Stack
 
 - **Frontend:** React 19 + Vite 7 + TypeScript
-- **Styling:** Tailwind CSS 4
+- **Styling:** Tailwind CSS 4 + String Design System
 - **Database:** NeonDB (PostgreSQL)
 - **ORM:** Drizzle
 - **API:** Vercel Edge Functions
+- **Auth:** Google OAuth (client-side)
 
 ## Testing Locally
 

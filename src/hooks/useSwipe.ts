@@ -1,16 +1,18 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 
 interface UseSwipeOptions {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  autoCloseDelay?: number; // milliseconds to auto-close after opening (default: 2000ms)
 }
 
-export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwipeOptions) {
+export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoCloseDelay = 2000 }: UseSwipeOptions) {
   const [isSwipeMenuOpen, setIsSwipeMenuOpen] = useState(false);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const touchEnd = useRef<{ x: number; y: number } | null>(null);
   const swipeCompleted = useRef(false);
+  const autoCloseTimer = useRef<NodeJS.Timeout | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     touchEnd.current = null;
@@ -40,6 +42,14 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwip
       if (deltaX > 0 && onSwipeLeft) {
         onSwipeLeft();
         setIsSwipeMenuOpen(true);
+
+        // Set up auto-close timer
+        if (autoCloseTimer.current) {
+          clearTimeout(autoCloseTimer.current);
+        }
+        autoCloseTimer.current = setTimeout(() => {
+          setIsSwipeMenuOpen(false);
+        }, autoCloseDelay);
       } else if (deltaX < 0 && onSwipeRight) {
         onSwipeRight();
         setIsSwipeMenuOpen(false);
@@ -48,7 +58,7 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwip
 
     touchStart.current = null;
     touchEnd.current = null;
-  }, [onSwipeLeft, onSwipeRight, threshold]);
+  }, [onSwipeLeft, onSwipeRight, threshold, autoCloseDelay]);
 
   const onClick = useCallback((e: React.MouseEvent) => {
     // Only prevent click if an actual swipe gesture completed
@@ -60,7 +70,20 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100 }: UseSwip
   }, []);
 
   const closeSwipeMenu = useCallback(() => {
+    if (autoCloseTimer.current) {
+      clearTimeout(autoCloseTimer.current);
+      autoCloseTimer.current = null;
+    }
     setIsSwipeMenuOpen(false);
+  }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimer.current) {
+        clearTimeout(autoCloseTimer.current);
+      }
+    };
   }, []);
 
   return {
