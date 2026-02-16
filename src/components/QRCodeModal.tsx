@@ -139,7 +139,7 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
         {/* URL Display */}
         <div className="w-full">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Trackable URL
+            Shareable URL
           </label>
           <div className="flex items-center gap-2">
             <input
@@ -173,12 +173,6 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
           </button>
         </div>
 
-        {/* Info */}
-        <p className="text-xs text-gray-500 text-center">
-          QR code includes tracking parameters for analytics.
-          <br />
-          Scans will be attributed to QR code sharing.
-        </p>
       </div>
     </Modal>
   );
