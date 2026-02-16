@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { usePreferences } from '../hooks/usePreferences';
 import { Header } from './ui/Header';
 import { AppsList } from './profile/AppsList';
 import { ProfileHeader } from './profile/ProfileHeader';
 import { ProfileFooter } from './profile/ProfileFooter';
+import { Modal } from './ui/Modal';
+import { AppSubmissionForm } from './AppSubmissionForm';
 
 // Mock profile data for development
 const mockProfileData = {
@@ -40,10 +43,61 @@ const mockProfileData = {
 
 export function DevProfileMock({ slug }: { slug: string }) {
   const { user } = useAuth();
+  const { preferences, togglePinnedApp } = usePreferences();
   const [loading] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [mockApps, setMockApps] = useState(mockProfileData.apps);
+
+  // Check if viewing own profile
+  const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
+
+  // Handle pin and addToProfile query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    const addToProfile = params.get('addToProfile');
+
+    if (pinId && addToProfile === 'true' && isOwnProfile) {
+      // Pin to homepage
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      if (!alreadyPinned) {
+        togglePinnedApp(pinId);
+      }
+
+      // In dev mode, just add a mock app to the list
+      const newMockApp = {
+        id: pinId,
+        name: `App ${pinId}`,
+        url: `https://example.com/${pinId}`,
+        logoUrl: null,
+        description: 'Added from autocomplete',
+        tagline: 'Pinned app',
+        category: 'Productivity',
+        type: 'pinned' as const,
+      };
+      
+      setMockApps(prev => {
+        // Don't add if already exists
+        if (prev.some(app => app.id === pinId)) return prev;
+        return [...prev, newMockApp];
+      });
+
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [slug, isOwnProfile, preferences.pinnedApps, togglePinnedApp]);
 
   const handleAppClick = (app: any) => {
     window.open(app.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleAddApp = () => {
+    setSubmitModalOpen(true);
+  };
+
+  const handleSubmitSuccess = () => {
+    setSubmitModalOpen(false);
+    // TODO: Refresh profile data
   };
 
   // Use real user data if available, otherwise use mock
@@ -54,7 +108,7 @@ export function DevProfileMock({ slug }: { slug: string }) {
       avatarUrl: user?.image || mockProfileData.profile.avatarUrl,
       memberSince: mockProfileData.profile.memberSince,
     },
-    apps: mockProfileData.apps
+    apps: mockApps
   };
 
   const { profile, apps } = profileData;
@@ -71,7 +125,7 @@ export function DevProfileMock({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Development Banner */}
       <div className="bg-string-mint/10 border-b border-string-mint/20 px-4 py-3">
         <div className="max-w-7xl mx-auto">
@@ -81,18 +135,14 @@ export function DevProfileMock({ slug }: { slug: string }) {
         </div>
       </div>
 
-      {/* Header */}
-      <Header
-        title={`${profile.name || 'User'}'s Apps`}
-        subtitle={`string.sg/${profile.slug}`}
-      />
-
       {/* Profile Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <AppsList
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
+          isOwnProfile={isOwnProfile}
+          onAddApp={handleAddApp}
         />
 
         <ProfileHeader
@@ -100,9 +150,21 @@ export function DevProfileMock({ slug }: { slug: string }) {
           apps={apps}
           className="mt-16"
         />
-
-        <ProfileFooter />
       </main>
+
+      <ProfileFooter profile={profile} />
+
+      {/* Add App Modal */}
+      <Modal
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        title="Add App to Profile"
+      >
+        <AppSubmissionForm
+          onSuccess={handleSubmitSuccess}
+          fromProfile={true}
+        />
+      </Modal>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 # String.sg v2 - Development Plan
 
-**Last Updated:** 2026-02-12
-**Status:** Phase 4 Complete + UI Design System Established
+**Last Updated:** 2026-02-13
+**Status:** Phase 5 In Progress - Profile App Management
 
 ---
 
@@ -55,12 +55,21 @@
   - Removed duplicate title in submission form
   - Submission modal accessible from both homepage and dashboard + buttons
 
-### 🔲 Phase 5: Personal Profile Pages (NEXT)
-- [ ] Email-prefix slug generation (e.g., `string.sg/lee-kh`)
-- [ ] Public profile API (`/api/users/[slug]`)
-- [ ] Personal launcher page (`/[slug]`) showing pinned + submitted apps
+### 🔄 Phase 5: Personal Profile Pages (IN PROGRESS)
+- [x] Email-prefix slug generation (e.g., `string.sg/lee-kh`) ✅
+- [x] Public profile API (`/api/profile/[slug]`) ✅
+- [x] Personal launcher page (`/[slug]`) showing pinned + submitted apps ✅
+- [x] DevProfileMock for local development without API ✅
+- [x] **Profile App Management** (NEW):
+  - [x] "+ Add App" button shown when viewing own profile (replaces empty state)
+  - [x] Modal with app submission form (with autocomplete)
+  - [x] Autocomplete detects existing apps and prevents duplicates
+  - [x] Smart redirect: clicking existing app redirects back to profile
+  - [x] Auto-pin to homepage + auto-add to profile via query params
+  - [x] `/api/profile/add-app` endpoint to add apps to user_profile_apps
+  - [x] Profile refreshes to show newly added app
 - [ ] Inline visibility controls with WYSIWYG public preview toggle
-- [ ] Profile app management (add/remove from public profile)
+- [ ] Hide/show apps from profile (different from unpinning)
 
 ### 🔲 Phase 6: PWA Support
 - [ ] manifest.json for installability
@@ -104,8 +113,13 @@
 string-v2/
 ├── api/
 │   ├── apps.ts              # GET /api/apps - Edge function ✅
-│   └── auth/
-│       └── [...nextauth].ts # NextAuth.js configuration ✅
+│   ├── profile/
+│   │   ├── [slug].ts        # GET /api/profile/[slug] - Public profile data ✅
+│   │   ├── manage.ts        # Profile management API ✅
+│   │   └── add-app.ts       # POST /api/profile/add-app - Add app to profile ✅
+│   ├── submissions.ts       # POST /api/submissions - Submit new app ✅
+│   ├── users.ts             # POST /api/users - Create/update user ✅
+│   └── preferences.ts       # User preferences API ✅
 ├── data/
 │   ├── schools.json         # 320 MOE schools ✅
 │   └── apps-seed.json       # 42 apps with metadata ✅
@@ -164,12 +178,21 @@ string-v2/
 apps                  -- 42 apps seeded ✅
 bump_rules            -- Time/date-based promotion rules ✅
 featured_apps         -- Daily featured app with messaging
-users                 -- User accounts (optional auth)
-user_preferences      -- App arrangement, hidden/pinned
+users                 -- User accounts with slug generation ✅
+user_preferences      -- App arrangement, hidden/pinned ✅
 user_app_launches     -- Analytics tracking
-app_submissions       -- UGC with moderation workflow
+app_submissions       -- UGC with moderation workflow ✅
+user_profile_apps     -- Apps visible on public profile (pinned + submitted) ✅
 categories            -- 8 categories ✅
 ```
+
+### Schema Notes
+- **users.id**: TEXT (OAuth provider IDs are strings, not UUIDs)
+- **users.slug**: Generated from email prefix (e.g., lee_kah_how@moe.edu.sg → lee-kah-how)
+- **user_profile_apps**: Links users to apps shown on their public profile
+  - `app_type`: 'pinned' or 'submitted'
+  - `is_visible`: Controls public visibility
+  - `display_order`: Custom ordering (future feature)
 
 ---
 
@@ -269,14 +292,30 @@ CREATE TABLE user_profile_apps (
 );
 ```
 
-#### API Routes to Create
+#### API Routes
 ```typescript
-// /api/users/[slug].ts - Get public profile data
-GET /api/users/john-doe
-Response: { user: {...}, apps: [...] }
+// /api/profile/[slug].ts - Get public profile data ✅
+GET /api/profile/john-doe
+Response: { profile: {...}, apps: [...] }
 
-// /api/profile/apps.ts - Manage profile apps visibility
+// /api/profile/add-app.ts - Add app to user profile ✅
+POST /api/profile/add-app { appId, userId }
+Response: { success: true, message: 'App added to profile' }
+
+// /api/profile/apps.ts - Manage profile apps visibility (FUTURE)
 POST /api/profile/apps { appId, type, isVisible }
+```
+
+#### Query Param Flow (Profile App Management) ✅
+```
+User on profile → Selects existing app from autocomplete
+→ Clicks "Add to profile and homepage →"
+→ Redirects to: /[slug]?pin=appId&addToProfile=true
+→ Profile page useEffect detects params:
+  1. Calls togglePinnedApp(appId) to pin to homepage
+  2. Calls /api/profile/add-app to add to profile
+  3. Reloads profile data to show new app
+  4. Cleans up URL (removes query params)
 ```
 
 #### Components Architecture ✅ COMPLETE
@@ -330,6 +369,32 @@ mkdir extension
 
 ---
 
+## Recent Improvements (2026-02-13)
+
+### Profile App Management
+**Problem:** Users couldn't add apps to their profile, had to manually submit and wait for approval
+**Solution:**
+1. **Dynamic Empty State** - Profile shows "+ Add App" button when viewing your own empty profile (other users see "No Apps Shared")
+2. **Smart Autocomplete** - When typing app name, suggests existing apps from library
+3. **Prevent Duplicates** - If selecting existing app, shows "Add to profile and homepage →" button instead of submission form
+4. **Auto-Pin Flow** - Clicking button redirects back to profile with query params (`?pin=appId&addToProfile=true`)
+5. **Seamless Integration** - Profile detects params, pins to homepage AND adds to profile, then refreshes to show new app
+6. **API Endpoint** - `/api/profile/add-app` handles adding apps to `user_profile_apps` table
+
+**User Flow:**
+- Visit your profile → Click "+ Add App" → Search app name → Select existing app
+- Click "Add to profile and homepage →" → Redirects back to profile
+- App now appears on profile AND pinned on homepage
+
+**Technical Details:**
+- `AppsList.tsx`: Conditional rendering based on `isOwnProfile` prop
+- `AppSubmissionForm.tsx`: New `fromProfile` prop changes behavior for existing apps
+- `PersonalProfile.tsx` & `DevProfileMock.tsx`: Handle query params with `useEffect`
+- `/api/profile/add-app.ts`: Edge function to insert into `user_profile_apps`
+- URL cleanup: Query params removed after processing via `history.replaceState`
+
+---
+
 ## Recent Improvements (2026-02-12)
 
 ### App Submission UX Overhaul
@@ -351,6 +416,7 @@ mkdir extension
 
 ## UGC Workflow
 
+### From Dashboard/Homepage
 1. User clicks + icon (homepage or dashboard)
 2. Modal opens with app submission form
 3. User types app name → autocomplete suggests existing apps to prevent duplicates
@@ -359,6 +425,19 @@ mkdir extension
 6. **Submitter sees their app immediately in dashboard**
 7. Admin reviews via Drizzle Studio
 8. Approved → visible globally in app directory
+
+### From Profile Page (NEW)
+1. User visits their own profile → Sees "+ Add App" button (if no apps yet)
+2. Clicks button → Modal opens with submission form
+3. Types app name → Autocomplete shows existing apps
+4. **If existing app selected:**
+   - Shows "Add to profile and homepage →" button
+   - Clicking redirects to profile with query params
+   - App automatically added to profile + pinned to homepage
+5. **If new app entered:**
+   - Submits for approval (same as dashboard flow)
+   - App appears in dashboard immediately (pending approval)
+6. Profile refreshes to show newly added app
 
 ---
 

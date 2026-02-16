@@ -5,9 +5,11 @@ import { PinButton } from './components/ui/PinButton';
 import { LaunchButton } from './components/ui/LaunchButton';
 import { Modal } from './components/ui/Modal';
 import { AppSubmissionForm } from './components/AppSubmissionForm';
+import { ToastContainer } from './components/ToastContainer';
 import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
+import { useToast } from './hooks/useToast';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -231,7 +233,8 @@ function PinnedAppCard({
 }) {
   const swipeProps = useSwipe({
     onSwipeLeft: () => {},  // Show menu on swipe left
-    threshold: 100
+    threshold: 100,
+    autoCloseDelay: 1500
   });
 
   const handleClick = (e: React.MouseEvent) => {
@@ -498,16 +501,24 @@ function AppGridCard({
 }) {
   const swipeProps = useSwipe({
     onSwipeLeft: () => {},  // Show menu on swipe left
-    threshold: 100
+    threshold: 100,
+    autoCloseDelay: 1500
   });
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     // If swipe menu is open, close it instead of selecting
     if (swipeProps.isSwipeMenuOpen) {
       swipeProps.closeSwipeMenu();
       return;
     }
-    onSelect(app);
+
+    // Call swipe onClick first to handle any touch/swipe prevention
+    swipeProps.handlers.onClick(e);
+
+    // Only proceed if the event wasn't prevented by swipe handler
+    if (!e.defaultPrevented) {
+      onSelect(app);
+    }
   };
 
   return (
@@ -901,9 +912,9 @@ function AppDetailSidebar({
 }) {
   return (
     <>
-      {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
+      {app && <div className="fixed inset-0 bg-black/40 z-20" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-30 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
@@ -1013,6 +1024,7 @@ export default function App() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { isDark, toggle: toggleTheme, t } = useTheme();
   const { preferences, togglePinnedApp } = usePreferences();
+  const { toasts, addToast, removeToast } = useToast();
 
   useEffect(() => {
     localStorage.setItem('string-recent-apps', JSON.stringify(recentAppIds));
@@ -1078,6 +1090,27 @@ export default function App() {
     fetchApps();
   }, []);
 
+  // Auto-pin app from query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pinId = params.get('pin');
+    
+    if (pinId && apps.length > 0) {
+      // Check if app exists and isn't already pinned
+      const appExists = apps.some(app => app.id === pinId);
+      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
+      
+      if (appExists && !alreadyPinned) {
+        togglePinnedApp(pinId);
+        // Show a brief success message (optional)
+        console.log('App pinned successfully!');
+      }
+      
+      // Clean up URL (remove query param)
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [apps, preferences.pinnedApps, togglePinnedApp]);
+
   const categories = [...new Set(apps.map((a) => a.category))].sort();
   const categoryCountMap = categories.reduce((acc, cat) => {
     acc[cat] = apps.filter((a) => a.category === cat).length;
@@ -1099,8 +1132,27 @@ export default function App() {
   const sortedApps = [...filteredApps].sort((a, b) => b.frequency - a.frequency);
   const pinnedApps = apps.filter((a) => preferences.pinnedApps.includes(a.id));
 
-  const handlePin = (id: string) => togglePinnedApp(id);
-  const handleUnpin = (id: string) => togglePinnedApp(id);
+  const handlePin = (id: string) => {
+    togglePinnedApp(id);
+    const app = apps.find(a => a.id === id);
+    if (app) {
+      // Check if we're on mobile (screen width < 640px)
+      if (window.innerWidth < 640) {
+        addToast(`${app.name} pinned`, 'success');
+      }
+    }
+  };
+
+  const handleUnpin = (id: string) => {
+    togglePinnedApp(id);
+    const app = apps.find(a => a.id === id);
+    if (app) {
+      // Check if we're on mobile (screen width < 640px)
+      if (window.innerWidth < 640) {
+        addToast(`${app.name} unpinned`, 'info');
+      }
+    }
+  };
 
   const handleSubmitSuccess = () => {
     setSubmitModalOpen(false);
@@ -1117,7 +1169,7 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen ${t('bg-string-bg', 'bg-string-darker')}`}>
+    <div className={`min-h-screen flex flex-col ${t('bg-string-bg', 'bg-string-darker')}`}>
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -1141,7 +1193,7 @@ export default function App() {
         t={t}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
         <GreetingSection t={t} />
         <PinnedAppsRow apps={pinnedApps} onUnpin={handleUnpin} t={t} />
 
@@ -1221,6 +1273,12 @@ export default function App() {
       </Modal>
 
       <Footer t={t} />
+
+      <ToastContainer
+        toasts={toasts}
+        onRemove={removeToast}
+        t={t}
+      />
     </div>
   );
 }
