@@ -5,7 +5,8 @@
       "WebFetch(domain:www.fengshanpri.moe.edu.sg)",
       "WebFetch(domain:www.crescent.edu.sg)",
       "WebFetch(domain:www.evergreensec.moe.edu.sg)",
-      "WebFetch(domain:www.xinminsec.moe.edu.sg)"
+      "WebFetch(domain:www.xinminsec.moe.edu.sg)",
+      "Bash(npm install:*)"
     ]
   }
 }
