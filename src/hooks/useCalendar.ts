@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { calendar2026, type Term, type Holiday, type PublicHoliday } from '../data/calendar-2026';
+import { getActiveCalendar, type Term, type Holiday, type PublicHoliday } from '../data/calendar-2026';
 
 interface CalendarInfo {
   currentTerm: string | null; // "T1", "T2", etc.
@@ -14,16 +14,17 @@ interface CalendarInfo {
 export function useCalendar(): CalendarInfo {
   return useMemo(() => {
     try {
+      const calendar = getActiveCalendar();
       const now = new Date();
       const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
 
       // Check if today is a public holiday
-      const todaysPublicHoliday = calendar2026.publicHolidays.find(
+      const todaysPublicHoliday = calendar.publicHolidays.find(
         holiday => holiday.date === today
       ) || null;
 
       // Check if we're in a term
-      const currentTerm = calendar2026.terms.find(term => {
+      const currentTerm = calendar.terms.find(term => {
         return today >= term.startDate && today <= term.endDate;
       });
 
@@ -38,7 +39,7 @@ export function useCalendar(): CalendarInfo {
 
         // Find next holiday after term end
         const termEndDate = new Date(currentTerm.endDate);
-        const nextHoliday = calendar2026.holidays.find(holiday => {
+        const nextHoliday = calendar.holidays.find(holiday => {
           const holidayStart = new Date(holiday.startDate);
           return holidayStart > termEndDate;
         });
@@ -75,14 +76,14 @@ export function useCalendar(): CalendarInfo {
       }
 
       // Check if we're in a holiday period
-      const currentHoliday = calendar2026.holidays.find(holiday => {
+      const currentHoliday = calendar.holidays.find(holiday => {
         return today >= holiday.startDate && today <= holiday.endDate;
       });
 
       if (currentHoliday) {
         // We're in holiday period, find next term
         const holidayEndDate = new Date(currentHoliday.endDate);
-        const nextTerm = calendar2026.terms.find(term => {
+        const nextTerm = calendar.terms.find(term => {
           const termStartDate = new Date(term.startDate);
           return termStartDate > holidayEndDate;
         });
@@ -120,7 +121,7 @@ export function useCalendar(): CalendarInfo {
       }
 
       // Not in term or holiday - might be before school year starts
-      const firstTerm = calendar2026.terms[0];
+      const firstTerm = calendar.terms[0];
       if (today < firstTerm.startDate) {
         const currentDate = new Date(today);
         const termStartDate = new Date(firstTerm.startDate);
