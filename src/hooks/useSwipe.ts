@@ -91,6 +91,10 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoClose
     onTouchMove,
     onTouchEnd,
     onClick,
+  };
+
+  return {
+    handlers,
     isSwipeMenuOpen,
     closeSwipeMenu,
     setIsSwipeMenuOpen

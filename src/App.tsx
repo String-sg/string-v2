@@ -246,7 +246,7 @@ function PinnedAppCard({
     }
 
     // Allow normal navigation
-    swipeProps.onClick(e);
+    swipeProps.handlers.onClick(e);
   };
 
   return (
@@ -259,7 +259,9 @@ function PinnedAppCard({
           'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
           'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
         )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
-        {...swipeProps}
+        onTouchStart={swipeProps.handlers.onTouchStart}
+        onTouchMove={swipeProps.handlers.onTouchMove}
+        onTouchEnd={swipeProps.handlers.onTouchEnd}
         onClick={handleClick}
       >
       <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
@@ -910,9 +912,9 @@ function AppDetailSidebar({
 }) {
   return (
     <>
-      {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
+      {app && <div className="fixed inset-0 bg-black/40 z-20" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-30 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
