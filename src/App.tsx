@@ -169,6 +169,7 @@ function Header({
   onToggleTheme,
   onSearchOpen,
   onOpenSubmitModal,
+  onDesktopSearchSubmit,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -177,6 +178,7 @@ function Header({
   onToggleTheme: () => void;
   onSearchOpen: () => void;
   onOpenSubmitModal: () => void;
+  onDesktopSearchSubmit: () => void;
 }) {
   const { isAuthenticated } = useAuth();
   return (
@@ -199,6 +201,12 @@ function Header({
               placeholder="Search apps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  onDesktopSearchSubmit();
+                }
+              }}
               className="w-72 px-4 py-2 pl-10 pr-16 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-string-mint bg-string-darker text-white placeholder-gray-400"
             />
             <kbd className="absolute right-3 top-2 text-xs px-1.5 py-0.5 rounded bg-string-darker text-gray-400">
@@ -1215,6 +1223,22 @@ export default function App() {
   const sortedApps = [...filteredApps].sort((a, b) => b.frequency - a.frequency);
   const pinnedApps = apps.filter((a) => preferences.pinnedApps.includes(a.id));
 
+  const openApp = (app: App) => {
+    addRecentApp(app.id);
+    window.open(app.url, '_blank');
+  };
+
+  const handleDesktopSearchSubmit = () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    const firstMatch = sortedApps[0];
+    if (firstMatch) {
+      openApp(firstMatch);
+    }
+  };
+
   const handlePin = (id: string) => {
     togglePinnedApp(id);
     const app = apps.find(a => a.id === id);
@@ -1261,6 +1285,7 @@ export default function App() {
         onToggleTheme={toggleTheme}
         onSearchOpen={() => setSearchModalOpen(true)}
         onOpenSubmitModal={() => setSubmitModalOpen(true)}
+        onDesktopSearchSubmit={handleDesktopSearchSubmit}
       />
 
       <SearchModal
@@ -1269,10 +1294,7 @@ export default function App() {
         apps={apps}
         pinnedApps={pinnedApps}
         recentApps={apps.filter((a) => recentAppIds.includes(a.id))}
-        onOpenApp={(app) => {
-          addRecentApp(app.id);
-          window.open(app.url, '_blank');
-        }}
+        onOpenApp={openApp}
         t={t}
       />
 
