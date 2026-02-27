@@ -13,7 +13,15 @@
       "https://sites.google.com/moe.edu.sg/hgv-links/staff-links",
       "https://www.eastspringpri.moe.edu.sg/for-staff/"
     ],
-    "total_schools_analyzed": 10
+    "total_schools_analyzed": 10,
+    "removed_apps": [
+      {
+        "name": "PaC@Gov",
+        "slug": "pac-gov",
+        "removed_at": "2026-01-31",
+        "reason": "Service deprecated by GovTech; PaC@Gov (Productivity and Collaboration @ Government) has been discontinued and replaced by M365 and other productivity tools provided centrally to public officers."
+      }
+    ]
   },
   "apps": [
     {
