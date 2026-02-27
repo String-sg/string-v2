@@ -6,10 +6,12 @@ import { LaunchButton } from './components/ui/LaunchButton';
 import { Modal } from './components/ui/Modal';
 import { AppSubmissionForm } from './components/AppSubmissionForm';
 import { ToastContainer } from './components/ToastContainer';
+import { CalendarBanner } from './components/CalendarBanner';
 import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
 import { useToast } from './hooks/useToast';
+import { getAppAvailability, isIntranetUrl } from './lib/app-access';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -28,6 +30,18 @@ interface App {
   featured: boolean;
 }
 
+type IconManifest = Record<string, string>;
+const WHITE_BG_ICON_SLUGS = new Set([
+  'icon',
+  'google-classroom',
+  'formsg',
+  'all-ears',
+  'go-gov',
+  'for-edu',
+  'askgov',
+  'epp',
+]);
+
 // ── Utilities ──────────────────────────────────────────
 
 function getGreeting(): string {
@@ -44,6 +58,32 @@ function getInitials(name: string) {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+}
+
+function applyIconManifest(apps: App[], manifest: IconManifest): App[] {
+  return apps.map((app) => {
+    if (app.logoUrl || !app.slug) {
+      return app;
+    }
+
+    const manifestLogo = manifest[app.slug];
+    if (!manifestLogo) {
+      return app;
+    }
+
+    return {
+      ...app,
+      logoUrl: manifestLogo,
+    };
+  });
+}
+
+function getIconTileSurface(app: App): string {
+  if (app.logoUrl && WHITE_BG_ICON_SLUGS.has(app.slug)) {
+    return 'bg-white border border-gray-200';
+  }
+
+  return 'bg-string-dark';
 }
 
 // ── Category Icons (inline SVGs) ──────────────────────
@@ -215,6 +255,7 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
   return (
     <div className="mb-6">
       <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>{getGreeting()}</h1>
+      <CalendarBanner t={t} />
       <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
         Access your tools and resources.<span className="hidden sm:inline"> Press <kbd className={`text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-600', 'bg-string-dark text-gray-400')}`}>Cmd+K</kbd> to quick-search.</span>
       </p>
@@ -262,8 +303,12 @@ function PinnedAppCard({
         {...swipeProps}
         onClick={handleClick}
       >
-      <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
-        {getInitials(app.name)}
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+        {app.logoUrl ? (
+          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-md" />
+        ) : (
+          getInitials(app.name)
+        )}
       </div>
       <div className="text-left min-w-0">
         <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
@@ -531,9 +576,9 @@ function AppGridCard({
         onTouchMove={swipeProps.onTouchMove}
         onTouchEnd={swipeProps.onTouchEnd}
       >
-      <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
         {app.logoUrl ? (
-          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-[15px]" />
+          <img src={app.logoUrl} alt={app.name} className="w-8 h-8 object-contain rounded-md" />
         ) : (
           getInitials(app.name)
         )}
@@ -642,8 +687,12 @@ function FeaturedSection({
           <div className="absolute top-4 right-4 w-32 h-32 rounded-full bg-string-mint/10 blur-2xl"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-string-mint/20 flex items-center justify-center text-string-mint font-bold text-lg">
-                {getInitials(primary.name)}
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-string-mint font-bold text-lg overflow-hidden ${getIconTileSurface(primary)}`}>
+                {primary.logoUrl ? (
+                  <img src={primary.logoUrl} alt={primary.name} className="w-9 h-9 object-contain rounded-md" />
+                ) : (
+                  getInitials(primary.name)
+                )}
               </div>
               <span className="bg-string-mint/20 text-string-mint text-xs font-medium px-2 py-1 rounded-full">New</span>
             </div>
@@ -675,8 +724,12 @@ function FeaturedSection({
                 'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
               )}`}
             >
-              <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
-                {getInitials(app.name)}
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                {app.logoUrl ? (
+                  <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-md" />
+                ) : (
+                  getInitials(app.name)
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
@@ -809,8 +862,12 @@ function SearchModal({
                       'hover:bg-[#2a2d30]'
                     )}`}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                      {getInitials(app.name)}
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                      {app.logoUrl ? (
+                        <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                      ) : (
+                        getInitials(app.name)
+                      )}
                     </div>
                     <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                   </button>
@@ -835,8 +892,12 @@ function SearchModal({
                           'hover:bg-[#2a2d30]'
                         )}`}
                       >
-                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                          {getInitials(app.name)}
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                          {app.logoUrl ? (
+                            <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                          ) : (
+                            getInitials(app.name)
+                          )}
                         </div>
                         <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                       </button>
@@ -860,8 +921,12 @@ function SearchModal({
                           'hover:bg-[#2a2d30]'
                         )}`}
                       >
-                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                          {getInitials(app.name)}
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                          {app.logoUrl ? (
+                            <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                          ) : (
+                            getInitials(app.name)
+                          )}
                         </div>
                         <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                       </button>
@@ -908,6 +973,9 @@ function AppDetailSidebar({
   onClose: () => void;
   t: (l: string, d: string) => string;
 }) {
+  const isIntranetOnly = app ? isIntranetUrl(app.url) : false;
+  const availability = app ? getAppAvailability(app.url) : 'available';
+
   return (
     <>
       {app && <div className="fixed inset-0 bg-black/40 z-20" onClick={onClose} />}
@@ -928,8 +996,8 @@ function AppDetailSidebar({
             </div>
 
             <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint font-bold text-2xl mb-3">
-                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain rounded-[15px]" /> : getInitials(app.name)}
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-string-mint font-bold text-2xl mb-3 overflow-hidden ${getIconTileSurface(app)}`}>
+                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-11 h-11 object-contain rounded-md" /> : getInitials(app.name)}
               </div>
               <h2 className={`text-xl font-bold ${t('text-string-dark', 'text-white')}`}>{app.name}</h2>
               <p className={`text-sm mt-2 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.description}</p>
@@ -983,14 +1051,21 @@ function AppDetailSidebar({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className={t('text-string-text-secondary', 'text-gray-400')}>Status</span>
-                  <span className="text-string-mint flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-string-mint inline-block"></span>
-                    Available
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                      availability === 'intranet-only'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-[#33373B] text-white'
+                    }`}
+                  >
+                    {availability === 'intranet-only' ? 'Intranet only' : 'Available'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className={t('text-string-text-secondary', 'text-gray-400')}>Access</span>
-                  <span className={`font-medium ${t('text-string-dark', 'text-white')}`}>{app.isOfficial ? 'MOE Staff' : 'Open Access'}</span>
+                  <span className={`font-medium ${isIntranetOnly ? 'text-red-600' : t('text-string-dark', 'text-white')}`}>
+                    {isIntranetOnly ? 'Intranet only' : app.isOfficial ? 'MOE Staff' : 'Open Access'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1052,13 +1127,23 @@ export default function App() {
 
   useEffect(() => {
     async function fetchApps() {
+      let iconManifest: IconManifest = {};
+      try {
+        const manifestRes = await fetch('/src/app-icons/manifest.json');
+        if (manifestRes.ok) {
+          iconManifest = (await manifestRes.json()) as IconManifest;
+        }
+      } catch {
+        // Non-blocking: app data should still load without manifest.
+      }
+
       try {
         const res = await fetch('/api/apps');
         if (!res.ok) throw new Error('API unavailable');
         const contentType = res.headers.get('content-type');
         if (!contentType?.includes('application/json')) throw new Error('Not JSON');
         const data = await res.json();
-        setApps(data.apps || []);
+        setApps(applyIconManifest(data.apps || [], iconManifest));
       } catch {
         try {
           const res = await fetch('/apps-seed.json');
@@ -1077,7 +1162,7 @@ export default function App() {
             frequency: (a.frequency as number) || 0,
             featured: (a.featured as boolean) || false,
           }));
-          setApps(seedApps);
+          setApps(applyIconManifest(seedApps, iconManifest));
         } catch (err) {
           console.error('Failed to load apps:', err);
         }
