@@ -20,6 +20,13 @@ const MANIFEST_PATH = path.join(ICON_DIR, 'manifest.json');
 const shouldOverwrite = process.argv.includes('--overwrite');
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const limit = limitArg ? Number(limitArg.split('=')[1]) : null;
+const delayArg = process.argv.find((arg) => arg.startsWith('--delay='));
+const parsedDelay = delayArg ? Number(delayArg.split('=')[1]) : NaN;
+const delayMs = Number.isFinite(parsedDelay) && parsedDelay >= 0 ? parsedDelay : 500;
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
 
 async function fetchWithTimeout(url: string, init: RequestInit = {}, timeoutMs = 12000) {
   const controller = new AbortController();
@@ -260,6 +267,10 @@ async function run() {
 
     updated++;
     console.log(`✓ ${app.name} -> ${publicPath}`);
+
+    if (delayMs > 0) {
+      await sleep(delayMs);
+    }
   }
 
   await fs.writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
