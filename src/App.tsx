@@ -1225,7 +1225,7 @@ export default function App() {
 
   const openApp = (app: App) => {
     addRecentApp(app.id);
-    window.open(app.url, '_blank');
+    window.open(app.url, '_blank', 'noopener,noreferrer');
   };
 
   const handleDesktopSearchSubmit = () => {
