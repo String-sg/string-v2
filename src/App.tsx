@@ -513,7 +513,7 @@ function AppGridCard({
     }
 
     // Call swipe onClick first to handle any touch/swipe prevention
-    swipeProps.handlers.onClick(e);
+    swipeProps.onClick(e);
 
     // Only proceed if the event wasn't prevented by swipe handler
     if (!e.defaultPrevented) {
@@ -529,9 +529,9 @@ function AppGridCard({
           'bg-white border border-gray-100 hover:border-string-mint hover:shadow-sm',
           'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
         )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
-        onTouchStart={swipeProps.handlers.onTouchStart}
-        onTouchMove={swipeProps.handlers.onTouchMove}
-        onTouchEnd={swipeProps.handlers.onTouchEnd}
+        onTouchStart={swipeProps.onTouchStart}
+        onTouchMove={swipeProps.onTouchMove}
+        onTouchEnd={swipeProps.onTouchEnd}
       >
       <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
         {app.logoUrl ? (

@@ -86,7 +86,7 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, threshold = 100, autoClose
     };
   }, []);
 
-  const handlers = {
+  return {
     onTouchStart,
     onTouchMove,
     onTouchEnd,
