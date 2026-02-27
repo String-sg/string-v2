@@ -1,5 +1,9 @@
-import { useMemo } from 'react';
-import { calendar2026, type Term, type Holiday, type PublicHoliday } from '../data/calendar-2026';
+import { useMemo, useState, useEffect } from 'react';
+import { calendar2026, type PublicHoliday } from '../data/calendar-2026';
+
+function getCurrentDateString(): string {
+  return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+}
 
 interface CalendarInfo {
   currentTerm: string | null; // "T1", "T2", etc.
@@ -12,10 +16,28 @@ interface CalendarInfo {
 }
 
 export function useCalendar(): CalendarInfo {
+  // Track today's date as state so the calendar recalculates when the date changes
+  // (e.g. app left open overnight or across term boundaries)
+  const [today, setToday] = useState(getCurrentDateString);
+
+  useEffect(() => {
+    // Schedule an update to fire exactly at midnight, then reschedule for each subsequent day
+    let timer: ReturnType<typeof setTimeout>;
+    function scheduleNextUpdate() {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      timer = setTimeout(() => {
+        setToday(getCurrentDateString());
+        scheduleNextUpdate();
+      }, midnight.getTime() - now.getTime());
+    }
+    scheduleNextUpdate();
+    return () => clearTimeout(timer);
+  }, []);
+
   return useMemo(() => {
     try {
-      const now = new Date();
-      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
 
       // Check if today is a public holiday
       const todaysPublicHoliday = calendar2026.publicHolidays.find(
@@ -164,5 +186,5 @@ export function useCalendar(): CalendarInfo {
         todaysPublicHoliday: null
       };
     }
-  }, []); // Empty dependency array - calculate once per component mount (daily updates handled by app restart)
+  }, [today]); // Recalculate whenever `today` changes (date polling above keeps it current)
 }
