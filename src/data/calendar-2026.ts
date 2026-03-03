@@ -27,6 +27,16 @@ export interface SchoolCalendar {
   publicHolidays: PublicHoliday[];
 }
 
+// ---------------------------------------------------------------------------
+// HOW TO ADD A NEW YEAR'S CALENDAR
+// ---------------------------------------------------------------------------
+// 1. Copy this file to `src/data/calendar-YYYY.ts` (replace YYYY with the year)
+// 2. Update all dates, terms, holidays and public holidays for that year
+//    (refer to the official MOE school calendar release each October)
+// 3. Import the new calendar constant below and add it to `availableCalendars`
+// 4. Remove calendars for years more than 1 year in the past if desired
+// ---------------------------------------------------------------------------
+
 export const calendar2026: SchoolCalendar = {
   year: 2026,
   terms: [
@@ -113,3 +123,29 @@ export const calendar2026: SchoolCalendar = {
     { name: 'Christmas Day', date: '2026-12-25', isSchoolDay: false }
   ]
 };
+
+// Registry of all available year calendars. Add new entries here each year.
+const availableCalendars: SchoolCalendar[] = [calendar2026];
+
+/**
+ * Returns the school calendar for the current year.
+ * Falls back to the most recent available calendar and logs a console warning
+ * if no calendar exists for the current year, signalling that the data needs
+ * to be updated (see instructions at the top of this file).
+ */
+export function getActiveCalendar(): SchoolCalendar {
+  const currentYear = new Date().getFullYear();
+  const calendar = availableCalendars.find(c => c.year === currentYear);
+
+  if (!calendar) {
+    const mostRecent = availableCalendars.reduce((a, b) => (a.year > b.year ? a : b));
+    console.warn(
+      `[Calendar] No school calendar found for ${currentYear}. ` +
+      `Falling back to ${mostRecent.year} data. ` +
+      `Please add a calendar-${currentYear}.ts file and register it in availableCalendars.`
+    );
+    return mostRecent;
+  }
+
+  return calendar;
+}

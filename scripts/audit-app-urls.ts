@@ -8,7 +8,14 @@ import { apps as appsTable } from '../src/db/schema';
 import { isIntranetUrl } from '../src/lib/app-access';
 
 const shouldPurge404 = process.argv.includes('--purge-404');
+const delayArg = process.argv.find((arg) => arg.startsWith('--delay='));
+const parsedDelay = delayArg ? Number(delayArg.split('=')[1]) : NaN;
+const delayMs = Number.isFinite(parsedDelay) && parsedDelay >= 0 ? parsedDelay : 500;
 const reportPath = path.resolve(process.cwd(), 'data/url-audit-report.json');
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
 
 async function fetchWithTimeout(url: string, init: RequestInit = {}, timeoutMs = 10000) {
   const controller = new AbortController();
@@ -100,6 +107,10 @@ async function run() {
     const statusLabel = result.status === null ? 'ERR' : String(result.status);
     const intranetLabel = intranetOnly ? ' [INTRANET]' : '';
     console.log(`${statusLabel} ${app.slug}${intranetLabel}`);
+
+    if (delayMs > 0) {
+      await sleep(delayMs);
+    }
   }
 
   const report = {
