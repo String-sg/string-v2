@@ -7,6 +7,18 @@ export const config = {
   runtime: 'edge',
 };
 
+const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
+
+function normalizeOpalLogo<T extends { slug: string | null; logoUrl: string | null }>(app: T): T {
+  if (app.slug === 'opal') {
+    return {
+      ...app,
+      logoUrl: OPAL_CANONICAL_LOGO,
+    };
+  }
+  return app;
+}
+
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not set');
@@ -71,10 +83,11 @@ export default async function handler(request: Request) {
       const pinnedAppIds = preferences.length > 0 ? preferences[0].pinnedApps || [] : [];
 
       // Get pinned apps details
-      const pinnedApps = pinnedAppIds.length > 0 ? await db
+      const pinnedAppsRaw = pinnedAppIds.length > 0 ? await db
         .select()
         .from(apps)
         .where(inArray(apps.id, pinnedAppIds)) : [];
+      const pinnedApps = pinnedAppsRaw.map(normalizeOpalLogo);
 
       // Get user's approved submissions
       const submissions = await db

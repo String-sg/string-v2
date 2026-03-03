@@ -23,6 +23,7 @@ interface ProfileApp {
 
 interface ProfileData {
   profile: {
+    id: string;
     name: string | null;
     slug: string;
     avatarUrl: string | null;
@@ -34,47 +35,31 @@ interface ProfileData {
 export function PersonalProfile({ slug }: { slug: string }) {
   const { user } = useAuth();
   const { preferences, togglePinnedApp } = usePreferences();
-  const { toasts, removeToast } = useToast();
+  const { toasts, addToast, removeToast } = useToast();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'others' | 'me'>('others');
+  const [removingAppKey, setRemovingAppKey] = useState<string | null>(null);
 
-  // Check if viewing own profile
-  const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
+  const isOwnProfile = !!user?.id && profileData?.profile?.id === user.id;
+  const canManageProfile = isOwnProfile && viewMode === 'me';
 
   useEffect(() => {
     loadProfile();
   }, [slug]);
 
-  // Handle pin and addToProfile query params
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const pinId = params.get('pin');
-    const addToProfile = params.get('addToProfile');
-
-    if (pinId && addToProfile === 'true' && isOwnProfile && user) {
-      // Pin to homepage
-      const alreadyPinned = preferences.pinnedApps?.includes(pinId);
-      if (!alreadyPinned) {
-        togglePinnedApp(pinId);
-      }
-
-      // Add to profile (make API call)
-      addAppToProfile(pinId);
-
-      // Clean up URL
-      window.history.replaceState({}, '', window.location.pathname);
-      
-      // Reload profile to show new app
-      setTimeout(() => loadProfile(), 500);
+    if (!isOwnProfile) {
+      setViewMode('others');
     }
-  }, [slug, isOwnProfile, user, preferences.pinnedApps, togglePinnedApp]);
+  }, [isOwnProfile]);
 
-  const addAppToProfile = async (appId: string) => {
+  const addAppToProfile = async (appId: string): Promise<boolean> => {
     if (!user?.id) {
       console.error('User ID not available');
-      return;
+      return false;
     }
 
     try {
@@ -86,9 +71,12 @@ export function PersonalProfile({ slug }: { slug: string }) {
 
       if (!response.ok) {
         console.error('Failed to add app to profile');
+        return false;
       }
+      return true;
     } catch (error) {
       console.error('Error adding app to profile:', error);
+      return false;
     }
   };
 
@@ -131,6 +119,58 @@ export function PersonalProfile({ slug }: { slug: string }) {
     setSubmitModalOpen(false);
     // Refresh profile data
     loadProfile();
+  };
+
+  const handleAddExistingApp = async (appId: string): Promise<boolean> => {
+    const alreadyPinned = preferences.pinnedApps?.includes(appId);
+    if (!alreadyPinned) {
+      togglePinnedApp(appId);
+    }
+
+    const added = await addAppToProfile(appId);
+    if (!added) {
+      addToast('Failed to add app to profile', 'error');
+      return false;
+    }
+
+    addToast('App added to profile', 'success');
+    loadProfile();
+    return true;
+  };
+
+  const handleRemoveApp = async (app: ProfileApp) => {
+    if (!user?.id) {
+      addToast('Sign in required', 'error');
+      return;
+    }
+
+    const appKey = `${app.type}-${app.id}`;
+    setRemovingAppKey(appKey);
+    try {
+      const response = await fetch('/api/profile/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          appType: app.type,
+          appId: app.type === 'pinned' ? app.id : null,
+          submissionId: app.type === 'submitted' ? app.id : null,
+          isVisible: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove app');
+      }
+
+      addToast(`${app.name} removed from profile`, 'info');
+      loadProfile();
+    } catch (removeError) {
+      console.error('Failed to remove app from profile:', removeError);
+      addToast('Failed to remove app from profile', 'error');
+    } finally {
+      setRemovingAppKey(null);
+    }
   };
 
   if (loading) {
@@ -178,12 +218,42 @@ export function PersonalProfile({ slug }: { slug: string }) {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Profile Content */}
       <main className="flex-1 max-w-4xl mx-auto px-4 py-8">
+        {isOwnProfile && (
+          <div className="mb-6 flex items-center justify-end">
+            <div className="inline-flex rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
+              <button
+                onClick={() => setViewMode('others')}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  viewMode === 'others'
+                    ? 'bg-string-dark text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                View as others
+              </button>
+              <button
+                onClick={() => setViewMode('me')}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  viewMode === 'me'
+                    ? 'bg-string-dark text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                View as me
+              </button>
+            </div>
+          </div>
+        )}
+
         <AppsList
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
           isOwnProfile={isOwnProfile}
+          showOwnerControls={canManageProfile}
           onAddApp={handleAddApp}
+          onRemoveApp={handleRemoveApp}
+          removingAppKey={removingAppKey}
         />
 
         <ProfileHeader
@@ -204,6 +274,7 @@ export function PersonalProfile({ slug }: { slug: string }) {
         <AppSubmissionForm
           onSuccess={handleSubmitSuccess}
           fromProfile={true}
+          onAddExistingApp={async (app) => handleAddExistingApp(app.id)}
         />
       </Modal>
 
