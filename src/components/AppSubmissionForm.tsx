@@ -200,11 +200,20 @@ export function AppSubmissionForm({
 
               if (onAddExistingApp) {
                 setLoading(true);
-                const success = await onAddExistingApp(selectedExistingApp);
-                setLoading(false);
+                try {
+                  const success = await onAddExistingApp(selectedExistingApp);
 
-                if (success && onSuccess) {
-                  onSuccess();
+                  if (success && onSuccess) {
+                    onSuccess();
+                  }
+                } catch (error) {
+                  console.error('Failed to add existing app:', error);
+                  // Optionally surface an error message to the user
+                  if (typeof setMessage === 'function') {
+                    setMessage('There was an error adding this app to your profile. Please try again.');
+                  }
+                } finally {
+                  setLoading(false);
                 }
                 return;
               }
