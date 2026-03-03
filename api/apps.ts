@@ -2,22 +2,11 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { apps, featuredApps, bumpRules } from '../src/db/schema';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { normalizeOpalLogo } from './_lib/opal';
 
 export const config = {
   runtime: 'edge',
 };
-
-const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
-
-function normalizeOpalLogo<T extends { slug: string | null; logoUrl: string | null }>(app: T): T {
-  if (app.slug === 'opal') {
-    return {
-      ...app,
-      logoUrl: OPAL_CANONICAL_LOGO,
-    };
-  }
-  return app;
-}
 
 export default async function handler(_request: Request) {
   try {

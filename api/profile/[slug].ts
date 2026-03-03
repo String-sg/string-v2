@@ -2,12 +2,11 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, userProfileApps, apps, appSubmissions } from '../../src/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { normalizeOpalLogo } from '../_lib/opal';
 
 export const config = {
   runtime: 'edge',
 };
-
-const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -110,17 +109,17 @@ export default async function handler(request: Request) {
     // Transform the data into a cleaner format
     const apps_data = profileApps.map((item) => {
       if (item.appType === 'pinned' && item.appId) {
-        return {
+        return normalizeOpalLogo({
           id: item.appId,
           name: item.appName,
           slug: item.appSlug,
           url: item.appUrl,
-          logoUrl: item.appSlug === 'opal' ? OPAL_CANONICAL_LOGO : item.appLogoUrl,
+          logoUrl: item.appLogoUrl,
           description: item.appDescription,
           tagline: item.appTagline,
           category: item.appCategory,
           type: 'pinned' as const,
-        };
+        });
       } else if (item.appType === 'submitted' && item.submissionId) {
         return {
           id: item.submissionId,
