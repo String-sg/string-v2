@@ -12,6 +12,26 @@ interface CalendarInfo {
 }
 
 export function useCalendar(): CalendarInfo {
+  // Track today's date as state so the calendar recalculates when the date changes
+  // (e.g. app left open overnight or across term boundaries)
+  const [today, setToday] = useState(getCurrentDateString);
+
+  useEffect(() => {
+    // Schedule an update to fire exactly at midnight, then reschedule for each subsequent day
+    let timer: ReturnType<typeof setTimeout>;
+    function scheduleNextUpdate() {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      timer = setTimeout(() => {
+        setToday(getCurrentDateString());
+        scheduleNextUpdate();
+      }, midnight.getTime() - now.getTime());
+    }
+    scheduleNextUpdate();
+    return () => clearTimeout(timer);
+  }, []);
+
   return useMemo(() => {
     try {
       const calendar = getActiveCalendar();
@@ -165,5 +185,5 @@ export function useCalendar(): CalendarInfo {
         todaysPublicHoliday: null
       };
     }
-  }, []); // Empty dependency array - calculate once per component mount (daily updates handled by app restart)
+  }, [today]); // Recalculate whenever `today` changes (date polling above keeps it current)
 }
