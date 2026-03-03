@@ -16,10 +16,22 @@ interface AppsListProps {
   userName: string | null;
   onAppClick: (app: App) => void;
   isOwnProfile?: boolean;
+  showOwnerControls?: boolean;
   onAddApp?: () => void;
+  onRemoveApp?: (app: App) => void;
+  removingAppKey?: string | null;
 }
 
-export function AppsList({ apps, userName, onAppClick, isOwnProfile = false, onAddApp }: AppsListProps) {
+export function AppsList({
+  apps,
+  userName,
+  onAppClick,
+  isOwnProfile = false,
+  showOwnerControls = false,
+  onAddApp,
+  onRemoveApp,
+  removingAppKey,
+}: AppsListProps) {
   // Sort apps to show submitted (user's contributions) first, then pinned
   const sortedApps = [...apps].sort((a, b) => {
     if (a.type === 'submitted' && b.type !== 'submitted') return -1;
@@ -29,7 +41,7 @@ export function AppsList({ apps, userName, onAppClick, isOwnProfile = false, onA
 
   if (sortedApps.length === 0) {
     // Show "Add App" button if viewing own profile
-    if (isOwnProfile && onAddApp) {
+    if (isOwnProfile && showOwnerControls && onAddApp) {
       return (
         <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -71,14 +83,36 @@ export function AppsList({ apps, userName, onAppClick, isOwnProfile = false, onA
   }
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-      {sortedApps.map((app) => (
-        <AppCard
-          key={`${app.type}-${app.id}`}
-          app={app}
-          onClick={() => onAppClick(app)}
-        />
-      ))}
+    <div>
+      {isOwnProfile && showOwnerControls && onAddApp && (
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-gray-600">Manage which apps appear on your profile.</p>
+          <button
+            onClick={onAddApp}
+            className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add App
+          </button>
+        </div>
+      )}
+
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {sortedApps.map((app) => {
+          const appKey = `${app.type}-${app.id}`;
+          return (
+            <AppCard
+              key={appKey}
+              app={app}
+              onClick={() => onAppClick(app)}
+              onRemove={showOwnerControls && onRemoveApp ? () => onRemoveApp(app) : undefined}
+              removing={removingAppKey === appKey}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

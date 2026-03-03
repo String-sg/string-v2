@@ -47,9 +47,11 @@ export function DevProfileMock({ slug }: { slug: string }) {
   const [loading] = useState(false);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [mockApps, setMockApps] = useState(mockProfileData.apps);
+  const [viewMode, setViewMode] = useState<'others' | 'me'>('others');
 
   // Check if viewing own profile
   const isOwnProfile = user?.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') === slug;
+  const canManageProfile = isOwnProfile && viewMode === 'me';
 
   // Handle pin and addToProfile query params
   useEffect(() => {
@@ -100,6 +102,10 @@ export function DevProfileMock({ slug }: { slug: string }) {
     // TODO: Refresh profile data
   };
 
+  const handleRemoveApp = (app: any) => {
+    setMockApps(prev => prev.filter((item) => !(item.id === app.id && item.type === app.type)));
+  };
+
   // Use real user data if available, otherwise use mock
   const profileData = {
     profile: {
@@ -137,12 +143,41 @@ export function DevProfileMock({ slug }: { slug: string }) {
 
       {/* Profile Content */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {isOwnProfile && (
+          <div className="mb-6 flex items-center justify-end">
+            <div className="inline-flex rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
+              <button
+                onClick={() => setViewMode('others')}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  viewMode === 'others'
+                    ? 'bg-string-dark text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                View as others
+              </button>
+              <button
+                onClick={() => setViewMode('me')}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  viewMode === 'me'
+                    ? 'bg-string-dark text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                View as me
+              </button>
+            </div>
+          </div>
+        )}
+
         <AppsList
           apps={apps}
           userName={profile.name}
           onAppClick={handleAppClick}
           isOwnProfile={isOwnProfile}
+          showOwnerControls={canManageProfile}
           onAddApp={handleAddApp}
+          onRemoveApp={handleRemoveApp}
         />
 
         <ProfileHeader
