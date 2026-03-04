@@ -5,7 +5,9 @@ interface IconButtonProps {
   onClick?: (e: React.MouseEvent) => void;
   className?: string;
   title?: string;
+  ariaLabel?: string;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'primary';
 }
 
 export function IconButton({
@@ -13,7 +15,9 @@ export function IconButton({
   onClick,
   className = '',
   title,
-  size = 'md'
+  ariaLabel,
+  size = 'md',
+  variant = 'default'
 }: IconButtonProps) {
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -27,18 +31,22 @@ export function IconButton({
     lg: 'w-5 h-5'
   };
 
+  const variants = {
+    default: 'text-gray-400 hover:bg-string-mint hover:text-string-dark',
+    primary: 'bg-string-mint text-string-dark hover:bg-string-mint-light'
+  };
+
   return (
     <button
       onClick={onClick}
       title={title}
+      aria-label={ariaLabel || title}
       className={`
         ${sizeClasses[size]}
         rounded-lg
         flex items-center justify-center
         transition-all duration-200
-        text-gray-400
-        hover:bg-string-mint
-        hover:text-string-dark
+        ${variants[variant]}
         ${className}
       `}
     >
