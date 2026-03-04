@@ -7,16 +7,29 @@ export const config = {
   runtime: 'edge',
 };
 
+const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
+
+function normalizeOpalLogo<T extends { slug: string | null; logoUrl: string | null }>(app: T): T {
+  if (app.slug === 'opal') {
+    return {
+      ...app,
+      logoUrl: OPAL_CANONICAL_LOGO,
+    };
+  }
+  return app;
+}
+
 export default async function handler(_request: Request) {
   try {
     const sqlClient = neon(process.env.DATABASE_URL!);
     const db = drizzle(sqlClient);
 
     // Get all official apps sorted by frequency
-    const officialApps = await db
+    const officialAppsRaw = await db
       .select()
       .from(apps)
       .orderBy(desc(apps.frequency));
+    const officialApps = officialAppsRaw.map(normalizeOpalLogo);
 
     // Get all approved submissions
     const approvedSubmissions = await db
