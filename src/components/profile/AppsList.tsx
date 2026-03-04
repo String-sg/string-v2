@@ -1,5 +1,5 @@
 import { AppCard } from '../ui/AppCard';
-import { Button } from '../ui/Button';
+import { IconButton } from '../ui/IconButton';
 
 interface App {
   id: string;
@@ -54,12 +54,16 @@ export function AppsList({
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
             Share apps you've created or frequently use with the community
           </p>
-          <Button onClick={onAddApp} size="lg" variant="primary" className="!px-6">
-            <span className="sr-only">Add app</span>
+          <IconButton
+            onClick={onAddApp}
+            size="lg"
+            title="Add app"
+            className="bg-string-mint text-string-dark hover:bg-string-mint-light"
+          >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-          </Button>
+          </IconButton>
         </div>
       );
     }
@@ -85,12 +89,16 @@ export function AppsList({
       {isOwnProfile && showOwnerControls && onAddApp && (
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-gray-600">Manage which apps appear on your profile.</p>
-          <Button onClick={onAddApp} size="md" variant="primary">
-            <span className="sr-only">Add app</span>
+          <IconButton
+            onClick={onAddApp}
+            size="md"
+            title="Add app"
+            className="bg-string-mint text-string-dark hover:bg-string-mint-light"
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-          </Button>
+          </IconButton>
         </div>
       )}
 
