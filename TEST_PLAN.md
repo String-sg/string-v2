@@ -5,10 +5,12 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
 ## Unit Tests
 - **Auth**
   - `useAuth` returns authenticated state after mock sign-in; clears on sign-out.
-  - AuthButton renders correct label/state for signed-in vs signed-out users and is disabled while loading.
+  - AuthButton renders correct label/state for signed-in vs signed-out users.
+  - AuthButton is disabled while loading to prevent duplicate actions.
 - **App submission (new app)**
   - `AppSubmissionForm` validates required fields and blocks submit on empty name/URL.
-  - Duplicate detection banner appears when existing app name is selected; submit button switches to “Add to profile and homepage” CTA when `fromProfile` is true.
+  - Duplicate detection banner appears when existing app name is selected.
+  - Submit button switches to “Add to profile and homepage” CTA when `fromProfile` is true.
   - Successful submit calls `/api/submissions` with `status: 'pending'`; submit button shows loading state and prevents double submit.
 - **Add existing app to profile/homepage**
   - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
@@ -21,7 +23,8 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - App card remove handler invokes `/api/profile/manage` with correct payload and disables controls while in-flight.
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
-  - `getAppAvailability` flags intranet-only URLs; `isIntranetUrl` returns true for MOE intranet domains (*.moe.edu.sg), including nested subdomains.
+  - `getAppAvailability` flags intranet-only URLs.
+  - `isIntranetUrl` returns true for MOE intranet domains (*.moe.edu.sg), including nested subdomains.
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
@@ -58,5 +61,5 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
 - **Deep links**
   - Visiting `/{slug}` for other users shows public view without “+ Add App” or removal controls.
 
-## Future/verify test coverage
+## Future test coverage
 - Add-to-profile redirect should preserve intent when a signed-out user hits `?pin=<appId>&addToProfile=true`, resumes after auth, and completes pin/profile-add flow.
