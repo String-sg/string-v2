@@ -18,6 +18,7 @@ interface ExistingApp {
   id: string;
   name: string;
   url: string;
+  isOfficial: boolean;
 }
 
 export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmissionFormProps = {}) {
@@ -57,7 +58,8 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
           const apps = data.apps.map((app: any) => ({
             id: app.id,
             name: app.name,
-            url: app.url
+            url: app.url,
+            isOfficial: app.isOfficial === true,
           }));
           setExistingApps(apps);
         }
@@ -88,8 +90,8 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
     setShowSuggestions(false);
     setSelectedExistingApp(app);
     
-    if (fromProfile) {
-      setMessage('existing-app'); // Special flag for existing app
+    if (fromProfile && app.isOfficial) {
+      setMessage('existing-app'); // Special flag for official existing app - show pin button
     } else {
       setMessage('Note: This app already exists. Consider if you really need to submit it again.');
     }
