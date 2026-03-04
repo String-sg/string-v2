@@ -130,6 +130,7 @@ export default async function handler(request: Request) {
           tagline: null,
           category: item.submissionCategory,
           type: 'submitted' as const,
+          status: item.submissionStatus,
         };
       }
       return null;
