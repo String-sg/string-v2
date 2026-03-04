@@ -55,12 +55,12 @@ export function AppsList({
           </p>
           <button
             onClick={onAddApp}
-            className="inline-flex items-center px-6 py-3 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className="sr-only">Add app</span>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add App
           </button>
         </div>
       );
@@ -89,12 +89,12 @@ export function AppsList({
           <p className="text-sm text-gray-600">Manage which apps appear on your profile.</p>
           <button
             onClick={onAddApp}
-            className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
+            className="inline-flex items-center justify-center px-4 py-2 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className="sr-only">Add app</span>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add App
           </button>
         </div>
       )}
