@@ -127,6 +127,7 @@ export default async function handler(request: Request) {
           description: item.submissionDescription,
           tagline: null,
           category: item.submissionCategory,
+          status: item.submissionStatus,
           type: 'submitted' as const,
         };
       }
