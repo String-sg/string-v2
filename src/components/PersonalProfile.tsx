@@ -122,15 +122,15 @@ export function PersonalProfile({ slug }: { slug: string }) {
   };
 
   const handleAddExistingApp = async (appId: string): Promise<boolean> => {
-    const alreadyPinned = preferences.pinnedApps?.includes(appId);
-    if (!alreadyPinned) {
-      togglePinnedApp(appId);
-    }
-
     const added = await addAppToProfile(appId);
     if (!added) {
       addToast('Failed to add app to profile', 'error');
       return false;
+    }
+
+    const alreadyPinned = preferences.pinnedApps?.includes(appId);
+    if (!alreadyPinned) {
+      togglePinnedApp(appId);
     }
 
     addToast('App added to profile', 'success');
