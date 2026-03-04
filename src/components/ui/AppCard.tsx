@@ -62,9 +62,16 @@ export function AppCard({ app, onClick, onRemove, removing = false }: AppCardPro
                 onRemove();
               }}
               disabled={removing}
-              className="px-2 py-1 text-xs rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              title={removing ? 'Removing app' : 'Remove from profile'}
             >
-              {removing ? 'Removing...' : 'Remove'}
+              {removing ? (
+                <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+              )}
             </button>
           )}
           <div className="opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 group-hover:bg-string-mint group-hover:text-string-dark transition-all duration-200">
