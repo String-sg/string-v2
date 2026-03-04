@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Modal } from './ui/Modal';
 import QRCode from 'qrcode';
+import { useToast } from '../hooks/useToast';
+import { ToastContainer } from './ToastContainer';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ interface QRCodeModalProps {
 export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const { toasts, addToast, removeToast } = useToast();
 
   // Create trackable URL with analytics parameters
   const trackableUrl = `${url}?utm_source=qr&utm_medium=scan&utm_campaign=profile_share&utm_content=${username}`;
@@ -108,10 +111,27 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
 
   const copyQRUrl = async () => {
     try {
-      await navigator.clipboard.writeText(trackableUrl);
-      // Could add a toast notification here
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(trackableUrl);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = trackableUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        // Legacy fallback for browsers without Clipboard API support.
+        const copied = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (!copied) {
+          throw new Error('Copy command failed');
+        }
+      }
+      addToast('Share URL copied to clipboard', 'success');
     } catch (err) {
       console.error('Failed to copy URL:', err);
+      addToast('Failed to copy URL', 'error');
     }
   };
 
@@ -174,6 +194,7 @@ export function QRCodeModal({ isOpen, onClose, url, username }: QRCodeModalProps
         </div>
 
       </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} t={(light) => light} />
     </Modal>
   );
 }

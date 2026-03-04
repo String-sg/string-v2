@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card } from '../ui/Card';
 import { QRCodeModal } from '../QRCodeModal';
 import { useToast } from '../../hooks/useToast';
+import { ToastContainer } from '../ToastContainer';
 
 interface ProfileHeaderProps {
   profile: {
@@ -30,13 +31,34 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
   // Only count apps that the user has uniquely contributed (submitted)
   const contributedAppsCount = apps.filter(app => app.type === 'submitted').length;
   const [qrModalOpen, setQrModalOpen] = useState(false);
-  const { addToast } = useToast();
+  const { toasts, addToast, removeToast } = useToast();
   const profileUrl = `string.sg/${profile.slug}`;
   const fullUrl = `https://${profileUrl}`;
 
+  const copyText = async (text: string) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    // Legacy fallback for browsers without Clipboard API support.
+    const copied = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    if (!copied) {
+      throw new Error('Copy command failed');
+    }
+  };
+
   const copyProfileUrl = async () => {
     try {
-      await navigator.clipboard.writeText(fullUrl);
+      await copyText(fullUrl);
       addToast('Profile URL copied to clipboard', 'success');
     } catch (err) {
       console.error('Failed to copy URL:', err);
@@ -116,6 +138,7 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
         url={fullUrl}
         username={profile.slug}
       />
+      <ToastContainer toasts={toasts} onRemove={removeToast} t={(light) => light} />
     </div>
   );
 }
