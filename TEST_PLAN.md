@@ -5,7 +5,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
 ## Unit Tests
 - **Auth**
   - `useAuth` returns authenticated state after mock sign-in; clears on sign-out.
-  - AuthButton renders correct label/state for signed-in vs signed-out users and disables while loading.
+  - AuthButton renders correct label/state for signed-in vs signed-out users and is disabled while loading.
 - **App submission (new app)**
   - `AppSubmissionForm` validates required fields and blocks submit on empty name/URL.
   - Duplicate detection banner appears when existing app name is selected; submit button switches to “Add to profile and homepage →” CTA when `fromProfile` is true.
@@ -13,7 +13,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
 - **Add existing app to profile/homepage**
   - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<id>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
   - AppsList empty state shows “+ Add App” only when `isOwnProfile` is true; other viewers see neutral empty state.
-  - App cards render remove affordance with neutral default + red hover, and loading spinner while `removing` is true (already covered by `AppCard.test.tsx`).
+  - App cards render remove affordance with neutral default + red hover, and loading spinner while `removing` is true.
 - **Pin / Unpin (favorite)**
   - `PinButton` stops event propagation, toggles icon/title for pinned vs unpinned, and calls correct handler.
   - `usePreferences` persists pinned IDs to API/local storage and rehydrates on load.
@@ -21,13 +21,15 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - App card remove handler invokes `/api/profile/manage` with correct payload and disables controls while in-flight.
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
-  - `getAppAvailability` flags intranet-only URLs; `isIntranetUrl` returns true for *.moe.edu.sg/etc.
+  - `getAppAvailability` flags intranet-only URLs; `isIntranetUrl` returns true for domains like *.moe.edu.sg, etc.
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
   - Category filters show correct counts and respect featured bump rules when filtering.
 - **Profile share copy**
   - Share action uses Clipboard API with `execCommand('copy')` fallback and shows toast on success/failure.
+- **Submission list feedback**
+  - Submissions list renders rejection reasons when provided by the API and hides the field when absent.
 
 ## End-to-End Tests
 - **Authentication**
