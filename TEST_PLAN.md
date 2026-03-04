@@ -8,7 +8,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - AuthButton renders correct label/state for signed-in vs signed-out users and is disabled while loading.
 - **App submission (new app)**
   - `AppSubmissionForm` validates required fields and blocks submit on empty name/URL.
-  - Duplicate detection banner appears when existing app name is selected; submit button switches to “Add to profile and homepage →” CTA when `fromProfile` is true.
+  - Duplicate detection banner appears when existing app name is selected; submit button switches to “Add to profile and homepage” CTA when `fromProfile` is true.
   - Successful submit calls `/api/submissions` with `status: 'pending'`; submit button shows loading state and prevents double submit.
 - **Add existing app to profile/homepage**
   - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
@@ -39,7 +39,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - From homepage/dashboard “+” -> fill form with new app -> submit -> success toast -> app appears in “My Submissions” with `pending` badge and is NOT in public catalog until approved.
   - Validation errors shown for missing name/URL or invalid URL.
 - **Add existing app to profile & homepage**
-  - From own profile “+ Add App” -> pick existing app from autocomplete -> click “Add to profile and homepage →” -> redirected back with app visible in profile grid and pinned on homepage; query params cleared after refresh.
+  - From own profile “+ Add App” -> pick existing app from autocomplete -> click “Add to profile and homepage” -> redirected back with app visible in profile grid and pinned on homepage; query params cleared after refresh.
   - Duplicate prevention: selecting existing app in submission form shows warning and prevents duplicate submission.
 - **Pin / Unpin (favorite)**
   - Pin app from homepage → app moves to pinned section + persists on reload; unpin removes it.
