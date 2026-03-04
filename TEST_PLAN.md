@@ -11,7 +11,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Duplicate detection banner appears when existing app name is selected; submit button switches to “Add to profile and homepage →” CTA when `fromProfile` is true.
   - Successful submit calls `/api/submissions` with `status: 'pending'`; submit button shows loading state and prevents double submit.
 - **Add existing app to profile/homepage**
-  - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<id>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
+  - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
   - AppsList empty state shows “+ Add App” only when `isOwnProfile` is true; other viewers see neutral empty state.
   - App cards render remove affordance with neutral default + red hover, and loading spinner while `removing` is true.
 - **Pin / Unpin (favorite)**
@@ -36,10 +36,10 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Sign in with Google mock succeeds, displays user avatar/name; sign out clears profile/homepage personalization.
   - Auth-guarded actions (submit app, pin) redirect to sign-in or show blocked state when unauthenticated.
 - **Submit new app (pending approval)**
-  - From homepage/dashboard “+” → fill form with new app → submit → success toast → app appears in “My Submissions” with `pending` badge and is NOT in public catalog until approved.
+  - From homepage/dashboard “+” -> fill form with new app -> submit -> success toast -> app appears in “My Submissions” with `pending` badge and is NOT in public catalog until approved.
   - Validation errors shown for missing name/URL or invalid URL.
 - **Add existing app to profile & homepage**
-  - From own profile “+ Add App” → pick existing app from autocomplete → click “Add to profile and homepage →” → redirected back with app visible in profile grid and pinned on homepage; query params cleared after refresh.
+  - From own profile “+ Add App” -> pick existing app from autocomplete -> click “Add to profile and homepage →” -> redirected back with app visible in profile grid and pinned on homepage; query params cleared after refresh.
   - Duplicate prevention: selecting existing app in submission form shows warning and prevents duplicate submission.
 - **Pin / Unpin (favorite)**
   - Pin app from homepage → app moves to pinned section + persists on reload; unpin removes it.
@@ -57,4 +57,4 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - “Copy profile link” copies `string.sg/{slug}`; toast confirms; link opens public profile view without edit controls.
 - **Deep links**
   - Visiting `/{slug}` for other users shows public view without “+ Add App” or removal controls.
-  - Hitting `/?pin=<id>&addToProfile=true` while signed out prompts auth and resumes action after sign-in.
+  - Hitting `/?pin=<appId>&addToProfile=true` while signed out prompts auth and resumes action after sign-in.
