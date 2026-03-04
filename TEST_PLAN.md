@@ -24,7 +24,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
   - `getAppAvailability` flags intranet-only URLs.
-  - `isIntranetUrl` returns true for MOE intranet domains (*.moe.edu.sg), including nested subdomains.
+  - `isIntranetUrl` returns true for MOE intranet domains (`*.moe.edu.sg`, i.e., wildcard subdomains of moe.edu.sg), including nested subdomains.
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
@@ -39,10 +39,10 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Sign in with Google mock succeeds, displays user avatar/name; sign out clears profile/homepage personalization.
   - Auth-guarded actions (submit app, pin) redirect to sign-in or show blocked state when unauthenticated.
 - **Submit new app (pending approval)**
-  - From homepage/dashboard “+” -> fill form with new app -> submit -> success toast -> app appears in “My Submissions” with `pending` badge and is NOT in public catalog until approved.
+  - From homepage/dashboard, open “+”, fill the form with a new app, submit, see success toast, and verify the app appears in “My Submissions” with `pending` badge and is NOT in the public catalog until approved.
   - Validation errors shown for missing name/URL or invalid URL.
 - **Add existing app to profile & homepage**
-  - From own profile “+ Add App” -> pick existing app from autocomplete -> click “Add to profile and homepage” -> redirected back with app visible in profile grid and pinned on homepage; query params cleared after refresh.
+  - From own profile, click “+ Add App”, pick an existing app from autocomplete, click “Add to profile and homepage”, get redirected back with the app visible in the profile grid and pinned on the homepage; query params are cleared after refresh.
   - Duplicate prevention: selecting existing app in submission form shows warning and prevents duplicate submission.
 - **Pin / Unpin (favorite)**
   - Pin app from homepage → app moves to pinned section + persists on reload; unpin removes it.
@@ -57,7 +57,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Searching narrows apps; clearing restores list; filters by category show matching apps and maintain pinned state.
   - Featured/bump rules: featured app surfaces in banner during relevant time windows.
 - **Profile sharing**
-  - “Copy profile link” copies `string.sg/{slug}`; toast confirms; link opens public profile view without edit controls.
+  - “Copy profile link” copies `https://string.sg/{slug}`; toast confirms; link opens public profile view without edit controls.
 - **Deep links**
   - Visiting `/{slug}` for other users shows public view without “+ Add App” or removal controls.
 
