@@ -679,6 +679,7 @@ function FeaturedSection({
   const primary = featuredApps[0];
   const secondary = featuredApps.slice(1);
   const primarySwipeProps = useSwipe({
+    // Intentionally no-op; hook uses this to enable swipe action menu state.
     onSwipeLeft: () => {},
     threshold: 100,
     autoCloseDelay: 1500
@@ -829,6 +830,7 @@ function FeaturedSecondaryCard({
   t: (l: string, d: string) => string;
 }) {
   const swipeProps = useSwipe({
+    // Intentionally no-op; hook uses this to enable swipe action menu state.
     onSwipeLeft: () => {},
     threshold: 100,
     autoCloseDelay: 1500

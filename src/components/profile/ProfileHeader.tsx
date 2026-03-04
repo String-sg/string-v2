@@ -48,6 +48,7 @@ export function ProfileHeader({ profile, apps, className = '' }: ProfileHeaderPr
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
+    // Legacy fallback for browsers without Clipboard API support.
     const copied = document.execCommand('copy');
     document.body.removeChild(textArea);
     if (!copied) {
