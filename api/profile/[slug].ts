@@ -92,13 +92,11 @@ export default async function handler(request: Request) {
         submissionLogoUrl: appSubmissions.logoUrl,
         submissionDescription: appSubmissions.description,
         submissionCategory: appSubmissions.category,
+        submissionStatus: appSubmissions.status,
       })
       .from(userProfileApps)
       .leftJoin(apps, eq(userProfileApps.appId, apps.id))
-      .leftJoin(appSubmissions, and(
-        eq(userProfileApps.submissionId, appSubmissions.id),
-        eq(appSubmissions.status, 'approved')  // Only show approved submissions
-      ))
+      .leftJoin(appSubmissions, eq(userProfileApps.submissionId, appSubmissions.id))
       .where(and(
         eq(userProfileApps.userId, profile.id),
         eq(userProfileApps.isVisible, true)

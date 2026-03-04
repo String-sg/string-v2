@@ -343,8 +343,8 @@ User on profile → Selects existing app from autocomplete
 3. **Dynamic routing**: `[slug].tsx` catches all profile URLs
 4. **Public by default**: Profiles are public, apps visible by default
 5. **Inline controls**: Toggle visibility with immediate preview
-6. **Two app sources**: Pinned apps + submitted (approved) apps
-7. **Profile-specific**: Users can hide apps from profile (different from unpinning)
+6. **Two app sources**: Pinned apps + submitted apps (Immediate on profile, approved on homepage)
+7. **Profile-specific**: Users' self-submitted apps show immediately on their personal profile; only show on main homepage after approval.
 
 #### User Flow
 1. User signs in → slug auto-generated from email prefix
