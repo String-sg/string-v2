@@ -8,6 +8,8 @@ A consolidated app launcher for educators that surfaces relevant apps at point-o
 - **Personal Profiles**: Public profile pages showing your pinned and submitted apps
 - **Smart Submission**: Autocomplete prevents duplicate submissions
 - **Profile App Management**: Add apps to your profile directly from existing library
+- **Mobile Featured Swipe Actions**: Featured cards reveal pin/launch controls via swipe on mobile
+- **Reliable Share Copy**: Profile and QR share copy support Clipboard API with legacy fallback + toasts
 - **Google OAuth**: Secure authentication with Google accounts
 - **Mobile-Optimized**: Responsive design with touch-friendly interactions
 
