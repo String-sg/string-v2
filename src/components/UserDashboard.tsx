@@ -48,11 +48,11 @@ interface App {
 
 interface ProfileApp {
   id: string;
+  appId: string | null;
+  submissionId: string | null;
   appType: 'pinned' | 'submitted';
   isVisible: boolean;
   displayOrder: number;
-  app?: App;
-  submission?: Submission;
 }
 
 interface ProfileData {
@@ -252,7 +252,7 @@ export function UserDashboard() {
                       <div className="space-y-3">
                         {profileData.pinnedApps.map((app) => {
                           const profileApp = profileData.profileApps.find(
-                            p => p.appType === 'pinned' && p.app?.id === app.id
+                            p => p.appType === 'pinned' && p.appId === app.id
                           );
                           const isVisible = profileApp?.isVisible ?? false;
 
@@ -298,7 +298,7 @@ export function UserDashboard() {
                       <div className="space-y-3">
                         {profileData.submissions.map((submission) => {
                           const profileApp = profileData.profileApps.find(
-                            p => p.appType === 'submitted' && p.submission?.id === submission.id
+                            p => p.appType === 'submitted' && p.submissionId === submission.id
                           );
                           const isVisible = profileApp?.isVisible ?? false;
 
