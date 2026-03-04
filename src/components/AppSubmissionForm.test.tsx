@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 
 test('adds an existing app to the profile launcher without waiting for approval', async () => {
   const originalFetch = globalThis.fetch;
+  const fetchCalls: string[] = [];
 
   // Keep auth in a signed-in state for the form
   window.localStorage.setItem(
@@ -17,11 +18,19 @@ test('adds an existing app to the profile launcher without waiting for approval'
     })
   );
 
-  globalThis.fetch = async () =>
-    ({
-      ok: true,
-      json: async () => ({ apps: [] }),
-    }) as unknown as Response;
+  globalThis.fetch = async (input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString();
+    fetchCalls.push(url);
+
+    if (url === '/api/apps') {
+      return {
+        ok: true,
+        json: async () => ({ apps: [] }),
+      } as unknown as Response;
+    }
+
+    throw new Error(`Unexpected fetch call: ${url}`);
+  };
 
   const addedApps: unknown[] = [];
   let successCount = 0;
@@ -67,6 +76,7 @@ test('adds an existing app to the profile launcher without waiting for approval'
     assert.equal(addedApps.length, 1);
     assert.equal((addedApps[0] as { id: string }).id, 'app-123');
     assert.equal(successCount, 1);
+    assert.deepEqual(fetchCalls, ['/api/apps']);
   } finally {
     root.unmount();
     container.remove();
