@@ -21,7 +21,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - App card remove handler invokes `/api/profile/manage` with correct payload and disables controls while in-flight.
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
-  - `getAppAvailability` flags intranet-only URLs; `isIntranetUrl` returns true for domains matching *.moe.edu.sg (e.g., intranet.moe.edu.sg).
+  - `getAppAvailability` flags intranet-only URLs; `isIntranetUrl` returns true for domains matching *.moe.edu.sg (e.g., intranet.moe.edu.sg and nested subdomains like portal.intranet.moe.edu.sg) based on the current matching strategy.
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
@@ -57,4 +57,4 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - “Copy profile link” copies `string.sg/{slug}`; toast confirms; link opens public profile view without edit controls.
 - **Deep links**
   - Visiting `/{slug}` for other users shows public view without “+ Add App” or removal controls.
-  - Hitting `?pin=<appId>&addToProfile=true` while signed out prompts auth and resumes action after sign-in.
+  - (Planned/verify) Hitting `?pin=<appId>&addToProfile=true` while signed out prompts auth and resumes action after sign-in, preserving the intent post-auth.
