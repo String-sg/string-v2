@@ -29,7 +29,7 @@ export default async function handler(_request: Request) {
       .select()
       .from(apps)
       .orderBy(desc(apps.frequency));
-    const officialApps = allAppsRaw.map(normalizeOpalLogo);
+    const dbApps = allAppsRaw.map(normalizeOpalLogo);
 
     // Get all approved submissions
     const approvedSubmissions = await db
@@ -57,7 +57,7 @@ export default async function handler(_request: Request) {
     }));
 
     // Combine both lists
-    const allApps = [...officialApps, ...submissionsAsApps];
+    const allApps = [...dbApps, ...submissionsAsApps];
 
     // Get today's featured app (if any)
     const today = new Date().toISOString().split('T')[0];
