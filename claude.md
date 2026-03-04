@@ -68,7 +68,7 @@
   - [x] Auto-pin to homepage + auto-add to profile via query params
   - [x] `/api/profile/add-app` endpoint to add apps to user_profile_apps
   - [x] Profile refreshes to show newly added app
-  - [x] Profile manage mode uses compact star-in-red-circle remove affordance
+  - [x] Profile manage mode uses compact cross icon remove affordance (neutral by default, red on hover)
   - [x] Featured cards on mobile use swipe-to-reveal actions (pin/unpin + launch) with one-time hint modal
   - [x] Profile share copy flows use Clipboard API with `execCommand('copy')` fallback + toast feedback
 - [ ] Inline visibility controls with WYSIWYG public preview toggle
