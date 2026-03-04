@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { apps, featuredApps, bumpRules } from '../src/db/schema';
+import { apps, featuredApps, bumpRules, appSubmissions } from '../src/db/schema';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
 export const config = {
@@ -30,6 +30,34 @@ export default async function handler(_request: Request) {
       .from(apps)
       .orderBy(desc(apps.frequency));
     const allApps = allAppsRaw.map(normalizeOpalLogo);
+
+    // Get all approved submissions
+    const approvedSubmissions = await db
+      .select()
+      .from(appSubmissions)
+      .where(eq(appSubmissions.status, 'approved'))
+      .orderBy(desc(appSubmissions.submittedAt));
+
+    // Transform submissions to match App interface
+    const submissionsAsApps = approvedSubmissions.map((s) => ({
+      id: s.id,
+      name: s.name,
+      slug: `ugc-${s.id}`,
+      url: s.url,
+      logoUrl: s.logoUrl,
+      description: s.description,
+      tagline: null,
+      category: s.category || 'Other',
+      tags: [],
+      isOfficial: false,
+      frequency: s.clickCount || 0,
+      featured: false,
+      createdAt: s.submittedAt,
+      updatedAt: s.reviewedAt || s.submittedAt,
+    }));
+
+    // Combine both lists
+    const allApps = [...officialApps, ...submissionsAsApps];
 
     // Get today's featured app (if any)
     const today = new Date().toISOString().split('T')[0];
