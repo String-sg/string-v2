@@ -2,7 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, userProfileApps, apps, appSubmissions } from '../../src/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { normalizeOpalLogo } from '../_lib/opal';
+import { normalizeOpalLogo } from '../../src/lib/branding';
 
 export const config = {
   runtime: 'edge',
