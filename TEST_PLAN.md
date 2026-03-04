@@ -15,7 +15,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Submit button shows loading state while the request is in flight.
   - Duplicate submissions are prevented while the request is in flight.
 - **Add existing app to profile/homepage**
-  - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
+  - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `window.history.replaceState`.
   - AppsList empty state shows “+ Add App” only when `isOwnProfile` is true; other viewers see neutral empty state.
   - App cards render remove affordance with neutral default + red hover, and loading spinner while `removing` is true.
 - **Pin / Unpin (favorite)**
@@ -26,13 +26,13 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
   - `getAppAvailability` flags intranet-only URLs.
-  - `isIntranetUrl` returns true for the configured intranet-only URL patterns in the codebase.
+  - `isIntranetUrl` returns true for the configured intranet-only URL patterns in the codebase (regex list currently lives in `src/lib/app-access.ts`).
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
   - Category filters show correct counts and respect featured bump rules when filtering.
 - **Profile share copy**
-  - Share action uses Clipboard API with an `execCommand('copy')` fallback for older browsers and shows toast on success/failure.
+  - Share action uses Clipboard API with an `execCommand('copy')` fallback for older browsers (deprecated API; only relevant for legacy environments) and shows toast on success/failure.
 - **Submission list feedback**
   - Submissions list renders rejection reasons when provided by the API and hides the field when absent.
 
