@@ -11,7 +11,9 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - `AppSubmissionForm` validates required fields and blocks submit on empty name/URL.
   - Duplicate detection banner appears when existing app name is selected.
   - Submit button switches to “Add to profile and homepage” CTA when `fromProfile` is true.
-  - Successful submit calls `/api/submissions` with `status: 'pending'`; submit button shows loading state and prevents duplicate submissions while the request is in flight.
+  - Successful submit calls `/api/submissions` with `status: 'pending'`.
+  - Submit button shows loading state while the request is in flight.
+  - Duplicate submissions are prevented while the request is in flight.
 - **Add existing app to profile/homepage**
   - `PersonalProfile` (and `DevProfileMock`) detect `?pin=<appId>&addToProfile=true` query params → call pin + `/api/profile/add-app`, then remove params via `history.replaceState`.
   - AppsList empty state shows “+ Add App” only when `isOwnProfile` is true; other viewers see neutral empty state.
@@ -24,7 +26,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
   - `getAppAvailability` flags intranet-only URLs.
-  - `isIntranetUrl` returns true for MOE intranet domains (`*.moe.edu.sg`, covering direct and multi-level subdomains such as portal.moe.edu.sg or portal.hr.moe.edu.sg).
+  - `isIntranetUrl` returns true for intranet patterns used in the codebase (e.g., hosts containing `intranet.` or ending with `.internal`, `.corp`, `.local`).
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
