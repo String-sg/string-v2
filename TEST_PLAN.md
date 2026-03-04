@@ -26,7 +26,7 @@ Comprehensive test coverage derived from `claude.md` and current product flows. 
   - Removing a submitted app keeps it in dashboard submissions list but removes it from profile grid.
 - **App availability and links**
   - `getAppAvailability` flags intranet-only URLs.
-  - `isIntranetUrl` returns true for intranet patterns used in the codebase (hosts containing `intranet.` or ending exactly with `.internal`, `.corp`, or `.local`).
+  - `isIntranetUrl` returns true for the configured intranet URL patterns in the codebase (e.g., hosts matching the current regex list such as `intranet.*`, `.internal`, `.corp`, `.local`).
   - `LaunchButton` sets `target="_blank"` + `rel="noopener noreferrer"` and stops propagation.
 - **Search and filters**
   - Header search updates results; clearing query resets list.
