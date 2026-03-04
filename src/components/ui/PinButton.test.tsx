@@ -43,7 +43,7 @@ test('invokes correct handlers and stops propagation', () => {
   const button = container.querySelector('button');
   assert.ok(button);
 
-  button?.dispatchEvent(
+  button.dispatchEvent(
     new window.MouseEvent('click', { bubbles: true, cancelable: true })
   );
 
@@ -64,7 +64,9 @@ test('invokes correct handlers and stops propagation', () => {
   });
 
   const pinnedButton = container.querySelector('button');
-  pinnedButton?.dispatchEvent(
+  assert.ok(pinnedButton);
+
+  pinnedButton.dispatchEvent(
     new window.MouseEvent('click', { bubbles: true, cancelable: true })
   );
 

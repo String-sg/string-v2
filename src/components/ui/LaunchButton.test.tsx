@@ -31,7 +31,7 @@ test('stops click propagation to parent elements', () => {
   const anchor = container.querySelector('a');
   assert.ok(anchor);
 
-  anchor?.dispatchEvent(
+  anchor.dispatchEvent(
     new window.MouseEvent('click', { bubbles: true, cancelable: true })
   );
 
