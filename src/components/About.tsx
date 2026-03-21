@@ -1,21 +1,6 @@
-import { useState } from 'react';
 import { AuthButton } from './AuthButton';
 import { navigateTo } from './Router';
-
-function useTheme() {
-  const [isDark, setIsDark] = useState(() => {
-    try {
-      return localStorage.getItem('string-theme') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  const toggle = () => setIsDark((d) => !d);
-  const t = (light: string, dark: string) => (isDark ? dark : light);
-
-  return { isDark, toggle, t };
-}
+import { useTheme } from '../hooks/useTheme';
 
 function Header({ isDark, onToggleTheme }: { isDark: boolean; onToggleTheme: () => void }) {
   return (

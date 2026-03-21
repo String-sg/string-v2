@@ -11,6 +11,7 @@ import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
 import { useToast } from './hooks/useToast';
+import { useTheme } from './hooks/useTheme';
 import { getAppAvailability, isIntranetUrl } from './lib/app-access';
 
 // ── Types ──────────────────────────────────────────────
@@ -139,25 +140,6 @@ const DEFAULT_ICON = (
 );
 
 // ── Theme helper ──────────────────────────────────────
-
-function useTheme() {
-  const [isDark, setIsDark] = useState(() => {
-    try {
-      return localStorage.getItem('string-theme') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('string-theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
-
-  const toggle = () => setIsDark((d) => !d);
-  const t = (light: string, dark: string) => (isDark ? dark : light);
-
-  return { isDark, toggle, t };
-}
 
 // ── Components ────────────────────────────────────────
 
