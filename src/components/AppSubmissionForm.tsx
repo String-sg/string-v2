@@ -20,6 +20,7 @@ interface ExistingApp {
   id: string;
   name: string;
   url: string;
+  isOfficial: boolean;
 }
 
 export function AppSubmissionForm({
@@ -64,7 +65,8 @@ export function AppSubmissionForm({
           const apps = data.apps.map((app: any) => ({
             id: app.id,
             name: app.name,
-            url: app.url
+            url: app.url,
+            isOfficial: app.isOfficial === true,
           }));
           setExistingApps(apps);
         }
