@@ -144,7 +144,7 @@ export function About() {
               </svg>
             </a>
             <a
-              href="http://reports.string.sg/"
+              href="https://reports.string.sg/"
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-xl border transition-colors ${t('border-string-border text-string-dark hover:bg-string-surface-hover', 'border-gray-600 text-gray-300 hover:bg-[#33373b]')}`}
