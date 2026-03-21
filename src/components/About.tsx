@@ -133,7 +133,7 @@ export function About() {
           <h2 className={`text-2xl font-bold mb-6 text-center ${t('text-string-dark', 'text-white')}`}>Get in Touch</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="http://join.string.sg/"
+              href="https://join.string.sg/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-string-mint text-string-dark font-semibold py-3 px-6 rounded-xl hover:bg-string-mint-light transition-colors"
