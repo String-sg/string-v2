@@ -36,6 +36,10 @@ export function Router({ children }: RouterProps) {
     return <Privacy />;
   }
 
+  if (currentPath === '/about') {
+    return <About />;
+  }
+
   // Check for user profile routes (e.g., /lee-kh)
   // Must be a single path segment (no nested routes)
   if (currentPath !== '/' && currentPath.startsWith('/')) {
