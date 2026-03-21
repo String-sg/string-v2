@@ -55,23 +55,14 @@ export function About() {
       <Header isDark={isDark} onToggleTheme={toggleTheme} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Intro */}
+        {/* Intro + Mission */}
         <div className={`${t('bg-white', 'bg-[#2a2d30]')} rounded-2xl p-8 shadow-sm text-center`}>
           <h1 className={`text-3xl font-bold mb-4 ${t('text-string-dark', 'text-white')}`}>About</h1>
-          <p className={`${t('text-string-text-primary', 'text-gray-300')}`}>
-            String surfaces good products and workflows used by public officers.
-          </p>
-          <p className={`${t('text-string-text-primary', 'text-gray-300')}`}>
-            Share best practices and help to increase operational efficiency with tech together.
-          </p>
-        </div>
-
-        {/* Mission */}
-        <div className={`${t('bg-white', 'bg-[#2a2d30]')} rounded-2xl p-8 shadow-sm text-center`}>
-          <p className={`text-sm mb-2 ${t('text-string-text-secondary', 'text-gray-400')}`}>Aspirationally, we are a:</p>
-          <h2 className="text-2xl font-bold text-string-mint mb-3">Tech ecosystem builder</h2>
+          <h2 className="text-xl font-semibold text-string-mint mb-4">
+            String is an EduTech ecosystem builder focused on products, programmes, and partnerships for educators.
+          </h2>
           <p className={`max-w-2xl mx-auto ${t('text-string-text-primary', 'text-gray-300')}`}>
-            We run tech explainers, build products and establish partnerships to drive adoption of more efficient solutions for education officers (previously for all public officers).
+            Our biggest resolution is to enable educators to focus on what truly matters: teaching and learning. We do this by culling subject-agnostic admin and facilitating access to tooling and community partners — tackling it one step at a time, together, with more thoughtful design and the right affordances of tech.
           </p>
         </div>
 
