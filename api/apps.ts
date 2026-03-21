@@ -4,7 +4,7 @@ import { apps, featuredApps, bumpRules, appSubmissions } from '../src/db/schema'
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
 export const config = {
-  runtime: 'edge',
+  runtime: 'nodejs',
 };
 
 const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
@@ -29,7 +29,7 @@ export default async function handler(_request: Request) {
       .select()
       .from(apps)
       .orderBy(desc(apps.frequency));
-    const allApps = allAppsRaw.map(normalizeOpalLogo);
+    const officialApps = allAppsRaw.map(normalizeOpalLogo);
 
     // Get all approved submissions
     const approvedSubmissions = await db
