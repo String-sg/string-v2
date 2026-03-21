@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { UserDashboard } from './UserDashboard';
 import { Terms } from './Terms';
 import { Privacy } from './Privacy';
+import { About } from './About';
 import { PersonalProfile } from './PersonalProfile';
 import { DevProfileMock } from './DevProfileMock';
 import { isReservedSlug } from '../lib/slug-utils';
