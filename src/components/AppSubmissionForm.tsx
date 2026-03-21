@@ -12,6 +12,7 @@ interface AppSubmissionForm {
 interface AppSubmissionFormProps {
   onSuccess?: () => void;
   fromProfile?: boolean;
+  onAddExistingApp?: (app: ExistingApp) => Promise<boolean> | boolean;
 }
 
 interface ExistingApp {
@@ -21,7 +22,11 @@ interface ExistingApp {
   isOfficial: boolean;
 }
 
-export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmissionFormProps = {}) {
+export function AppSubmissionForm({
+  onSuccess,
+  fromProfile = false,
+  onAddExistingApp,
+}: AppSubmissionFormProps = {}) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
     name: '',
@@ -73,6 +78,13 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
   // Filter apps based on input
   const handleNameChange = (value: string) => {
     setForm(prev => ({ ...prev, name: value }));
+
+    if (
+      selectedExistingApp &&
+      value.trim().toLowerCase() !== selectedExistingApp.name.trim().toLowerCase()
+    ) {
+      setSelectedExistingApp(null);
+    }
     
     if (value.length >= 2) {
       const matches = existingApps.filter(app =>
@@ -90,9 +102,7 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
     setShowSuggestions(false);
     setSelectedExistingApp(app);
     
-    if (fromProfile && app.isOfficial) {
-      setMessage('existing-app'); // Special flag for official existing app - show pin button
-    } else {
+    if (!fromProfile) {
       setMessage('Note: This app already exists. Consider if you really need to submit it again.');
     }
   };
@@ -169,7 +179,7 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {message && message !== 'existing-app' && (
+      {message && (
         <div className={`p-3 rounded-lg ${message.includes('successfully')
           ? 'bg-green-50 text-green-700 border border-green-200'
           : message.includes('Note:')
@@ -180,24 +190,46 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
       )}
 
       {/* Special message for existing apps from profile */}
-      {fromProfile && message === 'existing-app' && selectedExistingApp && (
+      {fromProfile && selectedExistingApp && (
         <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
           <p className="text-yellow-800 text-sm mb-3">
             <strong>This app already exists in the library.</strong>
           </p>
           <button
             type="button"
-            onClick={() => {
-              // Pin to homepage
+            onClick={async () => {
+              if (!selectedExistingApp) return;
+
+              if (onAddExistingApp) {
+                setLoading(true);
+                try {
+                  const success = await onAddExistingApp(selectedExistingApp);
+
+                  if (success && onSuccess) {
+                    onSuccess();
+                  }
+                } catch (error) {
+                  console.error('Failed to add existing app:', error);
+                  // Optionally surface an error message to the user
+                  if (typeof setMessage === 'function') {
+                    setMessage('There was an error adding this app to your profile. Please try again.');
+                  }
+                } finally {
+                  setLoading(false);
+                }
+                return;
+              }
+
               const currentUrl = window.location.pathname;
               window.location.href = `${currentUrl}?pin=${selectedExistingApp.id}&addToProfile=true`;
             }}
+            disabled={loading}
             className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark rounded-lg hover:bg-string-mint-light transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
-            Add to profile and homepage →
+            {loading ? 'Adding...' : 'Add to profile and homepage'}
           </button>
         </div>
       )}
@@ -246,7 +278,13 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
           type="url"
           required
           value={form.url}
-          onChange={(e) => setForm(prev => ({ ...prev, url: e.target.value }))}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm(prev => ({ ...prev, url: value }));
+            if (selectedExistingApp && value.trim() !== selectedExistingApp.url.trim()) {
+              setSelectedExistingApp(null);
+            }
+          }}
           placeholder="https://..."
           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-string-mint focus:border-string-mint"
         />
@@ -295,7 +333,7 @@ export function AppSubmissionForm({ onSuccess, fromProfile = false }: AppSubmiss
 
       <button
         type="submit"
-        disabled={loading || (fromProfile && message === 'existing-app')}
+        disabled={loading || (fromProfile && !!selectedExistingApp)}
         className="w-full bg-string-mint text-string-dark py-2.5 px-4 rounded-xl font-medium hover:bg-string-mint-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? 'Submitting...' : 'Submit App'}

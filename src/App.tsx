@@ -6,10 +6,12 @@ import { LaunchButton } from './components/ui/LaunchButton';
 import { Modal } from './components/ui/Modal';
 import { AppSubmissionForm } from './components/AppSubmissionForm';
 import { ToastContainer } from './components/ToastContainer';
+import { CalendarBanner } from './components/CalendarBanner';
 import { usePreferences } from './hooks/usePreferences';
 import { useSwipe } from './hooks/useSwipe';
 import { useAuth } from './hooks/useAuth';
 import { useToast } from './hooks/useToast';
+import { getAppAvailability, isIntranetUrl } from './lib/app-access';
 
 // ── Types ──────────────────────────────────────────────
 
@@ -28,6 +30,18 @@ interface App {
   featured: boolean;
 }
 
+type IconManifest = Record<string, string>;
+const WHITE_BG_ICON_SLUGS = new Set([
+  'icon',
+  'google-classroom',
+  'formsg',
+  'all-ears',
+  'go-gov',
+  'for-edu',
+  'askgov',
+  'epp',
+]);
+
 // ── Utilities ──────────────────────────────────────────
 
 function getGreeting(): string {
@@ -44,6 +58,32 @@ function getInitials(name: string) {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+}
+
+function applyIconManifest(apps: App[], manifest: IconManifest): App[] {
+  return apps.map((app) => {
+    if (app.logoUrl || !app.slug) {
+      return app;
+    }
+
+    const manifestLogo = manifest[app.slug];
+    if (!manifestLogo) {
+      return app;
+    }
+
+    return {
+      ...app,
+      logoUrl: manifestLogo,
+    };
+  });
+}
+
+function getIconTileSurface(app: App): string {
+  if (app.logoUrl && WHITE_BG_ICON_SLUGS.has(app.slug)) {
+    return 'bg-white border border-gray-200';
+  }
+
+  return 'bg-string-dark';
 }
 
 // ── Category Icons (inline SVGs) ──────────────────────
@@ -129,6 +169,7 @@ function Header({
   onToggleTheme,
   onSearchOpen,
   onOpenSubmitModal,
+  onDesktopSearchSubmit,
 }: {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -137,6 +178,7 @@ function Header({
   onToggleTheme: () => void;
   onSearchOpen: () => void;
   onOpenSubmitModal: () => void;
+  onDesktopSearchSubmit: () => void;
 }) {
   const { isAuthenticated } = useAuth();
   return (
@@ -159,6 +201,12 @@ function Header({
               placeholder="Search apps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  onDesktopSearchSubmit();
+                }
+              }}
               className="w-72 px-4 py-2 pl-10 pr-16 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-string-mint bg-string-darker text-white placeholder-gray-400"
             />
             <kbd className="absolute right-3 top-2 text-xs px-1.5 py-0.5 rounded bg-string-darker text-gray-400">
@@ -215,6 +263,7 @@ function GreetingSection({ t }: { t: (l: string, d: string) => string }) {
   return (
     <div className="mb-6">
       <h1 className={`text-3xl font-bold ${t('text-string-dark', 'text-white')}`}>{getGreeting()}</h1>
+      <CalendarBanner t={t} />
       <p className={`text-sm mt-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>
         Access your tools and resources.<span className="hidden sm:inline"> Press <kbd className={`text-xs px-1.5 py-0.5 rounded ${t('bg-gray-200 text-gray-600', 'bg-string-dark text-gray-400')}`}>Cmd+K</kbd> to quick-search.</span>
       </p>
@@ -262,8 +311,12 @@ function PinnedAppCard({
         {...swipeProps}
         onClick={handleClick}
       >
-      <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
-        {getInitials(app.name)}
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+        {app.logoUrl ? (
+          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-md" />
+        ) : (
+          getInitials(app.name)
+        )}
       </div>
       <div className="text-left min-w-0">
         <div className={`text-sm font-medium truncate ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
@@ -367,7 +420,7 @@ function CategorySidebar({
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
             selectedCategory === null
               ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-              : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 hover:text-string-text-primary`
+              : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 ${t('hover:text-string-text-primary', 'hover:text-white')}`
           }`}
         >
           {DEFAULT_ICON}
@@ -385,7 +438,7 @@ function CategorySidebar({
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
               selectedCategory === cat.name
                 ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 hover:text-string-text-primary`
+                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 ${t('hover:text-string-text-primary', 'hover:text-white')}`
             }`}
           >
             {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
@@ -444,7 +497,7 @@ function CategoryDropdown({
             className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
               selectedCategory === null
                 ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+                : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 ${t('hover:text-string-text-primary', 'hover:text-white')}`
             }`}
           >
             {DEFAULT_ICON}
@@ -462,7 +515,7 @@ function CategoryDropdown({
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors text-left ${
                 selectedCategory === cat.name
                   ? 'bg-string-mint/10 text-string-mint-dark font-medium'
-                  : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10`
+                  : `${t('text-gray-700', 'text-gray-300')} hover:bg-gray-100/10 ${t('hover:text-string-text-primary', 'hover:text-white')}`
               }`}
             >
               {CATEGORY_ICONS[cat.name] || DEFAULT_ICON}
@@ -531,9 +584,9 @@ function AppGridCard({
         onTouchMove={swipeProps.onTouchMove}
         onTouchEnd={swipeProps.onTouchEnd}
       >
-      <div className="w-11 h-11 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
         {app.logoUrl ? (
-          <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-[15px]" />
+          <img src={app.logoUrl} alt={app.name} className="w-8 h-8 object-contain rounded-md" />
         ) : (
           getInitials(app.name)
         )}
@@ -625,6 +678,37 @@ function FeaturedSection({
 
   const primary = featuredApps[0];
   const secondary = featuredApps.slice(1);
+  const primarySwipeProps = useSwipe({
+    // Intentionally no-op; hook uses this to enable swipe action menu state.
+    onSwipeLeft: () => {},
+    threshold: 100,
+    autoCloseDelay: 1500
+  });
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isMobile = window.matchMedia('(max-width: 639px)').matches;
+    if (isMobile && !localStorage.getItem('string-featured-swipe-hint-dismissed')) {
+      setShowSwipeHint(true);
+    }
+  }, []);
+
+  const dismissSwipeHint = () => {
+    localStorage.setItem('string-featured-swipe-hint-dismissed', 'true');
+    setShowSwipeHint(false);
+  };
+
+  const handlePrimaryClick = (e: React.MouseEvent) => {
+    if (primarySwipeProps.isSwipeMenuOpen) {
+      primarySwipeProps.closeSwipeMenu();
+      return;
+    }
+    primarySwipeProps.onClick(e);
+    if (!e.defaultPrevented) {
+      onSelectApp(primary);
+    }
+  };
 
   return (
     <div className="mb-6">
@@ -635,85 +719,215 @@ function FeaturedSection({
         <span className={`text-sm font-semibold ${t('text-string-dark', 'text-white')}`}>Featured</span>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div
-          onClick={() => onSelectApp(primary)}
-          className="lg:col-span-2 relative rounded-2xl p-6 cursor-pointer overflow-hidden bg-gradient-to-br from-string-dark to-string-darker text-white group"
-        >
-          <div className="absolute top-4 right-4 w-32 h-32 rounded-full bg-string-mint/10 blur-2xl"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-string-mint/20 flex items-center justify-center text-string-mint font-bold text-lg">
-                {getInitials(primary.name)}
+        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl">
+          <div
+            onClick={handlePrimaryClick}
+            className={`relative rounded-2xl p-6 cursor-pointer overflow-hidden bg-gradient-to-br from-string-dark to-string-darker text-white group transition-all duration-200 ${primarySwipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
+            onTouchStart={primarySwipeProps.onTouchStart}
+            onTouchMove={primarySwipeProps.onTouchMove}
+            onTouchEnd={primarySwipeProps.onTouchEnd}
+          >
+            <div className="absolute top-4 right-4 w-32 h-32 rounded-full bg-string-mint/10 blur-2xl"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-string-mint font-bold text-lg overflow-hidden ${getIconTileSurface(primary)}`}>
+                  {primary.logoUrl ? (
+                    <img src={primary.logoUrl} alt={primary.name} className="w-9 h-9 object-contain rounded-md" />
+                  ) : (
+                    getInitials(primary.name)
+                  )}
+                </div>
+                <span className="bg-string-mint/20 text-string-mint text-xs font-medium px-2 py-1 rounded-full">New</span>
               </div>
-              <span className="bg-string-mint/20 text-string-mint text-xs font-medium px-2 py-1 rounded-full">New</span>
+              <h3 className="text-xl font-bold mb-1">{primary.name}</h3>
+              <p className="text-gray-300 text-sm mb-1">{primary.tagline || primary.description}</p>
+              <span className="text-xs text-gray-400">{primary.category}</span>
             </div>
-            <h3 className="text-xl font-bold mb-1">{primary.name}</h3>
-            <p className="text-gray-300 text-sm mb-1">{primary.tagline || primary.description}</p>
-            <span className="text-xs text-gray-400">{primary.category}</span>
+            {/* Action buttons */}
+            <div className="absolute top-4 right-4 hidden sm:flex gap-2 opacity-0 sm:group-hover:opacity-100 transition-opacity z-20">
+              <PinButton
+                isPinned={pinnedApps.includes(primary.id)}
+                onPin={() => onPin(primary.id)}
+                onUnpin={() => onUnpin(primary.id)}
+                className="text-gray-300"
+              />
+              <LaunchButton
+                url={primary.url}
+                className="text-gray-300"
+              />
+            </div>
           </div>
-          {/* Action buttons */}
-          <div className="absolute top-4 right-4 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20">
-            <PinButton
-              isPinned={pinnedApps.includes(primary.id)}
-              onPin={() => onPin(primary.id)}
-              onUnpin={() => onUnpin(primary.id)}
-              className="text-gray-300"
-            />
-            <LaunchButton
-              url={primary.url}
-              className="text-gray-300"
-            />
+          <div className={`absolute top-0 right-0 h-full flex items-center transition-all duration-200 sm:hidden ${
+            primarySwipeProps.isSwipeMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); pinnedApps.includes(primary.id) ? onUnpin(primary.id) : onPin(primary.id); }}
+              className={`h-full px-3 flex items-center justify-center transition-colors ${
+                pinnedApps.includes(primary.id) ? 'bg-red-500 text-white' : 'bg-string-mint text-string-dark'
+              }`}
+              title={pinnedApps.includes(primary.id) ? 'Unpin' : 'Pin'}
+            >
+              <svg className="w-4 h-4" fill={pinnedApps.includes(primary.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              </svg>
+            </button>
+            <a
+              href={primary.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="h-full px-3 bg-string-mint text-string-dark flex items-center justify-center hover:bg-string-mint-light transition-colors"
+              title="Open in new tab"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
           </div>
         </div>
         <div className="flex flex-col gap-3">
           {secondary.map((app) => (
-            <div
+            <FeaturedSecondaryCard
               key={app.id}
-              onClick={() => onSelectApp(app)}
-              className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors flex-1 ${t(
-                'bg-white border border-gray-100 hover:border-string-mint',
-                'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
-              )}`}
-            >
-              <div className="w-10 h-10 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-sm shrink-0">
-                {getInitials(app.name)}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
-                <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
-                <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
-              </div>
-              {/* Action buttons */}
-              <div className="absolute top-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={(e) => { e.stopPropagation(); pinnedApps.includes(app.id) ? onUnpin(app.id) : onPin(app.id); }}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    pinnedApps.includes(app.id)
-                      ? 'text-string-mint bg-string-mint/10'
-                      : t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')
-                  }`}
-                  title={pinnedApps.includes(app.id) ? 'Unpin' : 'Pin'}
-                >
-                  <svg className="w-4 h-4" fill={pinnedApps.includes(app.id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a .563.563 0 00.475-.345L11.48 3.5z" />
-                  </svg>
-                </button>
-                <a
-                  href={app.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')}`}
-                  title="Open in new tab"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+              app={app}
+              isPinned={pinnedApps.includes(app.id)}
+              onPin={onPin}
+              onUnpin={onUnpin}
+              onSelect={onSelectApp}
+              t={t}
+            />
           ))}
         </div>
+      </div>
+      <Modal isOpen={showSwipeHint} onClose={dismissSwipeHint} title="Quick tip">
+        <div className="p-2">
+          <p className="text-sm text-gray-700 mb-4">On mobile, swipe featured app cards to reveal pin and launch actions.</p>
+          <button
+            onClick={dismissSwipeHint}
+            className="w-full bg-string-mint text-string-dark font-medium py-2.5 px-4 rounded-lg hover:bg-string-mint-light transition-colors"
+          >
+            Got it
+          </button>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+function FeaturedSecondaryCard({
+  app,
+  isPinned,
+  onPin,
+  onUnpin,
+  onSelect,
+  t,
+}: {
+  app: App;
+  isPinned: boolean;
+  onPin: (id: string) => void;
+  onUnpin: (id: string) => void;
+  onSelect: (app: App) => void;
+  t: (l: string, d: string) => string;
+}) {
+  const swipeProps = useSwipe({
+    // Intentionally no-op; hook uses this to enable swipe action menu state.
+    onSwipeLeft: () => {},
+    threshold: 100,
+    autoCloseDelay: 1500
+  });
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (swipeProps.isSwipeMenuOpen) {
+      swipeProps.closeSwipeMenu();
+      return;
+    }
+
+    swipeProps.onClick(e);
+    if (!e.defaultPrevented) {
+      onSelect(app);
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden rounded-xl">
+      <div
+        onClick={handleClick}
+        className={`group relative flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors flex-1 ${t(
+          'bg-white border border-gray-100 hover:border-string-mint',
+          'bg-[#2a2d30] border border-[#3a3f44] hover:border-string-mint'
+        )} ${swipeProps.isSwipeMenuOpen ? 'transform -translate-x-20' : ''}`}
+        onTouchStart={swipeProps.onTouchStart}
+        onTouchMove={swipeProps.onTouchMove}
+        onTouchEnd={swipeProps.onTouchEnd}
+      >
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-string-mint font-semibold text-sm shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+          {app.logoUrl ? (
+            <img src={app.logoUrl} alt={app.name} className="w-7 h-7 object-contain rounded-md" />
+          ) : (
+            getInitials(app.name)
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className={`text-sm font-medium ${t('text-string-dark', 'text-white')}`}>{app.name}</div>
+          <div className={`text-xs line-clamp-1 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.tagline || app.description}</div>
+          <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#C0F4FB] text-[#0B5563]">{app.category}</span>
+        </div>
+        {/* Desktop action buttons */}
+        <div className="absolute top-2 right-2 hidden sm:flex gap-1 opacity-0 sm:group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => { e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
+            className={`p-1.5 rounded-lg transition-colors ${
+              isPinned
+                ? 'text-string-mint bg-string-mint/10'
+                : t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')
+            }`}
+            title={isPinned ? 'Unpin' : 'Pin'}
+          >
+            <svg className="w-4 h-4" fill={isPinned ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a .563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+          </button>
+          <a
+            href={app.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className={`p-1.5 rounded-lg transition-colors ${t('text-gray-400 hover:text-string-dark hover:bg-string-mint', 'text-gray-500 hover:text-string-dark hover:bg-string-mint')}`}
+            title="Open in new tab"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div className={`absolute top-0 right-0 h-full flex items-center transition-all duration-200 sm:hidden ${
+        swipeProps.isSwipeMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); isPinned ? onUnpin(app.id) : onPin(app.id); }}
+          className={`h-full px-3 flex items-center justify-center transition-colors ${
+            isPinned ? 'bg-red-500 text-white' : 'bg-string-mint text-string-dark'
+          }`}
+          title={isPinned ? 'Unpin' : 'Pin'}
+        >
+          <svg className="w-4 h-4" fill={isPinned ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a .563.563 0 00.475-.345L11.48 3.5z" />
+          </svg>
+        </button>
+        <a
+          href={app.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="h-full px-3 bg-string-mint text-string-dark flex items-center justify-center hover:bg-string-mint-light transition-colors"
+          title="Open in new tab"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        </a>
       </div>
     </div>
   );
@@ -809,8 +1023,12 @@ function SearchModal({
                       'hover:bg-[#2a2d30]'
                     )}`}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                      {getInitials(app.name)}
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                      {app.logoUrl ? (
+                        <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                      ) : (
+                        getInitials(app.name)
+                      )}
                     </div>
                     <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                   </button>
@@ -835,8 +1053,12 @@ function SearchModal({
                           'hover:bg-[#2a2d30]'
                         )}`}
                       >
-                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                          {getInitials(app.name)}
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                          {app.logoUrl ? (
+                            <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                          ) : (
+                            getInitials(app.name)
+                          )}
                         </div>
                         <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                       </button>
@@ -860,8 +1082,12 @@ function SearchModal({
                           'hover:bg-[#2a2d30]'
                         )}`}
                       >
-                        <div className="w-9 h-9 rounded-xl bg-string-dark flex items-center justify-center text-string-mint font-semibold text-xs shrink-0">
-                          {getInitials(app.name)}
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-string-mint font-semibold text-xs shrink-0 overflow-hidden ${getIconTileSurface(app)}`}>
+                          {app.logoUrl ? (
+                            <img src={app.logoUrl} alt={app.name} className="w-6 h-6 object-contain rounded-md" />
+                          ) : (
+                            getInitials(app.name)
+                          )}
                         </div>
                         <span className={`text-sm ${t('text-string-dark', 'text-white')}`}>{app.name}</span>
                       </button>
@@ -908,11 +1134,14 @@ function AppDetailSidebar({
   onClose: () => void;
   t: (l: string, d: string) => string;
 }) {
+  const isIntranetOnly = app ? isIntranetUrl(app.url) : false;
+  const availability = app ? getAppAvailability(app.url) : 'available';
+
   return (
     <>
-      {app && <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />}
+      {app && <div className="fixed inset-0 bg-black/40 z-20" onClick={onClose} />}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-40 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 z-30 transform transition-transform duration-300 ease-in-out border-l overflow-y-auto ${
           app ? 'translate-x-0' : 'translate-x-full'
         } ${t('bg-white border-gray-200', 'bg-[#2a2d30] border-[#3a3f44]')}`}
       >
@@ -928,8 +1157,8 @@ function AppDetailSidebar({
             </div>
 
             <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-string-dark flex items-center justify-center text-string-mint font-bold text-2xl mb-3">
-                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-10 h-10 object-contain rounded-[15px]" /> : getInitials(app.name)}
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-string-mint font-bold text-2xl mb-3 overflow-hidden ${getIconTileSurface(app)}`}>
+                {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-11 h-11 object-contain rounded-md" /> : getInitials(app.name)}
               </div>
               <h2 className={`text-xl font-bold ${t('text-string-dark', 'text-white')}`}>{app.name}</h2>
               <p className={`text-sm mt-2 ${t('text-string-text-secondary', 'text-gray-400')}`}>{app.description}</p>
@@ -983,14 +1212,21 @@ function AppDetailSidebar({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className={t('text-string-text-secondary', 'text-gray-400')}>Status</span>
-                  <span className="text-string-mint flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-string-mint inline-block"></span>
-                    Available
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                      availability === 'intranet-only'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-[#33373B] text-white'
+                    }`}
+                  >
+                    {availability === 'intranet-only' ? 'Intranet only' : 'Available'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className={t('text-string-text-secondary', 'text-gray-400')}>Access</span>
-                  <span className={`font-medium ${t('text-string-dark', 'text-white')}`}>{app.isOfficial ? 'MOE Staff' : 'Open Access'}</span>
+                  <span className={`font-medium ${isIntranetOnly ? 'text-red-600' : t('text-string-dark', 'text-white')}`}>
+                    {isIntranetOnly ? 'Intranet only' : app.isOfficial ? 'MOE Staff' : 'Open Access'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1052,13 +1288,23 @@ export default function App() {
 
   useEffect(() => {
     async function fetchApps() {
+      let iconManifest: IconManifest = {};
+      try {
+        const manifestRes = await fetch('/src/app-icons/manifest.json');
+        if (manifestRes.ok) {
+          iconManifest = (await manifestRes.json()) as IconManifest;
+        }
+      } catch {
+        // Non-blocking: app data should still load without manifest.
+      }
+
       try {
         const res = await fetch('/api/apps');
         if (!res.ok) throw new Error('API unavailable');
         const contentType = res.headers.get('content-type');
         if (!contentType?.includes('application/json')) throw new Error('Not JSON');
         const data = await res.json();
-        setApps(data.apps || []);
+        setApps(applyIconManifest(data.apps || [], iconManifest));
       } catch {
         try {
           const res = await fetch('/apps-seed.json');
@@ -1077,7 +1323,7 @@ export default function App() {
             frequency: (a.frequency as number) || 0,
             featured: (a.featured as boolean) || false,
           }));
-          setApps(seedApps);
+          setApps(applyIconManifest(seedApps, iconManifest));
         } catch (err) {
           console.error('Failed to load apps:', err);
         }
@@ -1130,6 +1376,22 @@ export default function App() {
   const sortedApps = [...filteredApps].sort((a, b) => b.frequency - a.frequency);
   const pinnedApps = apps.filter((a) => preferences.pinnedApps.includes(a.id));
 
+  const openApp = (app: App) => {
+    addRecentApp(app.id);
+    window.open(app.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleDesktopSearchSubmit = () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    const firstMatch = sortedApps[0];
+    if (firstMatch) {
+      openApp(firstMatch);
+    }
+  };
+
   const handlePin = (id: string) => {
     togglePinnedApp(id);
     const app = apps.find(a => a.id === id);
@@ -1176,6 +1438,7 @@ export default function App() {
         onToggleTheme={toggleTheme}
         onSearchOpen={() => setSearchModalOpen(true)}
         onOpenSubmitModal={() => setSubmitModalOpen(true)}
+        onDesktopSearchSubmit={handleDesktopSearchSubmit}
       />
 
       <SearchModal
@@ -1184,10 +1447,7 @@ export default function App() {
         apps={apps}
         pinnedApps={pinnedApps}
         recentApps={apps.filter((a) => recentAppIds.includes(a.id))}
-        onOpenApp={(app) => {
-          addRecentApp(app.id);
-          window.open(app.url, '_blank');
-        }}
+        onOpenApp={openApp}
         t={t}
       />
 

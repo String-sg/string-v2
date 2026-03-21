@@ -7,6 +7,8 @@ export const config = {
   runtime: 'edge',
 };
 
+const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
+
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not set');
@@ -111,7 +113,7 @@ export default async function handler(request: Request) {
           name: item.appName,
           slug: item.appSlug,
           url: item.appUrl,
-          logoUrl: item.appLogoUrl,
+          logoUrl: item.appSlug === 'opal' ? OPAL_CANONICAL_LOGO : item.appLogoUrl,
           description: item.appDescription,
           tagline: item.appTagline,
           category: item.appCategory,
@@ -128,6 +130,7 @@ export default async function handler(request: Request) {
           tagline: null,
           category: item.submissionCategory,
           type: 'submitted' as const,
+          status: item.submissionStatus,
         };
       }
       return null;
@@ -135,6 +138,7 @@ export default async function handler(request: Request) {
 
     return new Response(JSON.stringify({
       profile: {
+        id: profile.id,
         name: profile.name,
         slug: profile.slug,
         avatarUrl: profile.avatarUrl,
