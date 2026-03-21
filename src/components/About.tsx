@@ -160,6 +160,17 @@ export function About() {
               </svg>
             </a>
             <a
+              href="https://luma.com/string"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-xl border transition-colors ${t('border-string-border text-string-dark hover:bg-string-surface-hover', 'border-gray-600 text-gray-300 hover:bg-[#33373b]')}`}
+            >
+              Events
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+              </svg>
+            </a>
+            <a
               href="https://discord.gg/ZRHqBtwh9b"
               target="_blank"
               rel="noopener noreferrer"
