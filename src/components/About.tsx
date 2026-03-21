@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthButton } from './AuthButton';
 import { navigateTo } from './Router';
 
@@ -10,6 +10,10 @@ function useTheme() {
       return false;
     }
   });
+
+  useEffect(() => {
+    localStorage.setItem('string-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   const toggle = () => setIsDark((d) => !d);
   const t = (light: string, dark: string) => (isDark ? dark : light);
