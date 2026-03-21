@@ -2,22 +2,11 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { apps, featuredApps, bumpRules, appSubmissions } from '../src/db/schema';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { normalizeOpalLogo } from '../src/lib/branding';
 
 export const config = {
   runtime: 'nodejs',
 };
-
-const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
-
-function normalizeOpalLogo<T extends { slug: string | null; logoUrl: string | null }>(app: T): T {
-  if (app.slug === 'opal') {
-    return {
-      ...app,
-      logoUrl: OPAL_CANONICAL_LOGO,
-    };
-  }
-  return app;
-}
 
 export default async function handler(_request: Request) {
   try {
@@ -29,7 +18,7 @@ export default async function handler(_request: Request) {
       .select()
       .from(apps)
       .orderBy(desc(apps.frequency));
-    const dbApps = allAppsRaw.map(normalizeOpalLogo);
+    const officialApps = allAppsRaw.map(normalizeOpalLogo);
 
     // Get all approved submissions
     const approvedSubmissions = await db

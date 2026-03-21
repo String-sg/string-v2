@@ -2,12 +2,11 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, userProfileApps, apps, appSubmissions } from '../../src/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { OPAL_CANONICAL_LOGO } from '../../src/lib/branding';
 
 export const config = {
   runtime: 'edge',
 };
-
-const OPAL_CANONICAL_LOGO = '/icons/opal2.png';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -130,6 +129,7 @@ export default async function handler(request: Request) {
           tagline: null,
           category: item.submissionCategory,
           type: 'submitted' as const,
+          status: item.submissionStatus,
         };
       }
       return null;

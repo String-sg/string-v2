@@ -6,6 +6,8 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
 
 globalThis.window = dom.window as unknown as typeof globalThis.window;
 globalThis.document = dom.window.document;
+// Provide storage APIs for components that rely on browser persistence
+(globalThis as typeof globalThis & { localStorage?: Storage }).localStorage = dom.window.localStorage;
 Object.defineProperty(globalThis, 'navigator', {
   value: dom.window.navigator,
   configurable: true

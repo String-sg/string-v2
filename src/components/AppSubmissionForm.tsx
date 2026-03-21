@@ -13,18 +13,21 @@ interface AppSubmissionFormProps {
   onSuccess?: () => void;
   fromProfile?: boolean;
   onAddExistingApp?: (app: ExistingApp) => Promise<boolean> | boolean;
+  testSelectedExistingApp?: ExistingApp;
 }
 
 interface ExistingApp {
   id: string;
   name: string;
   url: string;
+  isOfficial: boolean;
 }
 
 export function AppSubmissionForm({
   onSuccess,
   fromProfile = false,
   onAddExistingApp,
+  testSelectedExistingApp,
 }: AppSubmissionFormProps = {}) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState<AppSubmissionForm>({
@@ -39,7 +42,7 @@ export function AppSubmissionForm({
   const [existingApps, setExistingApps] = useState<ExistingApp[]>([]);
   const [filteredApps, setFilteredApps] = useState<ExistingApp[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedExistingApp, setSelectedExistingApp] = useState<ExistingApp | null>(null);
+  const [selectedExistingApp, setSelectedExistingApp] = useState<ExistingApp | null>(testSelectedExistingApp ?? null);
 
   const categories = [
     'Administration',
@@ -62,7 +65,8 @@ export function AppSubmissionForm({
           const apps = data.apps.map((app: any) => ({
             id: app.id,
             name: app.name,
-            url: app.url
+            url: app.url,
+            isOfficial: app.isOfficial === true,
           }));
           setExistingApps(apps);
         }
