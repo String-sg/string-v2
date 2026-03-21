@@ -1,29 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../hooks/useTheme';
 import { AppSubmissionForm } from './AppSubmissionForm';
 import { DashboardHeader } from './ui/DashboardHeader';
 import { MySubmissions } from './dashboard/MySubmissions';
 import { Modal } from './ui/Modal';
-
-// Theme helper function (consistent with main app)
-function useTheme() {
-  const [isDark, setIsDark] = useState(() => {
-    try {
-      return localStorage.getItem('string-theme') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('string-theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
-
-  const toggle = () => setIsDark((d) => !d);
-  const t = (light: string, dark: string) => (isDark ? dark : light);
-
-  return { isDark, toggle, t };
-}
 
 
 interface Submission {
