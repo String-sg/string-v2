@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthButton } from './AuthButton';
 import { navigateTo } from './Router';
 
@@ -10,6 +10,10 @@ function useTheme() {
       return false;
     }
   });
+
+  useEffect(() => {
+    localStorage.setItem('string-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   const toggle = () => setIsDark((d) => !d);
   const t = (light: string, dark: string) => (isDark ? dark : light);
@@ -129,7 +133,7 @@ export function About() {
           <h2 className={`text-2xl font-bold mb-6 text-center ${t('text-string-dark', 'text-white')}`}>Get in Touch</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="http://join.string.sg/"
+              href="https://join.string.sg/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-string-mint text-string-dark font-semibold py-3 px-6 rounded-xl hover:bg-string-mint-light transition-colors"
@@ -140,7 +144,7 @@ export function About() {
               </svg>
             </a>
             <a
-              href="http://reports.string.sg/"
+              href="https://reports.string.sg/"
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-xl border transition-colors ${t('border-string-border text-string-dark hover:bg-string-surface-hover', 'border-gray-600 text-gray-300 hover:bg-[#33373b]')}`}
