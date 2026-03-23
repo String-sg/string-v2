@@ -104,15 +104,6 @@ export function About() {
           <h2 className={`text-2xl font-bold mb-6 ${t('text-string-dark', 'text-white')}`}>Year in Review</h2>
           <div className="flex flex-col sm:flex-row gap-4">
             <a
-              href="https://medium.com/string/it-happened-on-string-e7f0a5df81f3"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex-1 rounded-xl p-5 border transition-colors ${t('border-string-border hover:bg-string-surface-hover', 'border-gray-600 hover:bg-[#33373b]')}`}
-            >
-              <p className="text-string-mint font-semibold mb-1">2024 Recap</p>
-              <p className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>It happened on String — a look back at 2024 →</p>
-            </a>
-            <a
               href="https://medium.com/it-happened-on-string-2025-09836fdef4b3"
               target="_blank"
               rel="noopener noreferrer"
@@ -120,6 +111,15 @@ export function About() {
             >
               <p className="text-string-mint font-semibold mb-1">2025 Recap</p>
               <p className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>It happened on String — a look back at 2025 →</p>
+            </a>
+            <a
+              href="https://medium.com/string/it-happened-on-string-e7f0a5df81f3"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex-1 rounded-xl p-5 border transition-colors ${t('border-string-border hover:bg-string-surface-hover', 'border-gray-600 hover:bg-[#33373b]')}`}
+            >
+              <p className="text-string-mint font-semibold mb-1">2024 Recap</p>
+              <p className={`text-sm ${t('text-string-text-secondary', 'text-gray-400')}`}>It happened on String — a look back at 2024 →</p>
             </a>
           </div>
         </div>
