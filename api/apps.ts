@@ -46,7 +46,7 @@ export default async function handler(_request: Request) {
     }));
 
     // Combine both lists
-    const allApps = [...officialApps, ...submissionsAsApps];
+    const allApps = [...dbApps, ...submissionsAsApps];
 
     // Get today's featured app (if any)
     const today = new Date().toISOString().split('T')[0];
