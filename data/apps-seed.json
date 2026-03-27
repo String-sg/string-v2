@@ -463,8 +463,7 @@
       "category": "Productivity",
       "tags": ["ai", "writing", "research", "transcription"],
       "is_official": true,
-      "frequency": 0,
-      "featured": true
+      "frequency": 0
     },
     {
       "name": "SmartCompose",
@@ -506,6 +505,41 @@
       "tags": ["ai", "mother-tongue", "language", "learning"],
       "is_official": true,
       "frequency": 0
+    },
+    {
+      "name": "Write Formula Game",
+      "slug": "write-formula-game",
+      "url": "https://writeformulagame.com/",
+      "description": "Interactive game for practising chemistry formula writing",
+      "tagline": "Make formula writing fun",
+      "category": "Teaching",
+      "tags": ["science"],
+      "is_official": false,
+      "frequency": 0
+    },
+    {
+      "name": "String Buy",
+      "slug": "buy",
+      "url": "https://buy.string.sg/",
+      "description": "Simulate a pit market and visualise demand-supply equilibrium with live price discovery",
+      "tagline": "Pit market demand-supply simulator",
+      "category": "Teaching",
+      "tags": ["economics", "simulation", "games", "classroom"],
+      "is_official": false,
+      "frequency": 0,
+      "featured": true
+    },
+    {
+      "name": "String Diagrams",
+      "slug": "diagrams",
+      "url": "https://diagrams.string.sg/",
+      "description": "Generate circuit diagrams and build isometric cube illustrations for lessons",
+      "tagline": "Circuit diagrams & isometric cubes",
+      "category": "Teaching",
+      "tags": ["science", "physics", "diagrams", "drawing"],
+      "is_official": false,
+      "frequency": 0,
+      "featured": true
     }
   ],
   "categories": [
