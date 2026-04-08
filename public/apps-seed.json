@@ -13,7 +13,15 @@
       "https://sites.google.com/moe.edu.sg/hgv-links/staff-links",
       "https://www.eastspringpri.moe.edu.sg/for-staff/"
     ],
-    "total_schools_analyzed": 10
+    "total_schools_analyzed": 10,
+    "removed_apps": [
+      {
+        "name": "PaC@Gov",
+        "slug": "pac-gov",
+        "removed_at": "2026-01-31",
+        "reason": "Service deprecated by GovTech; PaC@Gov (Productivity and Collaboration @ Government) has been discontinued and replaced by M365 and other productivity tools provided centrally to public officers."
+      }
+    ]
   },
   "apps": [
     {
@@ -23,12 +31,22 @@
       "description": "Mobile-first app for teachers to access essential school functions on-the-go",
       "tagline": "School Cockpit on mobile",
       "category": "Administration",
-      "tags": ["mobile", "attendance", "daily-ops"],
+      "tags": [
+        "mobile",
+        "attendance",
+        "daily-ops"
+      ],
       "is_official": true,
       "frequency": 10,
       "bump_rules": [
-        { "type": "time_window", "start": "06:00", "end": "07:30", "priority": 10 }
-      ]
+        {
+          "type": "time_window",
+          "start": "06:00",
+          "end": "07:30",
+          "priority": 10
+        }
+      ],
+      "logo_url": "/src/app-icons/sc-mobile.svg"
     },
     {
       "name": "Parents Gateway",
@@ -37,7 +55,11 @@
       "description": "Official communication channel between schools and parents",
       "tagline": "Connect with parents",
       "category": "Communication",
-      "tags": ["parents", "consent", "announcements"],
+      "tags": [
+        "parents",
+        "consent",
+        "announcements"
+      ],
       "is_official": true,
       "frequency": 10
     },
@@ -48,7 +70,11 @@
       "description": "Human Resource and Payroll portal for leave, claims, and HR matters",
       "tagline": "HR & Payroll",
       "category": "HR",
-      "tags": ["leave", "claims", "payroll"],
+      "tags": [
+        "leave",
+        "claims",
+        "payroll"
+      ],
       "is_official": true,
       "frequency": 10
     },
@@ -60,7 +86,11 @@
       "description": "Digital learning space for professional development",
       "tagline": "One Portal All Learners",
       "category": "Professional Development",
-      "tags": ["pd", "courses", "learning"],
+      "tags": [
+        "pd",
+        "courses",
+        "learning"
+      ],
       "is_official": true,
       "frequency": 10
     },
@@ -71,9 +101,14 @@
       "description": "Administrative portal for student data, results, and reports",
       "tagline": "School admin portal",
       "category": "Administration",
-      "tags": ["admin", "results", "reports"],
+      "tags": [
+        "admin",
+        "results",
+        "reports"
+      ],
       "is_official": true,
-      "frequency": 10
+      "frequency": 10,
+      "logo_url": "/src/app-icons/school-cockpit.svg"
     },
     {
       "name": "iCON",
@@ -82,23 +117,36 @@
       "description": "MOE email and Google Workspace apps for staff",
       "tagline": "Email & Google Apps",
       "category": "Communication",
-      "tags": ["email", "google", "workspace"],
+      "tags": [
+        "email",
+        "google",
+        "workspace"
+      ],
       "is_official": true,
       "frequency": 9
     },
     {
       "name": "iEXAMS",
       "slug": "iexams",
-      "url": "https://iexams.seab.gov.sg/",
+      "url": "https://myexamduty.seab.gov.sg/",
       "description": "SEAB examination portal for exam registration and results",
       "tagline": "Exam management",
       "category": "Assessment",
-      "tags": ["exams", "seab", "results"],
+      "tags": [
+        "exams",
+        "seab",
+        "results"
+      ],
       "is_official": true,
       "frequency": 8,
       "bump_rules": [
-        { "type": "date_range", "description": "Exam periods", "priority": 8 }
-      ]
+        {
+          "type": "date_range",
+          "description": "Exam periods",
+          "priority": 8
+        }
+      ],
+      "logo_url": "/src/app-icons/iexams.svg"
     },
     {
       "name": "MOE Intranet",
@@ -107,9 +155,14 @@
       "description": "Internal portal for MOE policies, circulars, and resources",
       "tagline": "MOE internal portal",
       "category": "Administration",
-      "tags": ["policies", "circulars", "resources"],
+      "tags": [
+        "policies",
+        "circulars",
+        "resources"
+      ],
       "is_official": true,
-      "frequency": 8
+      "frequency": 8,
+      "logo_url": "/src/app-icons/moe-intranet.svg"
     },
     {
       "name": "Student Learning Space (SLS)",
@@ -118,7 +171,11 @@
       "description": "National online learning platform with curriculum-aligned resources for all subjects",
       "tagline": "Digital learning for students",
       "category": "Teaching",
-      "tags": ["learning", "curriculum", "assignments"],
+      "tags": [
+        "learning",
+        "curriculum",
+        "assignments"
+      ],
       "is_official": true,
       "frequency": 8
     },
@@ -129,7 +186,11 @@
       "description": "Book school facilities and resources",
       "tagline": "Book facilities",
       "category": "Administration",
-      "tags": ["booking", "facilities", "resources"],
+      "tags": [
+        "booking",
+        "facilities",
+        "resources"
+      ],
       "is_official": false,
       "frequency": 7
     },
@@ -140,9 +201,14 @@
       "description": "HR policies, procedures, and staff development information",
       "tagline": "HR information hub",
       "category": "HR",
-      "tags": ["hr", "policies", "staff"],
+      "tags": [
+        "hr",
+        "policies",
+        "staff"
+      ],
       "is_official": true,
-      "frequency": 7
+      "frequency": 7,
+      "logo_url": "/src/app-icons/hr-online.svg"
     },
     {
       "name": "MIMS Portal",
@@ -151,9 +217,14 @@
       "description": "MOE Identity Management System for account management and password reset",
       "tagline": "Account management",
       "category": "Administration",
-      "tags": ["identity", "password", "account"],
+      "tags": [
+        "identity",
+        "password",
+        "account"
+      ],
       "is_official": true,
-      "frequency": 6
+      "frequency": 6,
+      "logo_url": "/src/app-icons/mims.svg"
     },
     {
       "name": "SSOE2 Service Portal",
@@ -162,9 +233,14 @@
       "description": "IT service portal for device and software support",
       "tagline": "ICT support portal",
       "category": "IT Support",
-      "tags": ["ict", "support", "devices"],
+      "tags": [
+        "ict",
+        "support",
+        "devices"
+      ],
       "is_official": true,
-      "frequency": 6
+      "frequency": 6,
+      "logo_url": "/src/app-icons/ssoe2.svg"
     },
     {
       "name": "Academy of Singapore Teachers",
@@ -173,7 +249,11 @@
       "description": "Professional learning community for educators",
       "tagline": "Teacher academy",
       "category": "Professional Development",
-      "tags": ["pd", "community", "learning"],
+      "tags": [
+        "pd",
+        "community",
+        "learning"
+      ],
       "is_official": true,
       "frequency": 6
     },
@@ -184,7 +264,11 @@
       "description": "Government form builder for surveys and data collection",
       "tagline": "Create forms easily",
       "category": "Productivity",
-      "tags": ["forms", "surveys", "data"],
+      "tags": [
+        "forms",
+        "surveys",
+        "data"
+      ],
       "is_official": true,
       "frequency": 5
     },
@@ -195,7 +279,10 @@
       "description": "MOE form builder for education sector",
       "tagline": "MOE forms",
       "category": "Productivity",
-      "tags": ["forms", "moe"],
+      "tags": [
+        "forms",
+        "moe"
+      ],
       "is_official": true,
       "frequency": 5
     },
@@ -206,7 +293,11 @@
       "description": "Education sector URL shortener",
       "tagline": "Education short links",
       "category": "Productivity",
-      "tags": ["links", "shortener", "education"],
+      "tags": [
+        "links",
+        "shortener",
+        "education"
+      ],
       "is_official": true,
       "frequency": 4
     },
@@ -217,7 +308,10 @@
       "description": "Official government URL shortener",
       "tagline": "Short links",
       "category": "Productivity",
-      "tags": ["links", "shortener"],
+      "tags": [
+        "links",
+        "shortener"
+      ],
       "is_official": true,
       "frequency": 4
     },
@@ -228,7 +322,11 @@
       "description": "Staff recreation and social activities club",
       "tagline": "Staff recreation",
       "category": "HR",
-      "tags": ["recreation", "social", "wellness"],
+      "tags": [
+        "recreation",
+        "social",
+        "wellness"
+      ],
       "is_official": true,
       "frequency": 3
     },
@@ -239,7 +337,11 @@
       "description": "Singapore Examinations and Assessment Board main portal",
       "tagline": "Exam authority",
       "category": "Assessment",
-      "tags": ["exams", "assessment", "national"],
+      "tags": [
+        "exams",
+        "assessment",
+        "national"
+      ],
       "is_official": true,
       "frequency": 2
     },
@@ -250,7 +352,11 @@
       "description": "Google's learning management system for assignments and collaboration",
       "tagline": "Classroom collaboration",
       "category": "Teaching",
-      "tags": ["google", "assignments", "lms"],
+      "tags": [
+        "google",
+        "assignments",
+        "lms"
+      ],
       "is_official": false,
       "frequency": 2
     },
@@ -261,7 +367,11 @@
       "description": "Career guidance and skills development portal for students",
       "tagline": "Career planning",
       "category": "Teaching",
-      "tags": ["careers", "guidance", "skills"],
+      "tags": [
+        "careers",
+        "guidance",
+        "skills"
+      ],
       "is_official": true,
       "frequency": 2
     },
@@ -273,7 +383,11 @@
       "description": "Cyber wellness resources on OPAL2",
       "tagline": "Cyber wellness resources on OPAL2",
       "category": "Teaching",
-      "tags": ["cyberwellness", "safety", "digital"],
+      "tags": [
+        "cyberwellness",
+        "safety",
+        "digital"
+      ],
       "is_official": true,
       "frequency": 2
     },
@@ -285,7 +399,11 @@
       "description": "Singapore Teaching Practice framework and resources on OPAL2",
       "tagline": "Teaching practice guide on OPAL2",
       "category": "Professional Development",
-      "tags": ["stp", "pedagogy", "framework"],
+      "tags": [
+        "stp",
+        "pedagogy",
+        "framework"
+      ],
       "is_official": true,
       "frequency": 2
     },
@@ -296,7 +414,11 @@
       "description": "Real-time haze and air quality updates",
       "tagline": "Air quality updates",
       "category": "Administration",
-      "tags": ["haze", "health", "environment"],
+      "tags": [
+        "haze",
+        "health",
+        "environment"
+      ],
       "is_official": true,
       "frequency": 2
     },
@@ -307,7 +429,11 @@
       "description": "School management system for timetabling, attendance, and communications",
       "tagline": "School management",
       "category": "Administration",
-      "tags": ["timetable", "management", "attendance"],
+      "tags": [
+        "timetable",
+        "management",
+        "attendance"
+      ],
       "is_official": false,
       "frequency": 1
     },
@@ -318,7 +444,11 @@
       "description": "Training and development for public service officers",
       "tagline": "Public service training",
       "category": "Professional Development",
-      "tags": ["training", "courses", "public-service"],
+      "tags": [
+        "training",
+        "courses",
+        "public-service"
+      ],
       "is_official": true,
       "frequency": 1
     },
@@ -329,9 +459,13 @@
       "description": "Public Service innovation and transformation initiatives",
       "tagline": "PS innovation",
       "category": "Professional Development",
-      "tags": ["innovation", "public-service"],
+      "tags": [
+        "innovation",
+        "public-service"
+      ],
       "is_official": true,
-      "frequency": 1
+      "frequency": 1,
+      "logo_url": "/src/app-icons/ps21.svg"
     },
     {
       "name": "Singapore Teachers' Union",
@@ -340,9 +474,14 @@
       "description": "Professional union for teachers in Singapore",
       "tagline": "Teachers' union",
       "category": "HR",
-      "tags": ["union", "membership", "advocacy"],
+      "tags": [
+        "union",
+        "membership",
+        "advocacy"
+      ],
       "is_official": false,
-      "frequency": 1
+      "frequency": 1,
+      "logo_url": "/src/app-icons/stu.svg"
     },
     {
       "name": "iMTL Portal",
@@ -351,9 +490,15 @@
       "description": "Interactive Mother Tongue Languages learning portal",
       "tagline": "Mother Tongue resources",
       "category": "Teaching",
-      "tags": ["mtl", "chinese", "malay", "tamil"],
+      "tags": [
+        "mtl",
+        "chinese",
+        "malay",
+        "tamil"
+      ],
       "is_official": true,
-      "frequency": 1
+      "frequency": 1,
+      "logo_url": "/src/app-icons/imtl.svg"
     },
     {
       "name": "ICT Connection",
@@ -362,9 +507,14 @@
       "description": "ICT resources and guides for educators",
       "tagline": "ICT resources",
       "category": "Teaching",
-      "tags": ["ict", "technology", "resources"],
+      "tags": [
+        "ict",
+        "technology",
+        "resources"
+      ],
       "is_official": true,
-      "frequency": 1
+      "frequency": 1,
+      "logo_url": "/src/app-icons/ict-connection.svg"
     },
     {
       "name": "Koobits",
@@ -373,19 +523,12 @@
       "description": "Math problem-solving platform for students",
       "tagline": "Math problem sums",
       "category": "Teaching",
-      "tags": ["math", "practice", "problems"],
+      "tags": [
+        "math",
+        "practice",
+        "problems"
+      ],
       "is_official": false,
-      "frequency": 1
-    },
-    {
-      "name": "PaC@Gov",
-      "slug": "pacgov",
-      "url": "https://pacgov.agd.gov.sg/",
-      "description": "Government payment and claims portal",
-      "tagline": "Payment claims",
-      "category": "Administration",
-      "tags": ["payment", "claims", "finance"],
-      "is_official": true,
       "frequency": 1
     },
     {
@@ -395,7 +538,11 @@
       "description": "SEAB portal for exam invigilation duties",
       "tagline": "Exam duties",
       "category": "Assessment",
-      "tags": ["exams", "invigilation", "seab"],
+      "tags": [
+        "exams",
+        "invigilation",
+        "seab"
+      ],
       "is_official": true,
       "frequency": 1
     },
@@ -406,7 +553,11 @@
       "description": "NIE publication for education research and practice",
       "tagline": "Education research",
       "category": "Professional Development",
-      "tags": ["research", "nie", "articles"],
+      "tags": [
+        "research",
+        "nie",
+        "articles"
+      ],
       "is_official": true,
       "frequency": 1
     },
@@ -417,7 +568,11 @@
       "description": "System for managing teacher relief and substitution",
       "tagline": "Relief management",
       "category": "Administration",
-      "tags": ["relief", "scheduling", "substitution"],
+      "tags": [
+        "relief",
+        "scheduling",
+        "substitution"
+      ],
       "is_official": false,
       "frequency": 1
     },
@@ -428,7 +583,11 @@
       "description": "SMS comms (gov.sg)",
       "tagline": "Gov SMS comms",
       "category": "Communication",
-      "tags": ["sms", "messaging", "government"],
+      "tags": [
+        "sms",
+        "messaging",
+        "government"
+      ],
       "is_official": true,
       "frequency": 1
     },
@@ -439,9 +598,15 @@
       "description": "Email comms, SMS comms (via Twilio)",
       "tagline": "Email & SMS comms",
       "category": "Communication",
-      "tags": ["email", "sms", "messaging", "twilio"],
+      "tags": [
+        "email",
+        "sms",
+        "messaging",
+        "twilio"
+      ],
       "is_official": true,
-      "frequency": 1
+      "frequency": 1,
+      "logo_url": "/src/app-icons/e99ba456-01b8-416b-accc-ca23ffa2d50d.png"
     },
     {
       "name": "ask.gov.sg",
@@ -450,7 +615,11 @@
       "description": "Government FAQ and Q&A platform",
       "tagline": "Government FAQ",
       "category": "Administration",
-      "tags": ["faq", "support", "questions"],
+      "tags": [
+        "faq",
+        "support",
+        "questions"
+      ],
       "is_official": true,
       "frequency": 1
     },
@@ -461,7 +630,12 @@
       "description": "AI-powered suite for public officers - writing, research, transcription, and data analysis",
       "tagline": "AI for public officers",
       "category": "Productivity",
-      "tags": ["ai", "writing", "research", "transcription"],
+      "tags": [
+        "ai",
+        "writing",
+        "research",
+        "transcription"
+      ],
       "is_official": true,
       "frequency": 0,
       "featured": true
@@ -473,13 +647,23 @@
       "description": "AI-assisted tool for writing student remarks and reports",
       "tagline": "Write student remarks faster",
       "category": "Teaching",
-      "tags": ["ai", "writing", "remarks", "reports"],
+      "tags": [
+        "ai",
+        "writing",
+        "remarks",
+        "reports"
+      ],
       "is_official": true,
       "frequency": 0,
       "featured": true,
       "bump_rules": [
-        { "type": "date_range", "description": "Mid-quarter and end-quarter", "priority": 10 }
-      ]
+        {
+          "type": "date_range",
+          "description": "Mid-quarter and end-quarter",
+          "priority": 10
+        }
+      ],
+      "logo_url": "/src/app-icons/smartcompose.svg"
     },
     {
       "name": "String Bingo",
@@ -488,13 +672,23 @@
       "description": "Quick icebreaker bingo generator for classroom activities",
       "tagline": "Classroom icebreakers",
       "category": "Teaching",
-      "tags": ["icebreaker", "games", "classroom"],
+      "tags": [
+        "icebreaker",
+        "games",
+        "classroom"
+      ],
       "is_official": false,
       "frequency": 0,
       "featured": true,
       "bump_rules": [
-        { "type": "time_window", "start": "07:30", "end": "08:30", "priority": 5 }
-      ]
+        {
+          "type": "time_window",
+          "start": "07:30",
+          "end": "08:30",
+          "priority": 5
+        }
+      ],
+      "logo_url": "/src/app-icons/bingo.svg"
     },
     {
       "name": "LangBuddy",
@@ -503,19 +697,57 @@
       "description": "AI-powered companion for Mother Tongue learning",
       "tagline": "AI Mother Tongue learning",
       "category": "Teaching",
-      "tags": ["ai", "mother-tongue", "language", "learning"],
+      "tags": [
+        "ai",
+        "mother-tongue",
+        "language",
+        "learning"
+      ],
       "is_official": true,
-      "frequency": 0
+      "frequency": 0,
+      "logo_url": "/src/app-icons/langbuddy.png"
     }
   ],
   "categories": [
-    { "id": "administration", "name": "Administration", "icon": "settings" },
-    { "id": "teaching", "name": "Teaching", "icon": "book-open" },
-    { "id": "communication", "name": "Communication", "icon": "message-circle" },
-    { "id": "hr", "name": "HR", "icon": "users" },
-    { "id": "assessment", "name": "Assessment", "icon": "clipboard-check" },
-    { "id": "professional-development", "name": "Professional Development", "icon": "graduation-cap" },
-    { "id": "productivity", "name": "Productivity", "icon": "zap" },
-    { "id": "it-support", "name": "IT Support", "icon": "help-circle" }
+    {
+      "id": "administration",
+      "name": "Administration",
+      "icon": "settings"
+    },
+    {
+      "id": "teaching",
+      "name": "Teaching",
+      "icon": "book-open"
+    },
+    {
+      "id": "communication",
+      "name": "Communication",
+      "icon": "message-circle"
+    },
+    {
+      "id": "hr",
+      "name": "HR",
+      "icon": "users"
+    },
+    {
+      "id": "assessment",
+      "name": "Assessment",
+      "icon": "clipboard-check"
+    },
+    {
+      "id": "professional-development",
+      "name": "Professional Development",
+      "icon": "graduation-cap"
+    },
+    {
+      "id": "productivity",
+      "name": "Productivity",
+      "icon": "zap"
+    },
+    {
+      "id": "it-support",
+      "name": "IT Support",
+      "icon": "help-circle"
+    }
   ]
 }

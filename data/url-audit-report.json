@@ -1,0 +1,413 @@
+{
+  "generatedAt": "2026-02-27T13:19:04.549Z",
+  "mode": "audit-only",
+  "summary": {
+    "total": 43,
+    "deadLinks": 0,
+    "intranetOnly": 2
+  },
+  "deadLinks": [],
+  "intranetApps": [
+    {
+      "id": "1030d665-f6ba-426b-a191-e409f847f743",
+      "name": "MOE Intranet",
+      "slug": "moe-intranet",
+      "url": "https://intranet.moe.gov.sg/"
+    },
+    {
+      "id": "8ded200b-18e4-48bf-96f1-95e231a6c738",
+      "name": "HR Online",
+      "slug": "hr-online",
+      "url": "https://intranet.moe.gov.sg/hronline/pages/home.aspx"
+    }
+  ],
+  "checked": [
+    {
+      "id": "6733deb4-d8e8-4ba9-91a9-1914407d7cf7",
+      "name": "OPAL 2.0",
+      "slug": "opal",
+      "url": "https://idm.opal2.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://www.opal2.moe.edu.sg/app",
+      "intranetOnly": false
+    },
+    {
+      "id": "07e17d55-184a-443f-8439-889dcbefb195",
+      "name": "iCON",
+      "slug": "icon",
+      "url": "https://icon.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fworkspace.google.com%2Fdashboard&dsh=S35213528%3A1772198334650738&followup=https%3A%2F%2Fworkspace.google.com%2Fdashboard&ifkv=ASfE1-oWFIqmeZpculWn01W_HAO8JeoSXONLVA9z8gZDpAme0YvmpjJE0_UM5lgPNktDgqFjeGj70Q&passive=1209600&flowName=WebLiteSignIn&flowEntry=ServiceLogin",
+      "intranetOnly": false
+    },
+    {
+      "id": "78fef98f-1e41-4b14-8bc1-9385f93e0ede",
+      "name": "Resource Booking System",
+      "slug": "rbs",
+      "url": "https://rbs.avero-tech.com/",
+      "status": 403,
+      "finalUrl": "https://rbs.avero-tech.com/",
+      "intranetOnly": false
+    },
+    {
+      "id": "1cbfd728-7cf2-4a10-b104-eb914878a6b8",
+      "name": "Academy of Singapore Teachers",
+      "slug": "ast",
+      "url": "https://academyofsingaporeteachers.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://academyofsingaporeteachers.moe.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "9ae2a405-826a-4ddd-9683-03a7b69f16e2",
+      "name": "FormSG",
+      "slug": "formsg",
+      "url": "https://form.gov.sg/",
+      "status": 403,
+      "finalUrl": "https://form.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "8e67a6f4-057c-4e19-80be-eba343ba1043",
+      "name": "All Ears Forms",
+      "slug": "all-ears",
+      "url": "https://forms.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://forms.moe.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "355f6cb2-206f-4594-8916-ac76a054006e",
+      "name": "For.edu.sg",
+      "slug": "for-edu",
+      "url": "https://for.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://for.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "32a7b808-8070-4f58-9b91-9c010045d34a",
+      "name": "Go.gov.sg",
+      "slug": "go-gov",
+      "url": "https://go.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://go.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "0d37287f-1c6d-46a5-87e1-16b97ab3da9e",
+      "name": "MOE Sports and Recreation Club",
+      "slug": "mesrc",
+      "url": "https://www.mesrc.net/",
+      "status": 200,
+      "finalUrl": "https://www.mesrc.net/",
+      "intranetOnly": false
+    },
+    {
+      "id": "6b62ee3d-b64f-414e-bf81-59c05a4d5734",
+      "name": "SEAB",
+      "slug": "seab",
+      "url": "https://www.seab.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://www.seab.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "22bc8782-61a7-4d46-8f82-01cf1ea8e080",
+      "name": "Google Classroom",
+      "slug": "google-classroom",
+      "url": "https://classroom.google.com/",
+      "status": 200,
+      "finalUrl": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fclassroom.google.com%2F&dsh=S1746263559%3A1772198335954532&emr=1&followup=https%3A%2F%2Fclassroom.google.com%2F&ifkv=ASfE1-qakwgVw-FLmSND5t3V8WGDAIvRY4qcGE3ACad0e8EBAXKHAq8MAWWvTyfDaTEBhnp90v-g&passive=1209600&service=classroom&flowName=WebLiteSignIn&flowEntry=ServiceLogin",
+      "intranetOnly": false
+    },
+    {
+      "id": "5ae45fe9-1cfd-4543-8437-5005374a4118",
+      "name": "MySkillsFuture",
+      "slug": "myskillsfuture",
+      "url": "https://www.myskillsfuture.gov.sg/content/student/en/secondary.html",
+      "status": 403,
+      "finalUrl": "https://www.myskillsfuture.gov.sg/content/student/en/secondary.html",
+      "intranetOnly": false
+    },
+    {
+      "id": "72c54a28-f4c1-492b-ac77-3c688702c1b8",
+      "name": "Singapore Teaching Practice",
+      "slug": "stp",
+      "url": "https://go.gov.sg/stpwiki",
+      "status": 200,
+      "finalUrl": "https://idm.opal2.moe.edu.sg/Account/Login?ReturnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3DcslV3.1.0%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Fwww.opal2.moe.edu.sg%252Fcsl%252Fuser%252Fauth%252Fexternal%253Fauthclient%253DIdM%26xoauth_displayname%3DOPAL2.0%26scope%3Dopenid%2520profile%2520cxDomainInternalApi%2520offline_access%26state%3Ddf527973e19faab364f43c13ef64c571299a9eeb969ca1d5c67c6185f009d307",
+      "intranetOnly": false
+    },
+    {
+      "id": "8e711cff-57cd-47a1-a389-ee9e01ed4172",
+      "name": "Haze Situation",
+      "slug": "haze",
+      "url": "https://www.haze.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://www.haze.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "e319f2bf-8e5f-4c0a-ab8e-05da6040a292",
+      "name": "Edupage",
+      "slug": "edupage",
+      "url": "https://www.edupage.org/",
+      "status": 200,
+      "finalUrl": "https://www.edupage.org/",
+      "intranetOnly": false
+    },
+    {
+      "id": "dd62e010-1177-49e0-a9ad-18bcaad594b1",
+      "name": "Civil Service College",
+      "slug": "csc",
+      "url": "https://www.cscollege.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://www.csc.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "40e5527e-923b-47cb-b59e-1fe59a4cf7f6",
+      "name": "SC Mobile",
+      "slug": "sc-mobile",
+      "url": "https://scmobile.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://scmobile.moe.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "f953be6b-a7a7-42f1-b3c1-ed1a18a768d5",
+      "name": "HRP",
+      "slug": "hrp",
+      "url": "https://www.hrp.gov.sg/hrp/#/",
+      "status": 200,
+      "finalUrl": "https://www.hrp.gov.sg/hrp/",
+      "intranetOnly": false
+    },
+    {
+      "id": "58942a15-ba04-4751-bc0c-966acd38b5c5",
+      "name": "School Cockpit",
+      "slug": "school-cockpit",
+      "url": "https://schoolcockpit.moe.gov.sg/",
+      "status": 403,
+      "finalUrl": "https://schoolcockpit.moe.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "1030d665-f6ba-426b-a191-e409f847f743",
+      "name": "MOE Intranet",
+      "slug": "moe-intranet",
+      "url": "https://intranet.moe.gov.sg/",
+      "status": 403,
+      "finalUrl": "https://intranet.moe.gov.sg/",
+      "intranetOnly": true
+    },
+    {
+      "id": "8ded200b-18e4-48bf-96f1-95e231a6c738",
+      "name": "HR Online",
+      "slug": "hr-online",
+      "url": "https://intranet.moe.gov.sg/hronline/pages/home.aspx",
+      "status": 403,
+      "finalUrl": "https://intranet.moe.gov.sg/hronline/pages/home.aspx",
+      "intranetOnly": true
+    },
+    {
+      "id": "c0162dda-c882-47b9-adf3-59dc85aaca0d",
+      "name": "MIMS Portal",
+      "slug": "mims",
+      "url": "https://portal.mims.moe.gov.sg/",
+      "status": 403,
+      "finalUrl": "https://portal.mims.moe.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "5f40a4fd-ff76-4fb1-96f1-cbd681c78505",
+      "name": "SSOE2 Service Portal",
+      "slug": "ssoe2",
+      "url": "https://ssoe2.moe.edu.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "de6a802d-6245-4b9f-a854-581370a85c3c",
+      "name": "Public Service 21",
+      "slug": "ps21",
+      "url": "https://www.ps21.gov.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "99e0ba59-d028-44c8-bcc1-7a32f745934f",
+      "name": "Singapore Teachers' Union",
+      "slug": "stu",
+      "url": "https://www.stu.org.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "c9be18e4-34da-4acd-af96-eddebbf5b473",
+      "name": "iMTL Portal",
+      "slug": "imtl",
+      "url": "https://imtl.moe.edu.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "1af5e373-c853-46cb-b818-d3f3752028f6",
+      "name": "ICT Connection",
+      "slug": "ict-connection",
+      "url": "https://ictconnection.moe.edu.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "892f95ba-c2d8-4768-b4bf-62622a68354e",
+      "name": "iEXAMS",
+      "slug": "iexams",
+      "url": "https://myexamduty.seab.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://myexamduty.seab.gov.sg/auth/login",
+      "intranetOnly": false
+    },
+    {
+      "id": "ff9cafa0-e030-4f84-aab7-abb48d3d8c94",
+      "name": "Singteach",
+      "slug": "singteach",
+      "url": "https://singteach.nie.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://singteach.nie.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "6b558aab-be0e-498f-a46e-72f9db124dea",
+      "name": "Relief Roster System",
+      "slug": "relief-roster",
+      "url": "https://roster.diveanalytics.com/",
+      "status": 200,
+      "finalUrl": "https://roster.diveanalytics.com/login",
+      "intranetOnly": false
+    },
+    {
+      "id": "0248b637-bce8-43c7-9c15-f7addf77ebf1",
+      "name": "Parents Gateway",
+      "slug": "parents-gateway",
+      "url": "https://pg.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://pg.moe.edu.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "40d3ae9c-5641-4da4-a67d-9cb87afbad0d",
+      "name": "Student Learning Space (SLS)",
+      "slug": "sls",
+      "url": "https://vle.learning.moe.edu.sg/login",
+      "status": 200,
+      "finalUrl": "https://vle.learning.moe.edu.sg/login",
+      "intranetOnly": false
+    },
+    {
+      "id": "a9760dbf-28e2-4452-a717-7feb5908b4a2",
+      "name": "Cyber Wellness Portal",
+      "slug": "cyber-wellness",
+      "url": "https://www.opal2.moe.edu.sg/csl/s/cce-2021-main-sdcd/wiki/page/view?title=Resources%20-%20Cyber%20Wellness",
+      "status": 200,
+      "finalUrl": "https://idm.opal2.moe.edu.sg/Account/Login?ReturnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3DcslV3.1.0%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Fwww.opal2.moe.edu.sg%252Fcsl%252Fuser%252Fauth%252Fexternal%253Fauthclient%253DIdM%26xoauth_displayname%3DOPAL2.0%26scope%3Dopenid%2520profile%2520cxDomainInternalApi%2520offline_access%26state%3D8d4f8ac7dac8526906400cf7398ff5408d750514d1de28c1b4396366458c901a",
+      "intranetOnly": false
+    },
+    {
+      "id": "d33ac51a-caf6-4522-8b53-96f1f7a38eac",
+      "name": "Koobits",
+      "slug": "koobits",
+      "url": "https://problemsums.koobits.com/",
+      "status": 200,
+      "finalUrl": "https://member.koobits.com/",
+      "intranetOnly": false
+    },
+    {
+      "id": "22bfdac3-1091-4225-b429-9966fc5d3216",
+      "name": "EPP (Exam Personal Portal)",
+      "slug": "epp",
+      "url": "https://myexamduty.seab.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://myexamduty.seab.gov.sg/auth/login",
+      "intranetOnly": false
+    },
+    {
+      "id": "9cf10334-d0d1-4741-99af-de43dc8208d9",
+      "name": "Commzgate SMS",
+      "slug": "commzgate",
+      "url": "https://portal.commzgate.com/",
+      "status": 200,
+      "finalUrl": "https://portal.commzgate.com/app/login",
+      "intranetOnly": false
+    },
+    {
+      "id": "1705a0e9-bde2-49ca-af02-ce92e4f28eac",
+      "name": "ask.gov.sg",
+      "slug": "askgov",
+      "url": "https://ask.gov.sg/",
+      "status": 403,
+      "finalUrl": "https://ask.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "70b49508-e65a-48f1-9cc7-7ac52a6743d8",
+      "name": "Pair",
+      "slug": "pair",
+      "url": "https://pair.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://pair.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "fee78306-16a7-43f7-906b-c7fe4235a771",
+      "name": "TRAISI",
+      "slug": "traisi",
+      "url": "https://traisi.moe.gov.sg/",
+      "status": null,
+      "finalUrl": null,
+      "intranetOnly": false
+    },
+    {
+      "id": "d2dab136-c669-4aec-b327-66cf3b53524f",
+      "name": "String Bingo",
+      "slug": "bingo",
+      "url": "https://bingo.string.sg/",
+      "status": 200,
+      "finalUrl": "https://bingo.string.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "00d6d32e-d472-432e-aea6-f81bc6a6ab8a",
+      "name": "SmartCompose",
+      "slug": "smartcompose",
+      "url": "https://smartcompose.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://www.smartcompose.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "b4f842a6-f502-4766-8141-ac25af38b2e8",
+      "name": "Postman Legacy",
+      "slug": "postman-legacy",
+      "url": "https://legacy.postman.gov.sg/",
+      "status": 200,
+      "finalUrl": "https://legacy.postman.gov.sg/",
+      "intranetOnly": false
+    },
+    {
+      "id": "12c5c523-921f-4c49-a580-f70d1b7a83f1",
+      "name": "LangBuddy",
+      "slug": "langbuddy",
+      "url": "https://langbuddy.moe.edu.sg/",
+      "status": 200,
+      "finalUrl": "https://langbuddy.moe.edu.sg/",
+      "intranetOnly": false
+    }
+  ]
+}

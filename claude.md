@@ -1,6 +1,6 @@
 # String.sg v2 - Development Plan
 
-**Last Updated:** 2026-02-13
+**Last Updated:** 2026-03-04
 **Status:** Phase 5 In Progress - Profile App Management
 
 ---
@@ -68,6 +68,9 @@
   - [x] Auto-pin to homepage + auto-add to profile via query params
   - [x] `/api/profile/add-app` endpoint to add apps to user_profile_apps
   - [x] Profile refreshes to show newly added app
+  - [x] Profile manage mode uses compact cross icon remove affordance (neutral by default, red on hover)
+  - [x] Featured cards on mobile use swipe-to-reveal actions (pin/unpin + launch) with one-time hint modal
+  - [x] Profile share copy flows use Clipboard API with `execCommand('copy')` fallback + toast feedback
 - [ ] Inline visibility controls with WYSIWYG public preview toggle
 - [ ] Hide/show apps from profile (different from unpinning)
 
@@ -272,6 +275,562 @@ npm run db:studio
 
 ---
 
+## Component Library & Styling Architecture
+
+### Overview
+This section documents the abstracted UI components introduced in Phase 4. **Always reference this section before creating new components** to maintain consistency and prevent hardcoding styling patterns. See also: `STYLING.md` for design system guidelines.
+
+---
+
+### 🎨 Core UI Components (`src/components/ui/`)
+
+#### **Button.tsx** - Variant-based Button System
+**Purpose:** Primary action buttons with consistent styling across the app.
+
+**Props:**
+- `variant`: `'primary' | 'secondary' | 'text'` (default: `'primary'`)
+- `size`: `'sm' | 'md' | 'lg'` (default: `'md'`)
+- `disabled`: `boolean` (default: `false`)
+- `onClick`, `className`, `children`
+
+**Variants:**
+```tsx
+primary:   bg-string-mint text-string-dark hover:bg-string-mint-light
+secondary: bg-white border border-gray-200 text-string-dark hover:bg-gray-50
+text:      text-string-mint hover:text-string-mint-light (no background)
+```
+
+**Sizes:**
+```tsx
+sm: px-3 py-1.5 text-sm
+md: px-4 py-2 text-sm
+lg: px-6 py-3 text-base
+```
+
+**Usage Example:**
+```tsx
+<Button variant="primary" size="lg" onClick={handleSubmit}>
+  Submit App
+</Button>
+```
+
+**Best Practices:**
+- ✅ Use `variant="primary"` for main CTAs
+- ✅ Use `variant="secondary"` for cancel/dismiss actions
+- ✅ Use `variant="text"` for inline/subtle actions
+- ❌ DON'T hardcode colors directly on button elements
+
+---
+
+#### **Card.tsx** - Flexible Container Component
+**Purpose:** Consistent container styling with optional hover effects.
+
+**Props:**
+- `hover`: `boolean` (default: `false`) - Enables border-string-mint and shadow on hover
+- `onClick`: `() => void` - Makes card clickable
+- `className`: string - Additional custom classes
+- `children`: ReactNode
+
+**Base Styling:**
+```tsx
+bg-white rounded-xl border border-gray-100 transition-colors
+```
+
+**With Hover:**
+```tsx
+hover:border-string-mint cursor-pointer hover:shadow-md
+```
+
+**Usage Example:**
+```tsx
+<Card hover onClick={() => navigate('/profile')}>
+  <div className="p-6">Profile content</div>
+</Card>
+```
+
+**Best Practices:**
+- ✅ Use for content sections, list items, modals
+- ✅ Enable `hover` prop for clickable cards
+- ✅ Add padding via `className` or child wrapper
+- ❌ DON'T create inline divs with repeated rounded-xl/border styles
+
+---
+
+#### **AppCard.tsx** - Specialized App Display Card
+**Purpose:** Displays app information with consistent layout (used in grids/lists).
+
+**Props:**
+- `app`: Object with `{ id, name, description, tagline, logoUrl, category, url, type }`
+- `onClick`: `() => void` - Card click handler
+
+**Key Features:**
+1. **Icon Fallback:** If no `logoUrl`, displays initials (first 2 letters) in mint-on-dark square
+2. **Category Badge:** Rounded pill with mint background at 10% opacity
+3. **Contributed Badge:** Shows "Contributed" tag for `type === 'submitted'` apps
+4. **Hover Launch Icon:** External link icon appears on hover (top-right)
+5. **Responsive Layout:** Flex with gap-4, shrink-0 icon, flex-1 content
+
+**Styling Pattern:**
+```tsx
+group bg-white rounded-xl p-6 shadow-sm border border-gray-100
+hover:border-string-mint hover:shadow-md transition-all cursor-pointer
+```
+
+**Best Practices:**
+- ✅ Use for all app representations in grids/lists
+- ✅ Pass complete app object (don't deconstruct prematurely)
+- ✅ Leverage `group-hover:opacity-100` pattern for progressive disclosure
+- ❌ DON'T create custom app cards with different layouts
+
+---
+
+#### **IconButton.tsx** - Icon-Only Button Wrapper
+**Purpose:** Consistent styling for icon-based actions (settings, close, etc.).
+
+**Props:**
+- `size`: `'sm' | 'md' | 'lg'` (default: `'md'`)
+- `onClick`, `title`, `className`, `children` (SVG icon)
+
+**Sizes:**
+```tsx
+sm: w-6 h-6 (icon: w-3 h-3)
+md: w-8 h-8 (icon: w-4 h-4)
+lg: w-10 h-10 (icon: w-5 h-5)
+```
+
+**Styling:**
+```tsx
+rounded-lg flex items-center justify-center transition-all
+text-gray-400 hover:bg-string-mint hover:text-string-dark
+```
+
+**Usage Example:**
+```tsx
+<IconButton size="md" onClick={handleClose} title="Close">
+  <svg><!-- X icon --></svg>
+</IconButton>
+```
+
+**Best Practices:**
+- ✅ Use for toolbar actions, modal close buttons, utility icons
+- ✅ Always include `title` prop for accessibility
+- ✅ Wrap SVG content in children
+- ❌ DON'T create inline buttons for icons without this component
+
+---
+
+#### **PinButton.tsx** - Pin/Unpin Toggle Button
+**Purpose:** Toggle pinned state for apps (filled star when pinned).
+
+**Props:**
+- `isPinned`: `boolean` - Current pin state
+- `onPin`: `() => void` - Pin handler
+- `onUnpin`: `() => void` - Unpin handler
+- `size`: `'sm' | 'md'` (default: `'md'`)
+- `className`: string
+
+**Visual States:**
+```tsx
+Pinned:   text-string-mint bg-string-mint/10 (filled star icon)
+Unpinned: text-gray-400 hover:text-string-dark hover:bg-string-mint (outlined star)
+```
+
+**Key Behavior:**
+- Calls `e.stopPropagation()` to prevent parent click events
+- Shows appropriate title attribute ("Pin" or "Unpin")
+
+**Usage Example:**
+```tsx
+<PinButton
+  isPinned={pinnedApps.includes(app.id)}
+  onPin={() => handlePin(app.id)}
+  onUnpin={() => handleUnpin(app.id)}
+/>
+```
+
+**Best Practices:**
+- ✅ Use for app pin/favorite actions
+- ✅ Let component handle event propagation
+- ❌ DON'T create custom pin buttons with different icons
+
+---
+
+#### **LaunchButton.tsx** - External Link Button
+**Purpose:** Opens app URL in new tab with security attributes.
+
+**Props:**
+- `url`: string - Target URL
+- `size`: `'sm' | 'md'` (default: `'md'`)
+- `className`: string
+
+**Features:**
+- Opens in new tab (`target="_blank"`)
+- Security: `rel="noopener noreferrer"`
+- Prevents click propagation (`e.stopPropagation()`)
+- External link icon (arrow-up-right)
+
+**Styling:**
+```tsx
+rounded-lg transition-colors text-gray-400
+hover:text-string-dark hover:bg-string-mint
+```
+
+**Usage Example:**
+```tsx
+<LaunchButton url={app.url} size="md" />
+```
+
+**Best Practices:**
+- ✅ Use for all external app launches
+- ✅ Let component handle security attributes
+- ❌ DON'T create inline `<a>` tags for external links
+
+---
+
+#### **Modal.tsx** - Accessible Modal Dialog
+**Purpose:** Full-screen overlay dialog with accessibility features.
+
+**Props:**
+- `isOpen`: `boolean` - Modal visibility state
+- `onClose`: `() => void` - Close handler
+- `title`: string - Modal header title
+- `size`: `'sm' | 'md' | 'lg' | 'xl'` (default: `'md'`)
+- `children`: ReactNode - Modal content
+
+**Sizes:**
+```tsx
+sm: max-w-md   (384px)
+md: max-w-lg   (512px)
+lg: max-w-2xl  (672px)
+xl: max-w-4xl  (896px)
+```
+
+**Key Features:**
+1. **Keyboard Support:** Escape key closes modal
+2. **Body Scroll Lock:** Prevents background scrolling when open
+3. **Click-Outside:** Backdrop click closes modal
+4. **Close Button:** X icon in header
+5. **Backdrop:** Semi-transparent black overlay (bg-opacity-50)
+
+**Structure:**
+```tsx
+<Modal isOpen={open} onClose={handleClose} title="Submit App" size="lg">
+  {/* Form or content */}
+</Modal>
+```
+
+**Best Practices:**
+- ✅ Use for forms, confirmations, detail views
+- ✅ Set appropriate size based on content
+- ✅ Always provide meaningful title
+- ❌ DON'T create custom modal wrappers
+
+---
+
+#### **Header.tsx** - Page Header with Navigation
+**Purpose:** Top navigation bar for detail/profile pages.
+
+**Props:**
+- `title`: string - Header title
+- `subtitle`: string (optional) - Subtitle text
+- `backUrl`: string (default: `'/'`) - Back button destination
+- `rightContent`: ReactNode (optional) - Right-aligned content
+
+**Styling:**
+```tsx
+bg-string-dark border-b border-gray-700
+title: text-lg font-semibold text-string-mint
+```
+
+**Features:**
+- Back button with String logo (green variant)
+- Customizable right-side content area
+- Optional subtitle display
+
+**Usage Example:**
+```tsx
+<Header
+  title="My Profile"
+  backUrl="/dashboard"
+  rightContent={<Button>Edit</Button>}
+/>
+```
+
+---
+
+#### **DashboardHeader.tsx** - Dashboard Navigation Header
+**Purpose:** Complex header with tab navigation, user menu, and theme toggle.
+
+**Props:**
+- `isDark`: boolean - Current theme state
+- `onToggleTheme`: `() => void` - Theme toggle handler
+- `t`: `(light: string, dark: string) => string` - Theme helper function
+- `activeTab`: `'profile' | 'submissions'` - Current active tab
+- `onTabChange`: `(tab) => void` - Tab change handler
+- `onSubmitApp`: `() => void` - Submit app button handler
+
+**Features:**
+1. **Back Button:** Returns to home (pushes state + logo)
+2. **Tab Navigation:** "Submissions" and "Profile" tabs with border-bottom active state
+3. **Submit App Button:** Plus icon button
+4. **Theme Toggle:** Sun/moon icons
+5. **User Menu:** Avatar/name button with dropdown (sign out option)
+6. **Click-Outside Detection:** Closes menu when clicking elsewhere
+7. **Responsive:** Hides logo on mobile, shows user initials only
+
+**Styling:**
+```tsx
+bg-string-dark sticky top-0 z-20
+Active tab: border-string-mint text-string-mint
+Inactive tab: text-gray-400 hover:text-gray-200
+```
+
+**Best Practices:**
+- ✅ Use as primary dashboard navigation
+- ✅ Maintain sticky positioning for scroll context
+- ❌ DON'T duplicate tab navigation patterns
+
+---
+
+### 👤 Profile Components (`src/components/profile/`)
+
+#### **ProfileHeader.tsx** - Profile Information Card
+**Purpose:** Displays user profile metadata (avatar, name, member date, contributions).
+
+**Props:**
+- `profile`: `{ name, slug, avatarUrl, memberSince }`
+- `apps`: Array of apps (to count submitted apps)
+- `className`: string (optional)
+
+**Composition:**
+- Wraps content in `Card` component
+- Padding: `p-8`
+
+**Features:**
+1. **Avatar Display:** 20x20 rounded-2xl with initials fallback
+2. **Name Display:** h1 (text-3xl font-bold)
+3. **Member Since:** Formatted as "Month YYYY"
+4. **Contributed Badge:** Only shows if user has submitted apps (counts `type === 'submitted'`)
+
+**Layout:**
+```tsx
+Flex layout with gap-6:
+- Avatar (w-20 h-20, shrink-0)
+- Content (flex-1): Name → Member date → Badge
+```
+
+**Best Practices:**
+- ✅ Use at top of profile pages
+- ✅ Let component handle contribution counting
+- ✅ Pass full app array for accurate counts
+- ❌ DON'T manually construct profile headers
+
+---
+
+#### **AppsList.tsx** - Apps Grid with Sorting
+**Purpose:** Grid display of user's apps with smart sorting (contributions first).
+
+**Props:**
+- `apps`: Array of app objects
+- `userName`: string | null - For empty state message
+- `onAppClick`: `(app) => void` - Card click handler
+
+**Features:**
+1. **Smart Sorting:** Submitted apps (`type === 'submitted'`) appear before pinned apps
+2. **Responsive Grid:** 2 columns on mobile (`sm:grid-cols-2`), 3 on desktop (`lg:grid-cols-3`)
+3. **Empty State:** Icon + message when no apps shared
+4. **Unique Keys:** Uses `${app.type}-${app.id}` to prevent duplicate key issues
+
+**Grid Styling:**
+```tsx
+grid gap-6 sm:grid-cols-2 lg:grid-cols-3
+```
+
+**Empty State:**
+- Centered icon in gray circle
+- "No Apps Shared" heading
+- Personalized message with userName
+
+**Best Practices:**
+- ✅ Use for all app grid displays on profiles
+- ✅ Let component handle sorting logic
+- ✅ Pass userName for personalized empty state
+- ❌ DON'T manually sort apps before passing to component
+
+---
+
+#### **ProfileFooter.tsx** - Branded Footer
+**Purpose:** Consistent footer with "Powered by String" and logo.
+
+**Features:**
+- SVG logo inline (`/Brand Guidelines/4. Svg Separate Files/primary_dark.svg`)
+- Link to home (`href="/"`)
+- Hover effect on logo link
+
+**Styling:**
+```tsx
+mt-16 pt-8 border-t border-gray-200 text-center
+text-sm text-gray-500
+```
+
+**Usage:**
+```tsx
+<ProfileFooter />
+```
+
+**Best Practices:**
+- ✅ Use at bottom of all public profile pages
+- ✅ No props needed (fully self-contained)
+- ❌ DON'T create custom footer variants
+
+---
+
+### 🔧 Development Components
+
+#### **DevProfileMock.tsx** - Local Testing Component
+**Purpose:** Mock profile page for development without API dependencies.
+
+**Features:**
+- Mock user data (name, slug, avatar, member date)
+- Sample apps array (mix of pinned and submitted)
+- Uses `ProfileHeader`, `AppsList`, and `ProfileFooter`
+- Renders at `/dev-profile` route
+
+**When to Use:**
+- Local development without backend
+- UI iteration and component testing
+- Design reviews and demos
+
+**Note:** Should NOT be deployed to production.
+
+---
+
+### 📋 Styling Patterns & Conventions
+
+#### **Consistent Patterns Across Components**
+
+| Pattern | Implementation | Where Used |
+|---------|---------------|------------|
+| **Hover → Mint** | `hover:border-string-mint`, `hover:bg-string-mint`, `hover:text-string-mint` | Cards, buttons, links |
+| **Size Variants** | `sm`, `md`, `lg` props with consistent padding/dimensions | Buttons, icons, modals |
+| **Rounded Corners** | `rounded-xl` (cards/buttons), `rounded-lg` (small elements), `rounded-2xl` (avatars) | All containers |
+| **Transitions** | `transition-colors`, `transition-all duration-200` | Interactive elements |
+| **Event Propagation** | `e.stopPropagation()` in nested interactive elements | PinButton, LaunchButton |
+| **Initials Fallback** | First 2 letters of name, uppercase | AppCard, ProfileHeader |
+| **Badge Style** | `px-3 py-1 rounded-full bg-string-mint/10 text-string-dark text-xs/sm font-medium` | Categories, tags |
+| **Icon Sizing** | Component prop controls both button and icon dimensions | IconButton, PinButton |
+| **Accessibility** | `title` attributes, semantic HTML, keyboard support | All interactive components |
+
+---
+
+### ⚠️ Anti-Patterns: What NOT to Do
+
+**❌ AVOID THESE PRACTICES:**
+
+1. **Hardcoding Colors**
+   ```tsx
+   // ❌ DON'T
+   <button className="bg-[#75F8CC] text-[#33373B]">
+   
+   // ✅ DO
+   <Button variant="primary">
+   ```
+
+2. **Inline Style Objects**
+   ```tsx
+   // ❌ DON'T
+   <div style={{ backgroundColor: '#75F8CC', padding: '16px' }}>
+   
+   // ✅ DO
+   <Card className="p-4 bg-string-mint">
+   ```
+
+3. **Duplicate Component Patterns**
+   ```tsx
+   // ❌ DON'T
+   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+   
+   // ✅ DO
+   <Card className="p-6">
+   ```
+
+4. **Custom Button Variants**
+   ```tsx
+   // ❌ DON'T
+   <button className="bg-string-mint hover:bg-string-mint-light px-4 py-2">
+   
+   // ✅ DO
+   <Button variant="primary" size="md">
+   ```
+
+5. **Inconsistent Sizing**
+   ```tsx
+   // ❌ DON'T
+   <button className="px-5 py-2.5">  // non-standard sizing
+   
+   // ✅ DO
+   <Button size="md">  // uses predefined sizes
+   ```
+
+6. **Manual Icon Styling**
+   ```tsx
+   // ❌ DON'T
+   <button className="w-8 h-8 rounded-lg text-gray-400 hover:bg-gray-100">
+     <svg>...</svg>
+   </button>
+   
+   // ✅ DO
+   <IconButton size="md">
+     <svg>...</svg>
+   </IconButton>
+   ```
+
+7. **Hardcoded Modal Structures**
+   ```tsx
+   // ❌ DON'T
+   <div className="fixed inset-0 bg-black bg-opacity-50">
+     <div className="bg-white rounded-xl max-w-lg">...</div>
+   </div>
+   
+   // ✅ DO
+   <Modal isOpen={open} onClose={close} size="md">...</Modal>
+   ```
+
+---
+
+### 🎯 Decision Making Guide
+
+**When building new features, ask:**
+
+1. **Does a component already exist?**
+   - Check `src/components/ui/` and `src/components/profile/` first
+   - Review this documentation section
+
+2. **Can I compose existing components?**
+   - Example: Combine `Card` + `Button` + `IconButton` instead of creating new component
+
+3. **Am I repeating styling patterns?**
+   - If yes, extract to props or create new abstracted component
+
+4. **Does this match the design system?**
+   - Verify colors against STYLING.md
+   - Use established size variants (sm/md/lg)
+   - Follow spacing conventions (px-4, py-2, gap-4, etc.)
+
+5. **Is this maintainable?**
+   - Future developers should understand component usage from props
+   - Avoid magic numbers or unexplained styling
+
+---
+
+### 📚 Related Documentation
+
+- **STYLING.md**: Color palette, typography, layout standards, theme support
+- **Component Files**: Browse `src/components/ui/` and `src/components/profile/` for implementation details
+- **Design System**: Tailwind configuration in `tailwind.config.js`
+
+---
+
 ## Next Steps (Resume Here)
 
 ### 1. Implement Personal Profile Pages (Phase 5)
@@ -343,8 +902,8 @@ User on profile → Selects existing app from autocomplete
 3. **Dynamic routing**: `[slug].tsx` catches all profile URLs
 4. **Public by default**: Profiles are public, apps visible by default
 5. **Inline controls**: Toggle visibility with immediate preview
-6. **Two app sources**: Pinned apps + submitted apps (Immediate on profile, approved on homepage)
-7. **Profile-specific**: Users' self-submitted apps show immediately on their personal profile; only show on main homepage after approval.
+6. **Two app sources**: Pinned apps + submitted apps (shown immediately on profile; shown on homepage only after approval)
+7. **Profile-specific**: Self-submitted apps appear immediately on the user's profile and appear on the main homepage only after approval.
 
 #### User Flow
 1. User signs in → slug auto-generated from email prefix
@@ -448,3 +1007,26 @@ mkdir extension
 - **Mobile:** PWA first → Capacitor later
 - **Admin:** Drizzle Studio (no custom panel)
 - **UGC:** Form → manual review
+- **Component Architecture:** Abstracted UI library in `src/components/ui/` with variant-based patterns
+- **Styling System:** Tailwind + String Design System (see STYLING.md and Component Library section)
+- **Profile Composition:** Separated ProfileHeader, AppsList, ProfileFooter for reusability
+- **Development Testing:** DevProfileMock for API-independent local testing
+
+---
+
+## Important Notes for Future Development
+
+### Before Adding New Components
+1. **Check existing components first** - Review Component Library section above
+2. **Consult STYLING.md** - Verify color usage and design patterns
+3. **Avoid hardcoding** - Use abstracted components with props/variants
+4. **Maintain consistency** - Follow established size variants (sm/md/lg) and spacing conventions
+5. **Document changes** - Update this file if creating new reusable components
+
+### Component Creation Checklist
+- [ ] Does a similar component already exist?
+- [ ] Can I compose existing components instead?
+- [ ] Am I using String Design System colors (string-mint, string-dark)?
+- [ ] Does it support size variants (sm/md/lg) if applicable?
+- [ ] Have I included TypeScript types for all props?
+- [ ] Is it documented in claude.md if it's reusable?

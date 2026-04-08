@@ -26,16 +26,10 @@ export function Footer({ t }: { t: (l: any, d: any) => any }) {
           {/* Links */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
             <button
-              onClick={() => navigateTo('/privacy')}
+              onClick={() => navigateTo('/about')}
               className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
             >
-              Privacy
-            </button>
-            <button
-              onClick={() => navigateTo('/terms')}
-              className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
-            >
-              Terms
+              About
             </button>
             <a
               href="https://www.linkedin.com/company/77759625"
@@ -61,6 +55,18 @@ export function Footer({ t }: { t: (l: any, d: any) => any }) {
             >
               Events
             </a>
+            <button
+              onClick={() => navigateTo('/privacy')}
+              className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
+            >
+              Privacy
+            </button>
+            <button
+              onClick={() => navigateTo('/terms')}
+              className={`transition-colors ${t('text-string-text-secondary hover:text-string-dark', 'text-gray-400 hover:text-white')}`}
+            >
+              Terms
+            </button>
           </div>
         </div>
 

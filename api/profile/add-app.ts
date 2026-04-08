@@ -72,6 +72,15 @@ export default async function handler(request: Request) {
       .limit(1);
 
     if (existing.length > 0) {
+      // Ensure existing app is visible again if it was previously hidden.
+      await db
+        .update(userProfileApps)
+        .set({
+          isVisible: true,
+          appType: 'pinned',
+        })
+        .where(eq(userProfileApps.id, existing[0].id));
+
       return new Response(JSON.stringify({ message: 'App already in profile', existing: true }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

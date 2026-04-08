@@ -9,12 +9,17 @@
     "api": "tsx server/dev-server.js",
     "dev:vercel": "vercel dev",
     "build": "vite build",
+    "test": "tsx --test --require ./test/setup.ts \"src/**/*.test.ts*\"",
     "preview": "vite preview",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx scripts/seed-apps.ts"
+    "db:seed": "tsx scripts/seed-apps.ts",
+    "apps:icons": "tsx scripts/sync-app-icons.ts",
+    "apps:audit": "tsx scripts/audit-app-urls.ts",
+    "apps:audit:apply": "tsx scripts/audit-app-urls.ts --purge-404",
+    "apps:lastmile": "tsx scripts/last-mile-icons.ts"
   },
   "keywords": [],
   "author": "",
@@ -44,11 +49,13 @@
     "@types/node-fetch": "^2.6.13",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
+    "@types/jsdom": "^21.1.7",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.24",
     "drizzle-kit": "^0.31.8",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
+    "jsdom": "^26.0.0",
     "vercel": "^50.9.6",
     "vite": "^7.3.1"
   }

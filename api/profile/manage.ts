@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, userProfileApps, apps, appSubmissions, userPreferences } from '../../src/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
+import { normalizeOpalLogo } from '../../src/lib/branding';
 
 export const config = {
   runtime: 'edge',
@@ -71,10 +72,11 @@ export default async function handler(request: Request) {
       const pinnedAppIds = preferences.length > 0 ? preferences[0].pinnedApps || [] : [];
 
       // Get pinned apps details
-      const pinnedApps = pinnedAppIds.length > 0 ? await db
+      const pinnedAppsRaw = pinnedAppIds.length > 0 ? await db
         .select()
         .from(apps)
         .where(inArray(apps.id, pinnedAppIds)) : [];
+      const pinnedApps = pinnedAppsRaw.map(normalizeOpalLogo);
 
       // Get user's approved submissions
       const submissions = await db

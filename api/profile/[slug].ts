@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, userProfileApps, apps, appSubmissions } from '../../src/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { OPAL_CANONICAL_LOGO } from '../../src/lib/branding';
 
 export const config = {
   runtime: 'edge',
@@ -111,7 +112,7 @@ export default async function handler(request: Request) {
           name: item.appName,
           slug: item.appSlug,
           url: item.appUrl,
-          logoUrl: item.appLogoUrl,
+          logoUrl: item.appSlug === 'opal' ? OPAL_CANONICAL_LOGO : item.appLogoUrl,
           description: item.appDescription,
           tagline: item.appTagline,
           category: item.appCategory,
@@ -128,6 +129,7 @@ export default async function handler(request: Request) {
           tagline: null,
           category: item.submissionCategory,
           type: 'submitted' as const,
+          status: item.submissionStatus,
         };
       }
       return null;
@@ -135,6 +137,7 @@ export default async function handler(request: Request) {
 
     return new Response(JSON.stringify({
       profile: {
+        id: profile.id,
         name: profile.name,
         slug: profile.slug,
         avatarUrl: profile.avatarUrl,

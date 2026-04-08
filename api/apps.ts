@@ -1,10 +1,11 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { apps, featuredApps, bumpRules, appSubmissions } from '../src/db/schema';
-import { eq, desc, and, gte, lte, asc } from 'drizzle-orm';
+import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { normalizeOpalLogo } from '../src/lib/branding';
 
 export const config = {
-  runtime: 'edge',
+  runtime: 'nodejs',
 };
 
 export default async function handler(_request: Request) {
@@ -12,11 +13,12 @@ export default async function handler(_request: Request) {
     const sqlClient = neon(process.env.DATABASE_URL!);
     const db = drizzle(sqlClient);
 
-    // Get all official apps sorted by frequency
-    const officialApps = await db
+    // Get all apps sorted by frequency
+    const allAppsRaw = await db
       .select()
       .from(apps)
       .orderBy(desc(apps.frequency));
+    const officialApps = allAppsRaw.map(normalizeOpalLogo);
 
     // Get all approved submissions
     const approvedSubmissions = await db
