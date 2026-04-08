@@ -981,9 +981,9 @@ mkdir extension
 3. User types app name → autocomplete suggests existing apps to prevent duplicates
 4. If selecting existing app → yellow warning appears
 5. Form validates and submits with `status: 'pending'`
-6. **Submitter sees their app immediately in dashboard**
+6. **App shows immediately on user's personal profile (`/[slug]`)**
 7. Admin reviews via Drizzle Studio
-8. Approved → visible globally in app directory
+8. **Approved** → visible globally on main `string.sg` homepage and searchable in app directory
 
 ### From Profile Page (NEW)
 1. User visits their own profile → Sees "+ Add App" button (if no apps yet)
