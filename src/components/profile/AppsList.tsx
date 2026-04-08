@@ -1,4 +1,5 @@
 import { AppCard } from '../ui/AppCard';
+import { IconButton } from '../ui/IconButton';
 
 interface App {
   id: string;
@@ -53,15 +54,17 @@ export function AppsList({
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
             Share apps you've created or frequently use with the community
           </p>
-          <button
+          <IconButton
             onClick={onAddApp}
-            className="inline-flex items-center px-6 py-3 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
+            size="lg"
+            title="Add app to your profile"
+            ariaLabel="Add app to your profile"
+            variant="primary"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add App
-          </button>
+          </IconButton>
         </div>
       );
     }
@@ -87,15 +90,17 @@ export function AppsList({
       {isOwnProfile && showOwnerControls && onAddApp && (
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-gray-600">Manage which apps appear on your profile.</p>
-          <button
+          <IconButton
             onClick={onAddApp}
-            className="inline-flex items-center px-4 py-2 bg-string-mint text-string-dark font-medium rounded-lg hover:bg-string-mint-light transition-colors"
+            size="md"
+            title="Add app to your profile"
+            ariaLabel="Add app to your profile"
+            variant="primary"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add App
-          </button>
+          </IconButton>
         </div>
       )}
 

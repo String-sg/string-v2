@@ -53,7 +53,7 @@ export function AppCard({ app, onClick, onRemove, removing = false }: AppCardPro
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           {onRemove && (
             <button
               type="button"
